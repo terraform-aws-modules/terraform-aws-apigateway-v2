@@ -116,7 +116,23 @@ variable "tags" {
 
 #####
 # default stage
+variable "default_stage_access_log_destination_arn" {
+  description = "Default stage's ARN of the CloudWatch Logs log group to receive access logs. Any trailing :* is trimmed from the ARN."
+  type        = string
+  default     = null
+}
 
+variable "default_stage_access_log_format" {
+  description = "Default stage's single line format of the access logs of data, as specified by selected $context variables."
+  type        = string
+  default     = null
+}
+
+variable "default_stage_tags" {
+  description = "A mapping of tags to assign to the default stage resource."
+  type        = map(string)
+  default     = {}
+}
 
 #####
 # default stage API mapping

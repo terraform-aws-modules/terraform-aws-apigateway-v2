@@ -6,7 +6,9 @@ provider "aws" {
   skip_metadata_api_check     = true
   skip_region_validation      = true
   skip_credentials_validation = true
-  skip_requesting_account_id  = true
+
+  # skip_requesting_account_id should be disabled to generate valid ARN in apigatewayv2_api_execution_arn
+  skip_requesting_account_id = false
 }
 
 locals {
@@ -17,7 +19,7 @@ locals {
 # HTTP API Gateway
 ###################
 
-module "http" {
+module "api_gateway" {
   source = "../../"
 
   name          = "${random_pet.this.id}-http"
@@ -34,8 +36,11 @@ module "http" {
   //    domain_name_certificate_arn = module.acm.this_acm_certificate_arn
   create_api_domain_name = false
 
+  default_stage_access_log_destination_arn = aws_cloudwatch_log_group.logs.arn
+  default_stage_access_log_format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
+
   integrations = {
-    "POST /" = {
+    "ANY /" = {
       lambda_arn             = module.lambda_function.this_lambda_function_arn
       payload_format_version = "2.0"
       timeout_milliseconds   = 12000
@@ -60,6 +65,10 @@ resource "random_pet" "this" {
   length = 2
 }
 
+resource "aws_cloudwatch_log_group" "logs" {
+  name = random_pet.this.id
+}
+
 ######
 # ACM
 ######
@@ -73,7 +82,7 @@ resource "random_pet" "this" {
 //  source  = "terraform-aws-modules/acm/aws"
 //  version = "~> 2.0"
 //
-//  domain_name = local.domain_name # trimsuffix(data.aws_route53_zone.this.name, ".") # Terraform >= 0.12.17
+//  domain_name = trimsuffix(data.aws_route53_zone.this.name, ".")
 //  zone_id     = data.aws_route53_zone.this.id
 //}
 
@@ -114,4 +123,11 @@ module "lambda_function" {
 
   create_package         = false
   local_existing_package = data.null_data_source.downloaded_package.outputs["filename"]
+
+  allowed_triggers = {
+    AllowExecutionFromAPIGateway = {
+      service = "apigateway"
+      arn     = module.api_gateway.this_apigatewayv2_api_execution_arn
+    }
+  }
 }

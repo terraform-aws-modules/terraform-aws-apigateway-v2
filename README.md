@@ -48,9 +48,13 @@ module "api_gateway" {
     allow_origins = ["*"]
   }
 
-  # ACM
+  # Custom domain
   domain_name                 = "terraform-aws-modules.modules.tf"
   domain_name_certificate_arn = "arn:aws:acm:eu-west-1:052235179155:certificate/2b3a7ed9-05e1-4f9e-952b-27744ba06da6"
+
+  # Access logs
+  default_stage_access_log_destination_arn = "arn:aws:logs:eu-west-1:835367859851:log-group:debug-apigateway"
+  default_stage_access_log_format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
 
   # Routes and integrations
   integrations = {
@@ -92,6 +96,10 @@ module "api_gateway" {
 }
 ```
 
+## Notes:
+
+* Make sure provider block has the setting of `skip_requesting_account_id` disabled (`false`) to produce correct value in the `execution_arn`.
+
 
 ## Examples
 
@@ -126,6 +134,9 @@ module "api_gateway" {
 | create\_default\_stage\_api\_mapping | Whether to create default stage API mapping | `bool` | `true` | no |
 | create\_routes\_and\_integrations | Whether to create routes and integrations resources | `bool` | `true` | no |
 | credentials\_arn | Part of quick create. Specifies any credentials required for the integration. Applicable for HTTP APIs. | `string` | `null` | no |
+| default\_stage\_access\_log\_destination\_arn | Default stage's ARN of the CloudWatch Logs log group to receive access logs. Any trailing :\* is trimmed from the ARN. | `string` | `null` | no |
+| default\_stage\_access\_log\_format | Default stage's single line format of the access logs of data, as specified by selected $context variables. | `string` | `null` | no |
+| default\_stage\_tags | A mapping of tags to assign to the default stage resource. | `map(string)` | `{}` | no |
 | description | The description of the API. | `string` | `null` | no |
 | domain\_name | The domain name to use for API gateway | `string` | `null` | no |
 | domain\_name\_certificate\_arn | The ARN of an AWS-managed certificate that will be used by the endpoint for the domain name | `string` | `null` | no |
