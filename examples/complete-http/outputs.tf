@@ -109,3 +109,12 @@ output "this_apigatewayv2_domain_name_id" {
   description = "The domain name identifier"
   value       = module.api_gateway.this_apigatewayv2_domain_name_id
 }
+
+# Route53 record
+output "api_fqdn" {
+  value = aws_route53_record.api.fqdn
+}
+
+output "api_endpoint" {
+  value = "https://${aws_route53_record.api.fqdn}"
+}

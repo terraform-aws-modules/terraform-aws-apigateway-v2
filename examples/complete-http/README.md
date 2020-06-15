@@ -36,6 +36,8 @@ No input.
 
 | Name | Description |
 |------|-------------|
+| api\_endpoint | n/a |
+| api\_fqdn | Route53 record |
 | lambda\_cloudwatch\_log\_group\_arn | The ARN of the Cloudwatch Log Group |
 | lambda\_role\_arn | The ARN of the IAM role created for the Lambda Function |
 | lambda\_role\_name | The name of the IAM role created for the Lambda Function |

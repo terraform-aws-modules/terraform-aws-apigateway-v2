@@ -12,7 +12,8 @@ provider "aws" {
 }
 
 locals {
-  domain_name = "terraform-aws-modules.modules.tf"
+  domain_name = "terraform-aws-modules.modules.tf" # trimsuffix(data.aws_route53_zone.this.name, ".")
+  subdomain   = "complete-http"
 }
 
 ###################
@@ -56,18 +57,6 @@ module "api_gateway" {
   }
 }
 
-##################
-# Extra resources
-##################
-
-resource "random_pet" "this" {
-  length = 2
-}
-
-resource "aws_cloudwatch_log_group" "logs" {
-  name = random_pet.this.id
-}
-
 ######
 # ACM
 ######
@@ -80,8 +69,37 @@ module "acm" {
   source  = "terraform-aws-modules/acm/aws"
   version = "~> 2.0"
 
-  domain_name = trimsuffix(data.aws_route53_zone.this.name, ".")
-  zone_id     = data.aws_route53_zone.this.id
+  domain_name               = local.domain_name
+  zone_id                   = data.aws_route53_zone.this.id
+  subject_alternative_names = ["${local.subdomain}.${local.domain_name}"]
+}
+
+##########
+# Route53
+##########
+
+resource "aws_route53_record" "api" {
+  zone_id = data.aws_route53_zone.this.zone_id
+  name    = local.subdomain
+  type    = "A"
+
+  alias {
+    name                   = module.api_gateway.this_apigatewayv2_domain_name_configuration.0.target_domain_name
+    zone_id                = module.api_gateway.this_apigatewayv2_domain_name_configuration.0.hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+##################
+# Extra resources
+##################
+
+resource "random_pet" "this" {
+  length = 2
+}
+
+resource "aws_cloudwatch_log_group" "logs" {
+  name = random_pet.this.id
 }
 
 #############################################
