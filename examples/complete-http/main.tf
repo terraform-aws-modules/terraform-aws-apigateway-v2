@@ -32,9 +32,8 @@ module "api_gateway" {
     allow_origins = ["*"]
   }
 
-  //    domain_name                 = local.domain_name
-  //    domain_name_certificate_arn = module.acm.this_acm_certificate_arn
-  create_api_domain_name = false
+  domain_name                 = local.domain_name
+  domain_name_certificate_arn = module.acm.this_acm_certificate_arn
 
   default_stage_access_log_destination_arn = aws_cloudwatch_log_group.logs.arn
   default_stage_access_log_format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
@@ -72,19 +71,18 @@ resource "aws_cloudwatch_log_group" "logs" {
 ######
 # ACM
 ######
-// // 5.6.2020:
-////// Error: Error requesting certificate: LimitExceededException: Error: you have reached your limit of 20 certificates in the last year.
-//data "aws_route53_zone" "this" {
-//  name = local.domain_name
-//}
-//
-//module "acm" {
-//  source  = "terraform-aws-modules/acm/aws"
-//  version = "~> 2.0"
-//
-//  domain_name = trimsuffix(data.aws_route53_zone.this.name, ".")
-//  zone_id     = data.aws_route53_zone.this.id
-//}
+
+data "aws_route53_zone" "this" {
+  name = local.domain_name
+}
+
+module "acm" {
+  source  = "terraform-aws-modules/acm/aws"
+  version = "~> 2.0"
+
+  domain_name = trimsuffix(data.aws_route53_zone.this.name, ".")
+  zone_id     = data.aws_route53_zone.this.id
+}
 
 #############################################
 # Using packaged function from Lambda module
@@ -120,6 +118,8 @@ module "lambda_function" {
   description   = "My awesome lambda function"
   handler       = "index.lambda_handler"
   runtime       = "python3.8"
+
+  publish = true
 
   create_package         = false
   local_existing_package = data.null_data_source.downloaded_package.outputs["filename"]
