@@ -111,14 +111,14 @@ module "api_gateway" {
 
 | Name | Version |
 |------|---------|
-| terraform | ~> 0.12.6 |
-| aws | ~> 2.46 |
+| terraform | >= 0.12.6, < 0.14 |
+| aws | >= 2.46, < 4.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | ~> 2.46 |
+| aws | >= 2.46, < 4.0 |
 
 ## Inputs
 
