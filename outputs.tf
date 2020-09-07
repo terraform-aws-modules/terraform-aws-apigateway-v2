@@ -71,3 +71,14 @@ output "this_apigatewayv2_api_mapping_id" {
 //  description = "The default route identifier."
 //  value       = element(concat(aws_apigatewayv2_route.this.*.id, list("")), 0)
 //}
+
+// vpc link
+output "this_apigatewayv2_vpc_link_id" {
+  description = "The VPC Link identifier"
+  value       = element(concat(aws_apigatewayv2_vpc_link.this.*.id, list("")), 0)
+}
+
+output "this_apigatewayv2_vpc_link_arn" {
+  description = "The VPC Link ARN"
+  value       = element(concat(aws_apigatewayv2_vpc_link.this.*.arn, list("")), 0)
+}

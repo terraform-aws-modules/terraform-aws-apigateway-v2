@@ -165,9 +165,21 @@ variable "integrations" {
   default     = {}
 }
 
+# vpc link
+variable "security_group_ids" {
+  description = "Security group IDs for the VPC Link"
+  type        = list(string)
+  default     = []
+}
 
-//variable "" {
-//  description = ""
-//  type        = string
-//  default     = null
-//}
+variable "subnet_ids" {
+  description = "Subnet IDs for the VPC Link"
+  type        = list(string)
+  default     = []
+}
+
+variable "vpc_link_tags" {
+  description = "A map of tags to add to the VPC Link"
+  type        = map(string)
+  default     = {}
+}
