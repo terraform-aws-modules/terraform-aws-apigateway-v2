@@ -46,6 +46,11 @@ variable "create_routes_and_integrations" {
   default     = true
 }
 
+variable "create_vpc_link" {
+  description = "Whether to create VPC link resource"
+  type        = bool
+  default     = false
+}
 
 # API Gateway
 variable "name" {

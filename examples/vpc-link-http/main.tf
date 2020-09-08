@@ -1,5 +1,9 @@
-provider "aws" {
+locals {
   region = "eu-west-1"
+}
+
+provider "aws" {
+  region = local.region
 
   # Make it faster by skipping something
   skip_get_ec2_platforms      = true
@@ -12,19 +16,26 @@ provider "aws" {
 }
 
 ################################
-# Data sources & extra resources
+# Supporting resources
 ################################
-
-data "aws_vpc" "default" {
-  default = true
-}
-
-data "aws_subnet_ids" "all" {
-  vpc_id = data.aws_vpc.default.id
-}
 
 resource "random_pet" "this" {
   length = 2
+}
+
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = " ~> 2.0"
+
+  name = "vpc-link-http"
+  cidr = "10.0.0.0/16"
+
+  azs             = ["${local.region}a", "${local.region}b", "${local.region}c"]
+  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+
+  enable_nat_gateway = true
+  single_nat_gateway = true
 }
 
 ###################
@@ -46,7 +57,7 @@ module "api_gateway" {
 
   create_api_domain_name = false
   security_group_ids     = [module.api_gateway_security_group.this_security_group_id]
-  subnet_ids             = data.aws_subnet_ids.all.ids
+  subnet_ids             = module.vpc.public_subnets
 
   integrations = {
     "ANY /" = {
@@ -72,7 +83,7 @@ module "api_gateway_security_group" {
 
   name        = "api-gateway-sg-${random_pet.this.id}"
   description = "API Gateway group for example usage"
-  vpc_id      = data.aws_vpc.default.id
+  vpc_id      = module.vpc.vpc_id
 
   ingress_cidr_blocks = ["0.0.0.0/0"]
   ingress_rules       = ["http-80-tcp"]
@@ -121,7 +132,7 @@ module "lambda_function" {
   local_existing_package = data.null_data_source.downloaded_package.outputs["filename"]
 
   attach_network_policy  = true
-  vpc_subnet_ids         = data.aws_subnet_ids.all.ids
+  vpc_subnet_ids         = module.vpc.private_subnets
   vpc_security_group_ids = [module.lambda_security_group.this_security_group_id]
 
   allowed_triggers = {
@@ -138,7 +149,7 @@ module "lambda_security_group" {
 
   name        = "lambda-sg-${random_pet.this.id}"
   description = "Lambda security group for example usage"
-  vpc_id      = data.aws_vpc.default.id
+  vpc_id      = module.vpc.vpc_id
 
   computed_ingress_with_source_security_group_id = [
     {

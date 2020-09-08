@@ -86,8 +86,9 @@ module "api_gateway" {
   create_api_gateway               = false  # to control creation of API Gateway
   create_api_domain_name           = false  # to control creation of API Gateway Domain Name
   create_default_stage             = false  # to control creation of "$default" stage
-  create_default_stage_api_mapping = false  # to control creation of "$default" stage and API madding
+  create_default_stage_api_mapping = false  # to control creation of "$default" stage and API mapping
   create_routes_and_integrations   = false  # to control creation of routes and integrations
+  create_vpc_link                  = false  # to control creation of VPC link
 
   # ... omitted
 }
@@ -108,13 +109,13 @@ module "api_gateway" {
 | Name | Version |
 |------|---------|
 | terraform | >= 0.12.6, < 0.14 |
-| aws | >= 2.46, < 4.0 |
+| aws | >= 2.59, < 4.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | >= 2.46, < 4.0 |
+| aws | >= 2.59, < 4.0 |
 
 ## Inputs
 
@@ -129,6 +130,7 @@ module "api_gateway" {
 | create\_default\_stage | Whether to create default stage | `bool` | `true` | no |
 | create\_default\_stage\_api\_mapping | Whether to create default stage API mapping | `bool` | `true` | no |
 | create\_routes\_and\_integrations | Whether to create routes and integrations resources | `bool` | `true` | no |
+| create\_vpc\_link | Whether to create VPC link resource | `bool` | `false` | no |
 | credentials\_arn | Part of quick create. Specifies any credentials required for the integration. Applicable for HTTP APIs. | `string` | `null` | no |
 | default\_stage\_access\_log\_destination\_arn | Default stage's ARN of the CloudWatch Logs log group to receive access logs. Any trailing :\* is trimmed from the ARN. | `string` | `null` | no |
 | default\_stage\_access\_log\_format | Default stage's single line format of the access logs of data, as specified by selected $context variables. | `string` | `null` | no |

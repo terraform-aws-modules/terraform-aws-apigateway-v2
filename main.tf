@@ -136,7 +136,7 @@ resource "aws_apigatewayv2_integration" "this" {
 
 # VPC Link (Private API)
 resource "aws_apigatewayv2_vpc_link" "this" {
-  count = var.create && length(var.security_group_ids) > 0 && length(var.subnet_ids) > 0 ? 1 : 0
+  count = var.create && var.create_vpc_link ? 1 : 0
 
   name               = var.name
   security_group_ids = var.security_group_ids
