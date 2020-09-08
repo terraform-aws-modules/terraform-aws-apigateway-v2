@@ -5,11 +5,11 @@ output "this_apigatewayv2_api_endpoint" {
 }
 
 output "this_apigatewayv2_vpc_link_arn" {
-  description = "The URI of the API"
+  description = "The ARN of the VPC Link"
   value       = module.api_gateway.this_apigatewayv2_vpc_link_arn
 }
 
 output "this_apigatewayv2_vpc_link_id" {
-  description = "The URI of the API"
+  description = "The identifier of the VPC Link"
   value       = module.api_gateway.this_apigatewayv2_vpc_link_id
 }

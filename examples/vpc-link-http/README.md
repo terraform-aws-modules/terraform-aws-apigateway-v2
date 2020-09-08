@@ -36,7 +36,7 @@ No input.
 | Name | Description |
 |------|-------------|
 | this\_apigatewayv2\_api\_endpoint | The URI of the API |
-| this\_apigatewayv2\_vpc\_link\_arn | The URI of the API |
-| this\_apigatewayv2\_vpc\_link\_id | The URI of the API |
+| this\_apigatewayv2\_vpc\_link\_arn | The ARN of the VPC Link |
+| this\_apigatewayv2\_vpc\_link\_id | The identifier of the VPC Link |
 
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
