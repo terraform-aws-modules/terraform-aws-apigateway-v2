@@ -133,3 +133,14 @@ resource "aws_apigatewayv2_integration" "this" {
     ignore_changes = [passthrough_behavior]
   }
 }
+
+# VPC Link (Private API)
+resource "aws_apigatewayv2_vpc_link" "this" {
+  count = var.create && var.create_vpc_link ? 1 : 0
+
+  name               = var.name
+  security_group_ids = var.security_group_ids
+  subnet_ids         = var.subnet_ids
+
+  tags = merge(var.tags, var.vpc_link_tags)
+}
