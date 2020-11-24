@@ -112,9 +112,11 @@ output "this_apigatewayv2_domain_name_id" {
 
 # Route53 record
 output "api_fqdn" {
-  value = aws_route53_record.api.fqdn
+  description = "List of Route53 records"
+  value       = aws_route53_record.api.fqdn
 }
 
 output "api_endpoint" {
-  value = "https://${aws_route53_record.api.fqdn}"
+  description = "FQDN of an API endpoint"
+  value       = "https://${aws_route53_record.api.fqdn}"
 }

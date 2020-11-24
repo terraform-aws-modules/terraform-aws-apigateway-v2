@@ -18,15 +18,20 @@ Note that this example may create resources which cost money. Run `terraform des
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
-No requirements.
+| Name | Version |
+|------|---------|
+| terraform | >= 0.12.6 |
+| aws | >= 2.59 |
+| null | >= 2.0 |
+| random | >= 2.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | n/a |
-| null | n/a |
-| random | n/a |
+| aws | >= 2.59 |
+| null | >= 2.0 |
+| random | >= 2.0 |
 
 ## Inputs
 
@@ -36,8 +41,8 @@ No input.
 
 | Name | Description |
 |------|-------------|
-| api\_endpoint | n/a |
-| api\_fqdn | Route53 record |
+| api\_endpoint | FQDN of an API endpoint |
+| api\_fqdn | List of Route53 records |
 | lambda\_cloudwatch\_log\_group\_arn | The ARN of the Cloudwatch Log Group |
 | lambda\_role\_arn | The ARN of the IAM role created for the Lambda Function |
 | lambda\_role\_name | The name of the IAM role created for the Lambda Function |

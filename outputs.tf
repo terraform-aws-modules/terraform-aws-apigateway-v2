@@ -18,7 +18,7 @@ output "this_apigatewayv2_api_execution_arn" {
   value       = element(concat(aws_apigatewayv2_api.this.*.execution_arn, list("")), 0)
 }
 
-// default stage
+# default stage
 output "default_apigatewayv2_stage_id" {
   description = "The default stage identifier"
   value       = element(concat(aws_apigatewayv2_stage.default.*.id, list("")), 0)
@@ -39,7 +39,7 @@ output "default_apigatewayv2_stage_invoke_url" {
   value       = element(concat(aws_apigatewayv2_stage.default.*.invoke_url, list("")), 0)
 }
 
-// domain name
+# domain name
 output "this_apigatewayv2_domain_name_id" {
   description = "The domain name identifier"
   value       = element(concat(aws_apigatewayv2_domain_name.this.*.id, list("")), 0)
@@ -60,19 +60,19 @@ output "this_apigatewayv2_domain_name_configuration" {
   value       = element(concat(aws_apigatewayv2_domain_name.this.*.domain_name_configuration, list("")), 0)
 }
 
-// api mapping
+# api mapping
 output "this_apigatewayv2_api_mapping_id" {
   description = "The API mapping identifier."
   value       = element(concat(aws_apigatewayv2_api_mapping.this.*.id, list("")), 0)
 }
 
-// route
-//output "this_apigatewayv2_route_id" {
-//  description = "The default route identifier."
-//  value       = element(concat(aws_apigatewayv2_route.this.*.id, list("")), 0)
-//}
+# route
+# output "this_apigatewayv2_route_id" {
+#  description = "The default route identifier."
+#  value       = element(concat(aws_apigatewayv2_route.this.*.id, list("")), 0)
+# }
 
-// vpc link
+# vpc link
 output "this_apigatewayv2_vpc_link_id" {
   description = "The VPC Link identifier"
   value       = element(concat(aws_apigatewayv2_vpc_link.this.*.id, list("")), 0)
