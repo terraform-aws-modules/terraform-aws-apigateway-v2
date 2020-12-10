@@ -45,6 +45,15 @@ output "this_apigatewayv2_domain_name_id" {
   value       = element(concat(aws_apigatewayv2_domain_name.this.*.id, list("")), 0)
 }
 
+output "this_apigatewayv2_target_domain_name" {
+  description = "The ARN of the domain name"
+  value       = concat(aws_apigatewayv2_domain_name.this.*.domain_name_configuration[0].target_domain_name
+}
+
+output "this_apigatewayv2_hosted_zone_id" {
+  description = "The ARN of the domain name"
+  value       = aws_apigatewayv2_domain_name.this.*.domain_name_configuration[0].hosted_zone_id
+}
 output "this_apigatewayv2_domain_name_arn" {
   description = "The ARN of the domain name"
   value       = element(concat(aws_apigatewayv2_domain_name.this.*.arn, list("")), 0)
