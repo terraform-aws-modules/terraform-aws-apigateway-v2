@@ -164,7 +164,7 @@ module "api_gateway" {
 | this\_apigatewayv2\_api\_id | The API identifier |
 | this\_apigatewayv2\_api\_mapping\_id | The API mapping identifier. |
 | this\_apigatewayv2\_target\_domain\_name | API GTW target domain name to use with route 53 |
-| this\_apigatewayv2\_target\_hosted\_id | API GTW hosted zone id to use with route 53 |
+| this\_apigatewayv2\_hosted\zone\_id | API GTW hosted zone id to use with route 53 |
 | this\_apigatewayv2\_domain\_name\_api\_mapping\_selection\_expression | The API mapping selection expression for the domain name. |
 | this\_apigatewayv2\_domain\_name\_arn | The ARN of the domain name |
 | this\_apigatewayv2\_domain\_name\_configuration | The ARN of the domain name |
