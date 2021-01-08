@@ -121,7 +121,7 @@ resource "aws_apigatewayv2_integration" "this" {
   description      = lookup(each.value, "description", null)
 
   connection_type    = lookup(each.value, "connection_type", "INTERNET")
-  integration_method = lookup(each.value, "integration_method", "ANY") # Q: Where this is used in API gateway? I can't see it in UI.
+  integration_method = lookup(each.value, "integration_method", "POST")
   integration_uri    = lookup(each.value, "lambda_arn", null)
 
   payload_format_version = lookup(each.value, "payload_format_version", null)
