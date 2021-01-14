@@ -122,7 +122,7 @@ resource "aws_apigatewayv2_integration" "this" {
 
   connection_type    = lookup(each.value, "connection_type", "INTERNET")
   integration_method = lookup(each.value, "integration_method", "POST")
-  integration_uri    = lookup(each.value, "lambda_arn", null)
+  integration_uri    = lookup(each.value, "lambda_arn", lookup(each.value, "integration_uri", null))
 
   payload_format_version = lookup(each.value, "payload_format_version", null)
   timeout_milliseconds   = lookup(each.value, "timeout_milliseconds", null)
