@@ -49,7 +49,10 @@ No input.
 | local\_filename | The filename of zip archive deployed (if deployment was from local) |
 | s3\_object | The map with S3 object data of zip archive deployed (if deployment was from S3) |
 | this\_apigatewayv2\_api\_api\_endpoint | The URI of the API |
+| this\_apigatewayv2\_domain\_name\_configuration | The domain name configuration |
 | this\_apigatewayv2\_domain\_name\_id | The domain name identifier |
+| this\_apigatewayv2\_hosted\_zone\_id | The Amazon Route 53 Hosted Zone ID of the endpoint |
+| this\_apigatewayv2\_target\_domain\_name | The target domain name |
 | this\_lambda\_function\_arn | The ARN of the Lambda Function |
 | this\_lambda\_function\_invoke\_arn | The Invoke ARN of the Lambda Function |
 | this\_lambda\_function\_kms\_key\_arn | The ARN for the KMS encryption key of Lambda Function |
