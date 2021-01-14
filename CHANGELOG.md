@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 
 
 
+<a name="v0.8.0"></a>
+## [v0.8.0] - 2021-01-14
+
+- feat: New useful outputs to use with route53 ([#11](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/11))
+
+
 <a name="v0.7.0"></a>
 ## [v0.7.0] - 2021-01-14
 
@@ -52,7 +58,8 @@ All notable changes to this project will be documented in this file.
 - Adding API Gateway module
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.8.0...HEAD
+[v0.8.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.7.0...v0.8.0
 [v0.7.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.6.0...v0.7.0
 [v0.6.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.5.0...v0.6.0
 [v0.5.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.4.0...v0.5.0
