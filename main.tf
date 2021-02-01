@@ -110,6 +110,9 @@ resource "aws_apigatewayv2_route" "this" {
 
   api_id    = aws_apigatewayv2_api.this[0].id
   route_key = each.key
+  authorization_type = lookup(each.value, "authorization_type", "NONE")
+  authorizer_id = lookup(each.value, "authorizer_id", null)
+
   target    = "integrations/${aws_apigatewayv2_integration.this[each.key].id}"
 }
 
