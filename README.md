@@ -136,6 +136,7 @@ module "api_gateway" {
 | default\_stage\_access\_log\_format | Default stage's single line format of the access logs of data, as specified by selected $context variables. | `string` | `null` | no |
 | default\_stage\_tags | A mapping of tags to assign to the default stage resource. | `map(string)` | `{}` | no |
 | description | The description of the API. | `string` | `null` | no |
+| disable\_execute\_api\_endpoint | Whether clients can invoke the API by using the default execute-api endpoint. To require that clients use a custom domain name to invoke the API, disable the default endpoint | `string` | `true` | no |
 | domain\_name | The domain name to use for API gateway | `string` | `null` | no |
 | domain\_name\_certificate\_arn | The ARN of an AWS-managed certificate that will be used by the endpoint for the domain name | `string` | `null` | no |
 | domain\_name\_tags | A mapping of tags to assign to API domain name resource. | `map(string)` | `{}` | no |
@@ -148,6 +149,8 @@ module "api_gateway" {
 | subnet\_ids | Subnet IDs for the VPC Link | `list(string)` | `[]` | no |
 | tags | A mapping of tags to assign to API gateway resources. | `map(string)` | `{}` | no |
 | target | Part of quick create. Quick create produces an API with an integration, a default catch-all route, and a default stage which is configured to automatically deploy changes. For HTTP integrations, specify a fully qualified URL. For Lambda integrations, specify a function ARN. The type of the integration will be HTTP\_PROXY or AWS\_PROXY, respectively. Applicable for HTTP APIs. | `string` | `null` | no |
+| truststore\_uri | An Amazon S3 URL that specifies the truststore for mutual TLS authentication | `string` | `null` | yes |
+| truststore\_version | The version of the S3 object that contains the truststore. | `string` | `null` | yes |
 | vpc\_link\_tags | A map of tags to add to the VPC Link | `map(string)` | `{}` | no |
 
 ## Outputs

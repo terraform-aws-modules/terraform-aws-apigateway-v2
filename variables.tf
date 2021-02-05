@@ -65,6 +65,12 @@ variable "description" {
   default     = null
 }
 
+variable "disable_execute_api_endpoint" {
+  type        = string
+  default     = false
+  description = "Whether clients can invoke the API by using the default execute-api endpoint. To require that clients use a custom domain name to invoke the API, disable the default endpoint"
+}
+
 variable "protocol_type" {
   description = "The API protocol. Valid values: HTTP, WEBSOCKET"
   type        = string
@@ -160,6 +166,18 @@ variable "domain_name_tags" {
   description = "A mapping of tags to assign to API domain name resource."
   type        = map(string)
   default     = {}
+}
+
+variable "truststore_uri" {
+  description = "An Amazon S3 URL that specifies the truststore for mutual TLS authentication"
+  type        = string
+  default     = null
+}
+
+variable "truststore_version" {
+  description = "The version of the S3 object that contains the truststore."
+  type        = string
+  default     = null
 }
 
 ####

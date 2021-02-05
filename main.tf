@@ -9,6 +9,7 @@ resource "aws_apigatewayv2_api" "this" {
 
   route_selection_expression   = var.route_selection_expression
   api_key_selection_expression = var.api_key_selection_expression
+  disable_execute_api_endpoint = var.disable_execute_api_endpoint
 
   /* Start of quick create */
   route_key       = var.route_key
@@ -42,6 +43,11 @@ resource "aws_apigatewayv2_domain_name" "this" {
     certificate_arn = var.domain_name_certificate_arn
     endpoint_type   = "REGIONAL"
     security_policy = "TLS_1_2"
+  }
+
+  mutual_tls_authentication {
+    truststore_uri     = var.truststore_uri
+    truststore_version = var.truststore_version
   }
 
   tags = merge(var.domain_name_tags, var.tags)
