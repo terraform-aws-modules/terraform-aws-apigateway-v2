@@ -110,10 +110,18 @@ resource "aws_apigatewayv2_route" "this" {
 
   api_id    = aws_apigatewayv2_api.this[0].id
   route_key = each.key
-  authorization_type = lookup(each.value, "authorization_type", "NONE")
-  authorizer_id = lookup(each.value, "authorizer_id", null)
 
-  target    = "integrations/${aws_apigatewayv2_integration.this[each.key].id}"
+  api_key_required                    = lookup(each.value, "api_key_required", null)
+  authorization_type                  = lookup(each.value, "authorization_type", "NONE")
+  authorizer_id                       = lookup(each.value, "authorizer_id", null)
+  model_selection_expression          = lookup(each.value, "model_selection_expression", null)
+  operation_name                      = lookup(each.value, "operation_name", null)
+  route_response_selection_expression = lookup(each.value, "route_response_selection_expression", null)
+  target                              = "integrations/${aws_apigatewayv2_integration.this[each.key].id}"
+
+  # Not sure what structure is allowed for these arguments...
+  #  authorization_scopes = lookup(each.value, "authorization_scopes", null)
+  #  request_models  = lookup(each.value, "request_models", null)
 }
 
 resource "aws_apigatewayv2_integration" "this" {

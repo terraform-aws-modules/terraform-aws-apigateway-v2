@@ -46,6 +46,13 @@ module "api_gateway" {
       timeout_milliseconds   = 12000
     }
 
+    "GET /some-route" = {
+      lambda_arn             = module.lambda_function.this_lambda_function_arn
+      payload_format_version = "2.0"
+      authorization_type     = "JWT"
+      authorizer_id          = aws_apigatewayv2_authorizer.some_authorizer.id
+    }
+
     "$default" = {
       lambda_arn = module.lambda_function.this_lambda_function_arn
     }
@@ -88,6 +95,29 @@ resource "aws_route53_record" "api" {
     zone_id                = module.api_gateway.this_apigatewayv2_domain_name_configuration[0].hosted_zone_id
     evaluate_target_health = false
   }
+}
+
+#############################
+# AWS API Gateway Authorizer
+#############################
+
+resource "aws_apigatewayv2_authorizer" "some_authorizer" {
+  api_id           = module.api_gateway.this_apigatewayv2_api_id
+  authorizer_type  = "JWT"
+  identity_sources = ["$request.header.Authorization"]
+  name             = random_pet.this.id
+
+  jwt_configuration {
+    audience = ["example"]
+    issuer   = "https://${aws_cognito_user_pool.this.endpoint}"
+  }
+}
+
+########################
+# AWS Cognito User Pool
+########################
+resource "aws_cognito_user_pool" "this" {
+  name = "user-pool-${random_pet.this.id}"
 }
 
 ##################

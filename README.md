@@ -100,7 +100,7 @@ module "api_gateway" {
 
 ## Examples
 
-- [Complete HTTP](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/tree/master/examples/complete-http) - Create API Gateway, domain name, stage and other resources in various combinations
+- [Complete HTTP](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/tree/master/examples/complete-http) - Create API Gateway, authorizer, domain name, stage and other resources in various combinations
 - [HTTP with VPC Link](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/tree/master/examples/vpc-link-http) - Create API Gateway with VPC link to access private resources
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
