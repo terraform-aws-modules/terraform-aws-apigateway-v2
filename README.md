@@ -125,8 +125,8 @@ No Modules.
 
 | Name |
 |------|
-| [aws_apigatewayv2_api](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/resources/apigatewayv2_api) |
 | [aws_apigatewayv2_api_mapping](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/resources/apigatewayv2_api_mapping) |
+| [aws_apigatewayv2_api](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/resources/apigatewayv2_api) |
 | [aws_apigatewayv2_domain_name](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/resources/apigatewayv2_domain_name) |
 | [aws_apigatewayv2_integration](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/resources/apigatewayv2_integration) |
 | [aws_apigatewayv2_route](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/resources/apigatewayv2_route) |
