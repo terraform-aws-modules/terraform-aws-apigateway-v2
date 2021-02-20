@@ -18,15 +18,20 @@ Note that this example may create resources which cost money. Run `terraform des
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
-No requirements.
+| Name | Version |
+|------|---------|
+| terraform | >= 0.12.6 |
+| aws | >= 2.59 |
+| null | >= 2.0 |
+| random | >= 2.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | n/a |
-| null | n/a |
-| random | n/a |
+| aws | >= 2.59 |
+| null | >= 2.0 |
+| random | >= 2.0 |
 
 ## Modules
 
@@ -55,15 +60,18 @@ No input.
 
 | Name | Description |
 |------|-------------|
-| api\_endpoint | n/a |
-| api\_fqdn | Route53 record |
+| api\_endpoint | FQDN of an API endpoint |
+| api\_fqdn | List of Route53 records |
 | lambda\_cloudwatch\_log\_group\_arn | The ARN of the Cloudwatch Log Group |
 | lambda\_role\_arn | The ARN of the IAM role created for the Lambda Function |
 | lambda\_role\_name | The name of the IAM role created for the Lambda Function |
 | local\_filename | The filename of zip archive deployed (if deployment was from local) |
 | s3\_object | The map with S3 object data of zip archive deployed (if deployment was from S3) |
 | this\_apigatewayv2\_api\_api\_endpoint | The URI of the API |
+| this\_apigatewayv2\_domain\_name\_configuration | The domain name configuration |
 | this\_apigatewayv2\_domain\_name\_id | The domain name identifier |
+| this\_apigatewayv2\_hosted\_zone\_id | The Amazon Route 53 Hosted Zone ID of the endpoint |
+| this\_apigatewayv2\_target\_domain\_name | The target domain name |
 | this\_lambda\_function\_arn | The ARN of the Lambda Function |
 | this\_lambda\_function\_invoke\_arn | The Invoke ARN of the Lambda Function |
 | this\_lambda\_function\_kms\_key\_arn | The ARN for the KMS encryption key of Lambda Function |

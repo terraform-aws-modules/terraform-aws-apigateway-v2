@@ -100,7 +100,7 @@ module "api_gateway" {
 
 ## Examples
 
-- [Complete HTTP](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/tree/master/examples/complete-http) - Create API Gateway, domain name, stage and other resources in various combinations
+- [Complete HTTP](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/tree/master/examples/complete-http) - Create API Gateway, authorizer, domain name, stage and other resources in various combinations
 - [HTTP with VPC Link](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/tree/master/examples/vpc-link-http) - Create API Gateway with VPC link to access private resources
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
@@ -108,14 +108,14 @@ module "api_gateway" {
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.12.6, < 0.14 |
-| aws | >= 2.59, < 4.0 |
+| terraform | >= 0.12.6 |
+| aws | >= 2.59 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | >= 2.59, < 4.0 |
+| aws | >= 2.59 |
 
 ## Modules
 
@@ -179,10 +179,12 @@ No Modules.
 | this\_apigatewayv2\_api\_execution\_arn | The ARN prefix to be used in an aws\_lambda\_permission's source\_arn attribute or in an aws\_iam\_policy to authorize access to the @connections API. |
 | this\_apigatewayv2\_api\_id | The API identifier |
 | this\_apigatewayv2\_api\_mapping\_id | The API mapping identifier. |
-| this\_apigatewayv2\_domain\_name\_api\_mapping\_selection\_expression | The API mapping selection expression for the domain name. |
+| this\_apigatewayv2\_domain\_name\_api\_mapping\_selection\_expression | The API mapping selection expression for the domain name |
 | this\_apigatewayv2\_domain\_name\_arn | The ARN of the domain name |
-| this\_apigatewayv2\_domain\_name\_configuration | The ARN of the domain name |
+| this\_apigatewayv2\_domain\_name\_configuration | The domain name configuration |
+| this\_apigatewayv2\_domain\_name\_hosted\_zone\_id | The Amazon Route 53 Hosted Zone ID of the endpoint |
 | this\_apigatewayv2\_domain\_name\_id | The domain name identifier |
+| this\_apigatewayv2\_domain\_name\_target\_domain\_name | The target domain name |
 | this\_apigatewayv2\_vpc\_link\_arn | The VPC Link ARN |
 | this\_apigatewayv2\_vpc\_link\_id | The VPC Link identifier |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

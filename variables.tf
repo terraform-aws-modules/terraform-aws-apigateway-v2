@@ -22,17 +22,17 @@ variable "create_default_stage_api_mapping" {
   default     = true
 }
 
-//variable "create_stage" {
-//  description = "Whether to create custom stage"
-//  type        = bool
-//  default     = false
-//}
-//
-//variable "create_stage_api_mapping" {
-//  description = "Whether to create stage API mapping"
-//  type        = bool
-//  default     = false
-//}
+# variable "create_stage" {
+#   description = "Whether to create custom stage"
+#   type        = bool
+#   default     = false
+# }
+#
+# variable "create_stage_api_mapping" {
+#   description = "Whether to create stage API mapping"
+#   type        = bool
+#   default     = false
+# }
 
 variable "create_api_domain_name" {
   description = "Whether to create API domain name resource"

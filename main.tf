@@ -63,29 +63,29 @@ resource "aws_apigatewayv2_stage" "default" {
     }
   }
 
-  //  dynamic "default_route_settings" {
-  //    for_each = var.default_stage_access_log_destination_arn != null && var.default_stage_access_log_format != null ? [true] : []
-  //    content {
-  //      data_trace_enabled = var.default_route_data_trace_enabled
-  //      detailed_metrics_enabled         = var.default_route_detailed_metrics_enabled
-  //      logging_level         = var.default_route_logging_level
-  //      throttling_burst_limit         = var.default_route_throttling_burst_limit
-  //      throttling_rate_limit         = var.default_route_throttling_rate_limit
-  //    }
-  //  }
+  #  dynamic "default_route_settings" {
+  #    for_each = var.default_stage_access_log_destination_arn != null && var.default_stage_access_log_format != null ? [true] : []
+  #    content {
+  #      data_trace_enabled = var.default_route_data_trace_enabled
+  #      detailed_metrics_enabled         = var.default_route_detailed_metrics_enabled
+  #      logging_level         = var.default_route_logging_level
+  #      throttling_burst_limit         = var.default_route_throttling_burst_limit
+  #      throttling_rate_limit         = var.default_route_throttling_rate_limit
+  #    }
+  #  }
 
-  //  // bug - https://github.com/terraform-providers/terraform-provider-aws/issues/12893
-  //  dynamic "route_settings" {
-  //    for_each = var.create_routes_and_integrations ? var.integrations : {}
-  //    content {
-  //      route_key = route_settings.key
-  //      data_trace_enabled = lookup(route_settings.value, "data_trace_enabled", null)
-  //      detailed_metrics_enabled         = lookup(route_settings.value, "detailed_metrics_enabled", null)
-  //      logging_level         = lookup(route_settings.value, "logging_level", null)  # Error: error updating API Gateway v2 stage ($default): BadRequestException: Execution logs are not supported on protocolType HTTP
-  //      throttling_burst_limit         = lookup(route_settings.value, "throttling_burst_limit", null)
-  //      throttling_rate_limit         = lookup(route_settings.value, "throttling_rate_limit", null)
-  //    }
-  //  }
+  #  # bug - https://github.com/terraform-providers/terraform-provider-aws/issues/12893
+  #  dynamic "route_settings" {
+  #    for_each = var.create_routes_and_integrations ? var.integrations : {}
+  #    content {
+  #      route_key = route_settings.key
+  #      data_trace_enabled = lookup(route_settings.value, "data_trace_enabled", null)
+  #      detailed_metrics_enabled         = lookup(route_settings.value, "detailed_metrics_enabled", null)
+  #      logging_level         = lookup(route_settings.value, "logging_level", null)  # Error: error updating API Gateway v2 stage ($default): BadRequestException: Execution logs are not supported on protocolType HTTP
+  #      throttling_burst_limit         = lookup(route_settings.value, "throttling_burst_limit", null)
+  #      throttling_rate_limit         = lookup(route_settings.value, "throttling_rate_limit", null)
+  #    }
+  #  }
 
   tags = merge(var.default_stage_tags, var.tags)
 
@@ -110,7 +110,18 @@ resource "aws_apigatewayv2_route" "this" {
 
   api_id    = aws_apigatewayv2_api.this[0].id
   route_key = each.key
-  target    = "integrations/${aws_apigatewayv2_integration.this[each.key].id}"
+
+  api_key_required                    = lookup(each.value, "api_key_required", null)
+  authorization_type                  = lookup(each.value, "authorization_type", "NONE")
+  authorizer_id                       = lookup(each.value, "authorizer_id", null)
+  model_selection_expression          = lookup(each.value, "model_selection_expression", null)
+  operation_name                      = lookup(each.value, "operation_name", null)
+  route_response_selection_expression = lookup(each.value, "route_response_selection_expression", null)
+  target                              = "integrations/${aws_apigatewayv2_integration.this[each.key].id}"
+
+  # Not sure what structure is allowed for these arguments...
+  #  authorization_scopes = lookup(each.value, "authorization_scopes", null)
+  #  request_models  = lookup(each.value, "request_models", null)
 }
 
 resource "aws_apigatewayv2_integration" "this" {
@@ -121,8 +132,8 @@ resource "aws_apigatewayv2_integration" "this" {
   description      = lookup(each.value, "description", null)
 
   connection_type    = lookup(each.value, "connection_type", "INTERNET")
-  integration_method = lookup(each.value, "integration_method", "ANY") # Q: Where this is used in API gateway? I can't see it in UI.
-  integration_uri    = lookup(each.value, "lambda_arn", null)
+  integration_method = lookup(each.value, "integration_method", "POST")
+  integration_uri    = lookup(each.value, "lambda_arn", lookup(each.value, "integration_uri", null))
 
   payload_format_version = lookup(each.value, "payload_format_version", null)
   timeout_milliseconds   = lookup(each.value, "timeout_milliseconds", null)
