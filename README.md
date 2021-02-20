@@ -117,6 +117,22 @@ module "api_gateway" {
 |------|---------|
 | aws | >= 2.59 |
 
+## Modules
+
+No Modules.
+
+## Resources
+
+| Name |
+|------|
+| [aws_apigatewayv2_api_mapping](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/resources/apigatewayv2_api_mapping) |
+| [aws_apigatewayv2_api](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/resources/apigatewayv2_api) |
+| [aws_apigatewayv2_domain_name](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/resources/apigatewayv2_domain_name) |
+| [aws_apigatewayv2_integration](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/resources/apigatewayv2_integration) |
+| [aws_apigatewayv2_route](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/resources/apigatewayv2_route) |
+| [aws_apigatewayv2_stage](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/resources/apigatewayv2_stage) |
+| [aws_apigatewayv2_vpc_link](https://registry.terraform.io/providers/hashicorp/aws/4.0/docs/resources/apigatewayv2_vpc_link) |
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -132,7 +148,7 @@ module "api_gateway" {
 | create\_routes\_and\_integrations | Whether to create routes and integrations resources | `bool` | `true` | no |
 | create\_vpc\_link | Whether to create VPC link resource | `bool` | `false` | no |
 | credentials\_arn | Part of quick create. Specifies any credentials required for the integration. Applicable for HTTP APIs. | `string` | `null` | no |
-| default\_stage\_access\_log\_destination\_arn | Default stage's ARN of the CloudWatch Logs log group to receive access logs. Any trailing :\* is trimmed from the ARN. | `string` | `null` | no |
+| default\_stage\_access\_log\_destination\_arn | Default stage's ARN of the CloudWatch Logs log group to receive access logs. Any trailing :* is trimmed from the ARN. | `string` | `null` | no |
 | default\_stage\_access\_log\_format | Default stage's single line format of the access logs of data, as specified by selected $context variables. | `string` | `null` | no |
 | default\_stage\_tags | A mapping of tags to assign to the default stage resource. | `map(string)` | `{}` | no |
 | description | The description of the API. | `string` | `null` | no |
@@ -171,7 +187,6 @@ module "api_gateway" {
 | this\_apigatewayv2\_domain\_name\_target\_domain\_name | The target domain name |
 | this\_apigatewayv2\_vpc\_link\_arn | The VPC Link ARN |
 | this\_apigatewayv2\_vpc\_link\_id | The VPC Link identifier |
-
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 ## Authors

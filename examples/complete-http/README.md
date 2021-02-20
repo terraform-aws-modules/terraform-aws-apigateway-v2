@@ -33,6 +33,25 @@ Note that this example may create resources which cost money. Run `terraform des
 | null | >= 2.0 |
 | random | >= 2.0 |
 
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| acm | terraform-aws-modules/acm/aws | ~> 2.0 |
+| api_gateway | ../../ |  |
+| lambda_function | terraform-aws-modules/lambda/aws | ~> 1.0 |
+
+## Resources
+
+| Name |
+|------|
+| [aws_cloudwatch_log_group](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) |
+| [aws_route53_record](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) |
+| [aws_route53_zone](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) |
+| [null_data_source](https://registry.terraform.io/providers/hashicorp/null/latest/docs/data-sources/data_source) |
+| [null_resource](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) |
+| [random_pet](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) |
+
 ## Inputs
 
 No input.
@@ -67,5 +86,4 @@ No input.
 | this\_lambda\_layer\_layer\_arn | The ARN of the Lambda Layer without version |
 | this\_lambda\_layer\_source\_code\_size | The size in bytes of the Lambda Layer .zip file |
 | this\_lambda\_layer\_version | The Lambda Layer version |
-
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
