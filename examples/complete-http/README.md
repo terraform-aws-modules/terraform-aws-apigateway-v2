@@ -20,7 +20,7 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.12.6 |
+| terraform | >= 0.12.26 |
 | aws | >= 2.59 |
 | null | >= 2.0 |
 | random | >= 2.0 |
@@ -39,7 +39,7 @@ Note that this example may create resources which cost money. Run `terraform des
 |------|--------|---------|
 | acm | terraform-aws-modules/acm/aws | ~> 2.0 |
 | api_gateway | ../../ |  |
-| lambda_function | terraform-aws-modules/lambda/aws | ~> 1.0 |
+| lambda_function | terraform-aws-modules/lambda/aws | 1.38 |
 
 ## Resources
 
