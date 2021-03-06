@@ -109,13 +109,13 @@ module "api_gateway" {
 | Name | Version |
 |------|---------|
 | terraform | >= 0.12.26 |
-| aws | >= 2.59 |
+| aws | >= 3.3.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | >= 2.59 |
+| aws | >= 3.3.0 |
 
 ## Modules
 
