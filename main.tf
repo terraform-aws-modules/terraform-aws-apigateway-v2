@@ -137,12 +137,6 @@ resource "aws_apigatewayv2_integration" "this" {
 
   payload_format_version = lookup(each.value, "payload_format_version", null)
   timeout_milliseconds   = lookup(each.value, "timeout_milliseconds", null)
-
-  # Due to open issue - https://github.com/terraform-providers/terraform-provider-aws/issues/11148#issuecomment-619160589
-  # Bug in terraform-aws-provider with perpetual diff
-  lifecycle {
-    ignore_changes = [passthrough_behavior]
-  }
 }
 
 # VPC Link (Private API)
