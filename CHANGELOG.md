@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 
 
 
+<a name="v0.12.0"></a>
+## [v0.12.0] - 2021-03-09
+
+- feat: Added VPC integration ([#25](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/25))
+
+
 <a name="v0.11.0"></a>
 ## [v0.11.0] - 2021-03-06
 
@@ -79,7 +85,8 @@ All notable changes to this project will be documented in this file.
 - Adding API Gateway module
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.12.0...HEAD
+[v0.12.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.11.0...v0.12.0
 [v0.11.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.10.0...v0.11.0
 [v0.10.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.9.0...v0.10.0
 [v0.9.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.8.0...v0.9.0
