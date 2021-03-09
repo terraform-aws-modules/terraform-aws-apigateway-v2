@@ -40,7 +40,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | alb_security_group | terraform-aws-modules/security-group/aws | ~> 3.0 |
 | api_gateway | ../../ |  |
 | api_gateway_security_group | terraform-aws-modules/security-group/aws | ~> 3.0 |
-| lambda_function | terraform-aws-modules/lambda/aws | 1.38 |
+| lambda_function | terraform-aws-modules/lambda/aws | ~> 1.0 |
 | lambda_security_group | terraform-aws-modules/security-group/aws | ~> 3.0 |
 | vpc | terraform-aws-modules/vpc/aws |  ~> 2.0 |
 

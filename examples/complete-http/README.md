@@ -39,7 +39,7 @@ Note that this example may create resources which cost money. Run `terraform des
 |------|--------|---------|
 | acm | terraform-aws-modules/acm/aws | ~> 2.0 |
 | api_gateway | ../../ |  |
-| lambda_function | terraform-aws-modules/lambda/aws | 1.38 |
+| lambda_function | terraform-aws-modules/lambda/aws | ~> 1.0 |
 
 ## Resources
 

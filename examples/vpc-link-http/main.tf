@@ -178,7 +178,7 @@ data "null_data_source" "downloaded_package" {
 
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "1.38"
+  version = "~> 1.0"
 
   function_name = "${random_pet.this.id}-lambda"
   description   = "My awesome lambda function"
