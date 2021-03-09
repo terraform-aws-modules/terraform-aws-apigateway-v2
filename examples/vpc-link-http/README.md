@@ -20,7 +20,7 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.12.6 |
+| terraform | >= 0.12.26 |
 | aws | >= 2.59 |
 | null | >= 2.0 |
 | random | >= 2.0 |
@@ -31,6 +31,24 @@ Note that this example may create resources which cost money. Run `terraform des
 |------|---------|
 | null | >= 2.0 |
 | random | >= 2.0 |
+
+## Modules
+
+| Name | Source | Version |
+|------|--------|---------|
+| api_gateway | ../../ |  |
+| api_gateway_security_group | terraform-aws-modules/security-group/aws | ~> 3.0 |
+| lambda_function | terraform-aws-modules/lambda/aws | 1.38 |
+| lambda_security_group | terraform-aws-modules/security-group/aws | ~> 3.0 |
+| vpc | terraform-aws-modules/vpc/aws |  ~> 2.0 |
+
+## Resources
+
+| Name |
+|------|
+| [null_data_source](https://registry.terraform.io/providers/hashicorp/null/latest/docs/data-sources/data_source) |
+| [null_resource](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) |
+| [random_pet](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) |
 
 ## Inputs
 
@@ -43,5 +61,4 @@ No input.
 | this\_apigatewayv2\_api\_endpoint | The URI of the API |
 | this\_apigatewayv2\_vpc\_link\_arn | The ARN of the VPC Link |
 | this\_apigatewayv2\_vpc\_link\_id | The identifier of the VPC Link |
-
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

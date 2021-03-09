@@ -7,6 +7,27 @@ All notable changes to this project will be documented in this file.
 
 
 
+<a name="v0.11.0"></a>
+## [v0.11.0] - 2021-03-06
+
+- fix: Remove workaround related to passthrough_behavior for older providers ([#24](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/24))
+- chore: align ci-cd static checks to use individual minimum Terraform versions ([#23](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/23))
+- fix: bump min supported version due to types unsupported on current ([#22](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/22))
+- chore: add ci-cd workflow for pre-commit checks ([#21](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/21))
+
+
+<a name="v0.10.0"></a>
+## [v0.10.0] - 2021-02-20
+
+- chore: update documentation based on latest `terraform-docs` which includes module and resource sections ([#19](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/19))
+
+
+<a name="v0.9.0"></a>
+## [v0.9.0] - 2021-02-14
+
+- feat: support authorization_type and authorizer_id on routes ([#17](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/17))
+
+
 <a name="v0.8.0"></a>
 ## [v0.8.0] - 2021-01-14
 
@@ -58,7 +79,10 @@ All notable changes to this project will be documented in this file.
 - Adding API Gateway module
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.11.0...HEAD
+[v0.11.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.10.0...v0.11.0
+[v0.10.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.9.0...v0.10.0
+[v0.9.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.8.0...v0.9.0
 [v0.8.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.7.0...v0.8.0
 [v0.7.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.6.0...v0.7.0
 [v0.6.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.5.0...v0.6.0
