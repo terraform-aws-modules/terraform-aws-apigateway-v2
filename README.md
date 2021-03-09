@@ -101,7 +101,7 @@ module "api_gateway" {
 ## Examples
 
 - [Complete HTTP](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/tree/master/examples/complete-http) - Create API Gateway, authorizer, domain name, stage and other resources in various combinations
-- [HTTP with VPC Link](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/tree/master/examples/vpc-link-http) - Create API Gateway with VPC link to access private resources
+- [HTTP with VPC Link](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/tree/master/examples/vpc-link-http) - Create API Gateway with VPC link and integration with resources in VPC (eg. ALB)
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
@@ -146,7 +146,7 @@ No Modules.
 | create\_default\_stage | Whether to create default stage | `bool` | `true` | no |
 | create\_default\_stage\_api\_mapping | Whether to create default stage API mapping | `bool` | `true` | no |
 | create\_routes\_and\_integrations | Whether to create routes and integrations resources | `bool` | `true` | no |
-| create\_vpc\_link | Whether to create VPC link resource | `bool` | `false` | no |
+| create\_vpc\_link | Whether to create VPC links | `bool` | `true` | no |
 | credentials\_arn | Part of quick create. Specifies any credentials required for the integration. Applicable for HTTP APIs. | `string` | `null` | no |
 | default\_stage\_access\_log\_destination\_arn | Default stage's ARN of the CloudWatch Logs log group to receive access logs. Any trailing :* is trimmed from the ARN. | `string` | `null` | no |
 | default\_stage\_access\_log\_format | Default stage's single line format of the access logs of data, as specified by selected $context variables. | `string` | `null` | no |
@@ -160,11 +160,10 @@ No Modules.
 | protocol\_type | The API protocol. Valid values: HTTP, WEBSOCKET | `string` | `"HTTP"` | no |
 | route\_key | Part of quick create. Specifies any route key. Applicable for HTTP APIs. | `string` | `null` | no |
 | route\_selection\_expression | The route selection expression for the API. | `string` | `"$request.method $request.path"` | no |
-| security\_group\_ids | Security group IDs for the VPC Link | `list(string)` | `[]` | no |
-| subnet\_ids | Subnet IDs for the VPC Link | `list(string)` | `[]` | no |
 | tags | A mapping of tags to assign to API gateway resources. | `map(string)` | `{}` | no |
 | target | Part of quick create. Quick create produces an API with an integration, a default catch-all route, and a default stage which is configured to automatically deploy changes. For HTTP integrations, specify a fully qualified URL. For Lambda integrations, specify a function ARN. The type of the integration will be HTTP\_PROXY or AWS\_PROXY, respectively. Applicable for HTTP APIs. | `string` | `null` | no |
 | vpc\_link\_tags | A map of tags to add to the VPC Link | `map(string)` | `{}` | no |
+| vpc\_links | Map of VPC Links details to create | `map(any)` | `{}` | no |
 
 ## Outputs
 
@@ -185,8 +184,8 @@ No Modules.
 | this\_apigatewayv2\_domain\_name\_hosted\_zone\_id | The Amazon Route 53 Hosted Zone ID of the endpoint |
 | this\_apigatewayv2\_domain\_name\_id | The domain name identifier |
 | this\_apigatewayv2\_domain\_name\_target\_domain\_name | The target domain name |
-| this\_apigatewayv2\_vpc\_link\_arn | The VPC Link ARN |
-| this\_apigatewayv2\_vpc\_link\_id | The VPC Link identifier |
+| this\_apigatewayv2\_vpc\_link\_arn | The map of VPC Link ARNs |
+| this\_apigatewayv2\_vpc\_link\_id | The map of VPC Link identifiers |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 ## Authors

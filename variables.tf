@@ -47,9 +47,9 @@ variable "create_routes_and_integrations" {
 }
 
 variable "create_vpc_link" {
-  description = "Whether to create VPC link resource"
+  description = "Whether to create VPC links"
   type        = bool
-  default     = false
+  default     = true
 }
 
 # API Gateway
@@ -171,16 +171,10 @@ variable "integrations" {
 }
 
 # vpc link
-variable "security_group_ids" {
-  description = "Security group IDs for the VPC Link"
-  type        = list(string)
-  default     = []
-}
-
-variable "subnet_ids" {
-  description = "Subnet IDs for the VPC Link"
-  type        = list(string)
-  default     = []
+variable "vpc_links" {
+  description = "Map of VPC Links details to create"
+  type        = map(any)
+  default     = {}
 }
 
 variable "vpc_link_tags" {

@@ -34,7 +34,7 @@ module "vpc" {
   private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
   public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
 
-  enable_nat_gateway = true
+  enable_nat_gateway = false
   single_nat_gateway = true
 }
 
@@ -56,8 +56,6 @@ module "api_gateway" {
   }
 
   create_api_domain_name = false
-  security_group_ids     = [module.api_gateway_security_group.this_security_group_id]
-  subnet_ids             = module.vpc.public_subnets
 
   integrations = {
     "ANY /" = {
@@ -66,10 +64,25 @@ module "api_gateway" {
       timeout_milliseconds   = 12000
     }
 
+    "GET /alb-internal-route" = {
+      connection_type    = "VPC_LINK"
+      vpc_link           = "my-vpc"
+      integration_uri    = module.alb.http_tcp_listener_arns[0]
+      integration_type   = "HTTP_PROXY"
+      integration_method = "ANY"
+    }
+
     "$default" = {
       lambda_arn = module.lambda_function.this_lambda_function_arn
     }
+  }
 
+  vpc_links = {
+    my-vpc = {
+      name               = "example"
+      security_group_ids = [module.api_gateway_security_group.this_security_group_id]
+      subnet_ids         = module.vpc.public_subnets
+    }
   }
 
   tags = {
@@ -90,6 +103,52 @@ module "api_gateway_security_group" {
 
   egress_rules = ["all-all"]
 }
+
+
+############################
+# Application Load Balancer
+############################
+
+module "alb" {
+  source = "terraform-aws-modules/alb/aws"
+
+  name = "alb-${random_pet.this.id}"
+
+  vpc_id          = module.vpc.vpc_id
+  security_groups = [module.alb_security_group.this_security_group_id]
+  subnets         = module.vpc.public_subnets
+
+  http_tcp_listeners = [
+    {
+      port               = 80
+      protocol           = "HTTP"
+      target_group_index = 0
+      action_type        = "forward"
+    }
+  ]
+
+  target_groups = [
+    {
+      name_prefix = "l1-"
+      target_type = "lambda"
+    }
+  ]
+}
+
+module "alb_security_group" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "~> 3.0"
+
+  name        = "alb-sg-${random_pet.this.id}"
+  description = "ALB for example usage"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress_cidr_blocks = ["0.0.0.0/0"]
+  ingress_rules       = ["http-80-tcp"]
+
+  egress_rules = ["all-all"]
+}
+
 
 #############################################
 # Using packaged function from Lambda module

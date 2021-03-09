@@ -82,13 +82,13 @@ output "this_apigatewayv2_api_mapping_id" {
 #  value       = element(concat(aws_apigatewayv2_route.this.*.id, [""]), 0)
 # }
 
-# vpc link
+# VPC link
 output "this_apigatewayv2_vpc_link_id" {
-  description = "The VPC Link identifier"
-  value       = element(concat(aws_apigatewayv2_vpc_link.this.*.id, [""]), 0)
+  description = "The map of VPC Link identifiers"
+  value       = { for k, v in aws_apigatewayv2_vpc_link.this : k => v.id }
 }
 
 output "this_apigatewayv2_vpc_link_arn" {
-  description = "The VPC Link ARN"
-  value       = element(concat(aws_apigatewayv2_vpc_link.this.*.arn, [""]), 0)
+  description = "The map of VPC Link ARNs"
+  value       = { for k, v in aws_apigatewayv2_vpc_link.this : k => v.arn }
 }

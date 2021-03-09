@@ -1,6 +1,6 @@
 # AWS API Gateway w/ VPC Links example
 
-Configuration in this directory creates a private AWS API Gateway with VPC links and integrates it with a VPC bound Lambda function.
+Configuration in this directory creates a private AWS API Gateway with VPC link and integrates it with a VPC bound resources (Lambda function and ALB).
 
 
 ## Usage
@@ -36,6 +36,8 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Source | Version |
 |------|--------|---------|
+| alb | terraform-aws-modules/alb/aws |  |
+| alb_security_group | terraform-aws-modules/security-group/aws | ~> 3.0 |
 | api_gateway | ../../ |  |
 | api_gateway_security_group | terraform-aws-modules/security-group/aws | ~> 3.0 |
 | lambda_function | terraform-aws-modules/lambda/aws | 1.38 |
