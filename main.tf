@@ -131,7 +131,9 @@ resource "aws_apigatewayv2_integration" "this" {
   integration_type = lookup(each.value, "integration_type", lookup(each.value, "lambda_arn", "") != "" ? "AWS_PROXY" : "MOCK")
   description      = lookup(each.value, "description", null)
 
-  connection_type    = lookup(each.value, "connection_type", "INTERNET")
+  connection_type = lookup(each.value, "connection_type", "INTERNET")
+  connection_id   = try(aws_apigatewayv2_vpc_link.this[each.value["vpc_link"]].id, lookup(each.value, "connection_id", null))
+
   integration_method = lookup(each.value, "integration_method", "POST")
   integration_uri    = lookup(each.value, "lambda_arn", lookup(each.value, "integration_uri", null))
 
@@ -141,11 +143,11 @@ resource "aws_apigatewayv2_integration" "this" {
 
 # VPC Link (Private API)
 resource "aws_apigatewayv2_vpc_link" "this" {
-  count = var.create && var.create_vpc_link ? 1 : 0
+  for_each = var.create && var.create_vpc_link ? var.vpc_links : {}
 
-  name               = var.name
-  security_group_ids = var.security_group_ids
-  subnet_ids         = var.subnet_ids
+  name               = lookup(each.value, "name", each.key)
+  security_group_ids = each.value["security_group_ids"]
+  subnet_ids         = each.value["subnet_ids"]
 
-  tags = merge(var.tags, var.vpc_link_tags)
+  tags = merge(var.tags, var.vpc_link_tags, lookup(each.value, "tags", {}))
 }
