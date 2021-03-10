@@ -106,7 +106,7 @@ resource "aws_apigatewayv2_api_mapping" "this" {
 
 # Routes and integrations
 resource "aws_apigatewayv2_route" "this" {
-  for_each = var.create && var.create_routes_and_integrations ? var.integrations : {}
+  for_each = var.create && var.create_routes_and_integrations ? var.integrations : tomap({})
 
   api_id    = aws_apigatewayv2_api.this[0].id
   route_key = each.key
@@ -127,18 +127,23 @@ resource "aws_apigatewayv2_route" "this" {
 resource "aws_apigatewayv2_integration" "this" {
   for_each = var.create && var.create_routes_and_integrations ? var.integrations : {}
 
-  api_id           = aws_apigatewayv2_api.this[0].id
-  integration_type = lookup(each.value, "integration_type", lookup(each.value, "lambda_arn", "") != "" ? "AWS_PROXY" : "MOCK")
-  description      = lookup(each.value, "description", null)
+  api_id      = aws_apigatewayv2_api.this[0].id
+  description = lookup(each.value, "description", null)
+
+  integration_type    = lookup(each.value, "integration_type", lookup(each.value, "lambda_arn", "") != "" ? "AWS_PROXY" : "MOCK")
+  integration_subtype = lookup(each.value, "integration_subtype", null)
+  integration_method  = lookup(each.value, "integration_method", lookup(each.value, "integration_subtype", null) == null ? "POST" : null)
+  integration_uri     = lookup(each.value, "lambda_arn", lookup(each.value, "integration_uri", null))
 
   connection_type = lookup(each.value, "connection_type", "INTERNET")
   connection_id   = try(aws_apigatewayv2_vpc_link.this[each.value["vpc_link"]].id, lookup(each.value, "connection_id", null))
 
-  integration_method = lookup(each.value, "integration_method", "POST")
-  integration_uri    = lookup(each.value, "lambda_arn", lookup(each.value, "integration_uri", null))
-
-  payload_format_version = lookup(each.value, "payload_format_version", null)
-  timeout_milliseconds   = lookup(each.value, "timeout_milliseconds", null)
+  payload_format_version    = lookup(each.value, "payload_format_version", null)
+  timeout_milliseconds      = lookup(each.value, "timeout_milliseconds", null)
+  passthrough_behavior      = lookup(each.value, "passthrough_behavior", null)
+  content_handling_strategy = lookup(each.value, "content_handling_strategy", null)
+  credentials_arn           = lookup(each.value, "credentials_arn", null)
+  request_parameters        = try(jsondecode(each.value["request_parameters"]), each.value["request_parameters"], null)
 }
 
 # VPC Link (Private API)

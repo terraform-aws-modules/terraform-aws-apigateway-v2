@@ -53,6 +53,20 @@ module "api_gateway" {
       authorizer_id          = aws_apigatewayv2_authorizer.some_authorizer.id
     }
 
+    "POST /start-step-function" = {
+      integration_type    = "AWS_PROXY"
+      integration_subtype = "StepFunctions-StartExecution"
+      credentials_arn     = module.step_function.this_role_arn
+
+      # Note: jsonencode is used to pass argument as a string
+      request_parameters = jsonencode({
+        StateMachineArn = module.step_function.this_state_machine_arn
+      })
+
+      payload_format_version = "1.0"
+      timeout_milliseconds   = 12000
+    }
+
     "$default" = {
       lambda_arn = module.lambda_function.this_lambda_function_arn
     }
@@ -116,8 +130,39 @@ resource "aws_apigatewayv2_authorizer" "some_authorizer" {
 ########################
 # AWS Cognito User Pool
 ########################
+
 resource "aws_cognito_user_pool" "this" {
   name = "user-pool-${random_pet.this.id}"
+}
+
+####################
+# AWS Step Function
+####################
+
+module "step_function" {
+  source  = "terraform-aws-modules/step-functions/aws"
+  version = "~> 1.0"
+
+  name = random_pet.this.id
+
+  definition = <<EOF
+{
+  "Comment": "A Hello World example of the Amazon States Language using Pass states",
+  "StartAt": "Hello",
+  "States": {
+    "Hello": {
+      "Type": "Pass",
+      "Result": "Hello",
+      "Next": "World"
+    },
+    "World": {
+      "Type": "Pass",
+      "Result": "World",
+      "End": true
+    }
+  }
+}
+EOF
 }
 
 ##################
