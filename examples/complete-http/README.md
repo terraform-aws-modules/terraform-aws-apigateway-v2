@@ -1,6 +1,6 @@
 # Complete AWS API Gateway (HTTP/WebSocket) examples
 
-Configuration in this directory creates AWS API Gateway with Domain Name, ACM Certificate, and integrates it with Lambda Function and shows the variety of supported features.
+Configuration in this directory creates AWS API Gateway with Domain Name, ACM Certificate, and integrates it with Lambda and Step Function and shows the variety of supported features.
 
 
 ## Usage
@@ -20,7 +20,7 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.12.26 |
+| terraform | >= 0.13.1 |
 | aws | >= 2.59 |
 | null | >= 2.0 |
 | random | >= 2.0 |
@@ -40,6 +40,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | acm | terraform-aws-modules/acm/aws | ~> 2.0 |
 | api_gateway | ../../ |  |
 | lambda_function | terraform-aws-modules/lambda/aws | ~> 1.0 |
+| step_function | terraform-aws-modules/step-functions/aws | ~> 1.0 |
 
 ## Resources
 
