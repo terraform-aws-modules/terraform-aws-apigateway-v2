@@ -73,6 +73,10 @@ module "api_gateway" {
 
   }
 
+  body = templatefile("api.yaml", {
+    example_function_arn = module.lambda_function.this_lambda_function_arn
+  })
+
   tags = {
     Name = "dev-api-new"
   }
