@@ -1,4 +1,4 @@
-# Complete AWS API Gateway (HTTP/WebSocket) examples
+# Complete AWS API Gateway (HTTP) examples
 
 Configuration in this directory creates AWS API Gateway with Domain Name, ACM Certificate, and integrates it with Lambda and Step Function and shows the variety of supported features.
 

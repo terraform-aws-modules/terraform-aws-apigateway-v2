@@ -139,6 +139,7 @@ No Modules.
 |------|-------------|------|---------|:--------:|
 | api\_key\_selection\_expression | An API key selection expression. Valid values: $context.authorizer.usageIdentifierKey, $request.header.x-api-key. | `string` | `"$request.header.x-api-key"` | no |
 | api\_version | A version identifier for the API | `string` | `null` | no |
+| body | An OpenAPI specification that defines the set of routes and integrations to create as part of the HTTP APIs. Supported only for HTTP APIs. | `string` | `null` | no |
 | cors\_configuration | The cross-origin resource sharing (CORS) configuration. Applicable for HTTP APIs. | `any` | `{}` | no |
 | create | Controls if API Gateway resources should be created | `bool` | `true` | no |
 | create\_api\_domain\_name | Whether to create API domain name resource | `bool` | `true` | no |

@@ -107,6 +107,12 @@ variable "target" {
   default     = null
 }
 
+variable "body" {
+  description = "An OpenAPI specification that defines the set of routes and integrations to create as part of the HTTP APIs. Supported only for HTTP APIs."
+  type        = string
+  default     = null
+}
+
 variable "api_version" {
   description = "A version identifier for the API"
   type        = string
