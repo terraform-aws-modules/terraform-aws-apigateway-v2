@@ -174,15 +174,9 @@ variable "domain_name_tags" {
   default     = {}
 }
 
-variable "truststore_uri" {
-  description = "An Amazon S3 URL that specifies the truststore for mutual TLS authentication"
-  type        = string
-  default     = null
-}
-
-variable "truststore_version" {
-  description = "The version of the S3 object that contains the truststore."
-  type        = string
+variable "truststore" {
+  description = "An Amazon S3 URL that specifies the truststore for mutual TLS authentication as well as version, keyed at uri and version"
+  type        = any
   default     = null
 }
 
