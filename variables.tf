@@ -66,9 +66,9 @@ variable "description" {
 }
 
 variable "disable_execute_api_endpoint" {
+  description = "Whether clients can invoke the API by using the default execute-api endpoint. To require that clients use a custom domain name to invoke the API, disable the default endpoint"
   type        = string
   default     = false
-  description = "Whether clients can invoke the API by using the default execute-api endpoint. To require that clients use a custom domain name to invoke the API, disable the default endpoint"
 }
 
 variable "protocol_type" {
