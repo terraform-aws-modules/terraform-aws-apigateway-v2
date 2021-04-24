@@ -11,6 +11,8 @@ provider "aws" {
   skip_requesting_account_id = false
 }
 
+provider "tls" {}
+
 locals {
   domain_name = "terraform-aws-modules.modules.tf" # trimsuffix(data.aws_route53_zone.this.name, ".")
   subdomain   = "complete-http"
@@ -31,6 +33,11 @@ module "api_gateway" {
     allow_headers = ["content-type", "x-amz-date", "authorization", "x-api-key", "x-amz-security-token", "x-amz-user-agent"]
     allow_methods = ["*"]
     allow_origins = ["*"]
+  }
+
+  truststore = {
+    uri     = "s3://${aws_s3_bucket.truststore.bucket}/${aws_s3_bucket_object.truststore.id}"
+    version = aws_s3_bucket_object.truststore.version_id
   }
 
   domain_name                 = local.domain_name
@@ -227,4 +234,44 @@ module "lambda_function" {
       source_arn = "${module.api_gateway.this_apigatewayv2_api_execution_arn}/*/*/*"
     }
   }
+}
+
+## add s3 bucket for truststore
+
+locals {
+  key_algo = "RSA"
+}
+
+resource "aws_s3_bucket" "truststore" {
+  bucket = "${random_pet.this.id}-truststore"
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_object" "truststore" {
+  bucket                 = aws_s3_bucket.truststore.bucket
+  key                    = "truststore.pem"
+  server_side_encryption = "AES256"
+  source                 = tls_self_signed_cert.example.cert_pem
+}
+
+resource "tls_self_signed_cert" "example" {
+  key_algorithm     = local.key_algo
+  is_ca_certificate = true
+  private_key_pem   = tls_private_key.private_key.private_key_pem
+
+  subject {
+    common_name  = "example.com"
+    organization = "ACME Examples, Inc"
+  }
+
+  validity_period_hours = 12
+
+  allowed_uses = [
+    "cert_signing",
+    "server_auth",
+  ]
+}
+
+resource "tls_private_key" "private_key" {
+  algorithm = local.key_algo
 }
