@@ -174,10 +174,10 @@ variable "domain_name_tags" {
   default     = {}
 }
 
-variable "truststore" {
+variable "mutual_tls_authentication" {
   description = "An Amazon S3 URL that specifies the truststore for mutual TLS authentication as well as version, keyed at uri and version"
-  type        = any
-  default     = null
+  type        = map(string)
+  default     = {}
 }
 
 ####

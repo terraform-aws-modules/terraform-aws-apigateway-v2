@@ -158,13 +158,13 @@ No modules.
 | <a name="input_domain_name_certificate_arn"></a> [domain\_name\_certificate\_arn](#input\_domain\_name\_certificate\_arn) | The ARN of an AWS-managed certificate that will be used by the endpoint for the domain name | `string` | `null` | no |
 | <a name="input_domain_name_tags"></a> [domain\_name\_tags](#input\_domain\_name\_tags) | A mapping of tags to assign to API domain name resource. | `map(string)` | `{}` | no |
 | <a name="input_integrations"></a> [integrations](#input\_integrations) | Map of API gateway routes with integrations | `map(any)` | `{}` | no |
+| <a name="input_mutual_tls_authentication"></a> [mutual\_tls\_authentication](#input\_mutual\_tls\_authentication) | An Amazon S3 URL that specifies the truststore for mutual TLS authentication as well as version, keyed at uri and version | `map(string)` | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the API | `string` | `""` | no |
 | <a name="input_protocol_type"></a> [protocol\_type](#input\_protocol\_type) | The API protocol. Valid values: HTTP, WEBSOCKET | `string` | `"HTTP"` | no |
 | <a name="input_route_key"></a> [route\_key](#input\_route\_key) | Part of quick create. Specifies any route key. Applicable for HTTP APIs. | `string` | `null` | no |
 | <a name="input_route_selection_expression"></a> [route\_selection\_expression](#input\_route\_selection\_expression) | The route selection expression for the API. | `string` | `"$request.method $request.path"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to API gateway resources. | `map(string)` | `{}` | no |
 | <a name="input_target"></a> [target](#input\_target) | Part of quick create. Quick create produces an API with an integration, a default catch-all route, and a default stage which is configured to automatically deploy changes. For HTTP integrations, specify a fully qualified URL. For Lambda integrations, specify a function ARN. The type of the integration will be HTTP\_PROXY or AWS\_PROXY, respectively. Applicable for HTTP APIs. | `string` | `null` | no |
-| <a name="input_truststore"></a> [truststore](#input\_truststore) | An Amazon S3 URL that specifies the truststore for mutual TLS authentication as well as version, keyed at uri and version | `any` | `null` | no |
 | <a name="input_vpc_link_tags"></a> [vpc\_link\_tags](#input\_vpc\_link\_tags) | A map of tags to add to the VPC Link | `map(string)` | `{}` | no |
 | <a name="input_vpc_links"></a> [vpc\_links](#input\_vpc\_links) | Map of VPC Links details to create | `map(any)` | `{}` | no |
 

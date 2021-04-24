@@ -33,9 +33,9 @@ module "api_gateway" {
     allow_origins = ["*"]
   }
 
-  truststore = {
-    uri     = "s3://${aws_s3_bucket.truststore.bucket}/${aws_s3_bucket_object.truststore.id}"
-    version = aws_s3_bucket_object.truststore.version_id
+  mutual_tls_authentication = {
+    truststore_uri     = "s3://${aws_s3_bucket.truststore.bucket}/${aws_s3_bucket_object.truststore.id}"
+    truststore_version = aws_s3_bucket_object.truststore.version_id
   }
 
   domain_name                 = local.domain_name
