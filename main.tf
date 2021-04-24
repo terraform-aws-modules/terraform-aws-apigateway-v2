@@ -10,6 +10,7 @@ resource "aws_apigatewayv2_api" "this" {
 
   route_selection_expression   = var.route_selection_expression
   api_key_selection_expression = var.api_key_selection_expression
+  disable_execute_api_endpoint = var.disable_execute_api_endpoint
 
   /* Start of quick create */
   route_key       = var.route_key
@@ -43,6 +44,14 @@ resource "aws_apigatewayv2_domain_name" "this" {
     certificate_arn = var.domain_name_certificate_arn
     endpoint_type   = "REGIONAL"
     security_policy = "TLS_1_2"
+  }
+
+  dynamic "mutual_tls_authentication" {
+    for_each = length(keys(var.mutual_tls_authentication)) == 0 ? [] : [var.mutual_tls_authentication]
+    content {
+      truststore_uri     = mutual_tls_authentication.value.truststore_uri
+      truststore_version = lookup(mutual_tls_authentication.value, "truststore_version", null)
+    }
   }
 
   tags = merge(var.domain_name_tags, var.tags)

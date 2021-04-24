@@ -5,5 +5,6 @@ terraform {
     aws    = ">= 2.59"
     random = ">= 2.0"
     null   = ">= 2.0"
+    tls    = ">= 3.1"
   }
 }

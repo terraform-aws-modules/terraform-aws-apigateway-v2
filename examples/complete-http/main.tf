@@ -33,6 +33,11 @@ module "api_gateway" {
     allow_origins = ["*"]
   }
 
+  mutual_tls_authentication = {
+    truststore_uri     = "s3://${aws_s3_bucket.truststore.bucket}/${aws_s3_bucket_object.truststore.id}"
+    truststore_version = aws_s3_bucket_object.truststore.version_id
+  }
+
   domain_name                 = local.domain_name
   domain_name_certificate_arn = module.acm.this_acm_certificate_arn
 
@@ -200,13 +205,6 @@ resource "null_resource" "download_package" {
   }
 }
 
-data "null_data_source" "downloaded_package" {
-  inputs = {
-    id       = null_resource.download_package.id
-    filename = local.downloaded
-  }
-}
-
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "~> 1.0"
@@ -219,7 +217,7 @@ module "lambda_function" {
   publish = true
 
   create_package         = false
-  local_existing_package = data.null_data_source.downloaded_package.outputs["filename"]
+  local_existing_package = local.downloaded
 
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {
@@ -227,4 +225,42 @@ module "lambda_function" {
       source_arn = "${module.api_gateway.this_apigatewayv2_api_execution_arn}/*/*/*"
     }
   }
+}
+
+###############################################
+# S3 bucket and TLS certificate for truststore
+###############################################
+
+resource "aws_s3_bucket" "truststore" {
+  bucket = "${random_pet.this.id}-truststore"
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_object" "truststore" {
+  bucket                 = aws_s3_bucket.truststore.bucket
+  key                    = "truststore.pem"
+  server_side_encryption = "AES256"
+  content                = tls_self_signed_cert.example.cert_pem
+}
+
+resource "tls_private_key" "private_key" {
+  algorithm = "RSA"
+}
+
+resource "tls_self_signed_cert" "example" {
+  key_algorithm     = tls_private_key.private_key.algorithm
+  is_ca_certificate = true
+  private_key_pem   = tls_private_key.private_key.private_key_pem
+
+  subject {
+    common_name  = "example.com"
+    organization = "ACME Examples, Inc"
+  }
+
+  validity_period_hours = 12
+
+  allowed_uses = [
+    "cert_signing",
+    "server_auth",
+  ]
 }
