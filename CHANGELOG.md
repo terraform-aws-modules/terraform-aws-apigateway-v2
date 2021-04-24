@@ -7,6 +7,13 @@ All notable changes to this project will be documented in this file.
 
 
 
+<a name="v0.15.0"></a>
+## [v0.15.0] - 2021-04-24
+
+- feat: Added support for mTLS and the ability to disable default endpoint ([#29](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/29))
+- chore: update documentation and pin `terraform_docs` version to avoid future changes ([#28](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/28))
+
+
 <a name="v0.14.0"></a>
 ## [v0.14.0] - 2021-03-16
 
@@ -97,7 +104,8 @@ All notable changes to this project will be documented in this file.
 - Adding API Gateway module
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.14.0...HEAD
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.15.0...HEAD
+[v0.15.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.14.0...v0.15.0
 [v0.14.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.13.0...v0.14.0
 [v0.13.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.12.0...v0.13.0
 [v0.12.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.11.0...v0.12.0
