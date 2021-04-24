@@ -153,6 +153,7 @@ No modules.
 | <a name="input_default_stage_access_log_format"></a> [default\_stage\_access\_log\_format](#input\_default\_stage\_access\_log\_format) | Default stage's single line format of the access logs of data, as specified by selected $context variables. | `string` | `null` | no |
 | <a name="input_default_stage_tags"></a> [default\_stage\_tags](#input\_default\_stage\_tags) | A mapping of tags to assign to the default stage resource. | `map(string)` | `{}` | no |
 | <a name="input_description"></a> [description](#input\_description) | The description of the API. | `string` | `null` | no |
+| <a name="input_disable_execute_api_endpoint"></a> [disable\_execute\_api\_endpoint](#input\_disable\_execute\_api\_endpoint) | Whether clients can invoke the API by using the default execute-api endpoint. To require that clients use a custom domain name to invoke the API, disable the default endpoint | `string` | `false` | no |
 | <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | The domain name to use for API gateway | `string` | `null` | no |
 | <a name="input_domain_name_certificate_arn"></a> [domain\_name\_certificate\_arn](#input\_domain\_name\_certificate\_arn) | The ARN of an AWS-managed certificate that will be used by the endpoint for the domain name | `string` | `null` | no |
 | <a name="input_domain_name_tags"></a> [domain\_name\_tags](#input\_domain\_name\_tags) | A mapping of tags to assign to API domain name resource. | `map(string)` | `{}` | no |
@@ -163,6 +164,7 @@ No modules.
 | <a name="input_route_selection_expression"></a> [route\_selection\_expression](#input\_route\_selection\_expression) | The route selection expression for the API. | `string` | `"$request.method $request.path"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to API gateway resources. | `map(string)` | `{}` | no |
 | <a name="input_target"></a> [target](#input\_target) | Part of quick create. Quick create produces an API with an integration, a default catch-all route, and a default stage which is configured to automatically deploy changes. For HTTP integrations, specify a fully qualified URL. For Lambda integrations, specify a function ARN. The type of the integration will be HTTP\_PROXY or AWS\_PROXY, respectively. Applicable for HTTP APIs. | `string` | `null` | no |
+| <a name="input_truststore"></a> [truststore](#input\_truststore) | An Amazon S3 URL that specifies the truststore for mutual TLS authentication as well as version, keyed at uri and version | `any` | `null` | no |
 | <a name="input_vpc_link_tags"></a> [vpc\_link\_tags](#input\_vpc\_link\_tags) | A map of tags to add to the VPC Link | `map(string)` | `{}` | no |
 | <a name="input_vpc_links"></a> [vpc\_links](#input\_vpc\_links) | Map of VPC Links details to create | `map(any)` | `{}` | no |
 

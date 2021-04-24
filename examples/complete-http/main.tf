@@ -11,8 +11,6 @@ provider "aws" {
   skip_requesting_account_id = false
 }
 
-provider "tls" {}
-
 locals {
   domain_name = "terraform-aws-modules.modules.tf" # trimsuffix(data.aws_route53_zone.this.name, ".")
   subdomain   = "complete-http"
@@ -207,13 +205,6 @@ resource "null_resource" "download_package" {
   }
 }
 
-data "null_data_source" "downloaded_package" {
-  inputs = {
-    id       = null_resource.download_package.id
-    filename = local.downloaded
-  }
-}
-
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "~> 1.0"
@@ -226,7 +217,7 @@ module "lambda_function" {
   publish = true
 
   create_package         = false
-  local_existing_package = data.null_data_source.downloaded_package.outputs["filename"]
+  local_existing_package = local.downloaded
 
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {
@@ -236,11 +227,9 @@ module "lambda_function" {
   }
 }
 
-## add s3 bucket for truststore
-
-locals {
-  key_algo = "RSA"
-}
+###############################################
+# S3 bucket and TLS certificate for truststore
+###############################################
 
 resource "aws_s3_bucket" "truststore" {
   bucket = "${random_pet.this.id}-truststore"
@@ -251,11 +240,15 @@ resource "aws_s3_bucket_object" "truststore" {
   bucket                 = aws_s3_bucket.truststore.bucket
   key                    = "truststore.pem"
   server_side_encryption = "AES256"
-  source                 = tls_self_signed_cert.example.cert_pem
+  content                = tls_self_signed_cert.example.cert_pem
+}
+
+resource "tls_private_key" "private_key" {
+  algorithm = "RSA"
 }
 
 resource "tls_self_signed_cert" "example" {
-  key_algorithm     = local.key_algo
+  key_algorithm     = tls_private_key.private_key.algorithm
   is_ca_certificate = true
   private_key_pem   = tls_private_key.private_key.private_key_pem
 
@@ -270,8 +263,4 @@ resource "tls_self_signed_cert" "example" {
     "cert_signing",
     "server_auth",
   ]
-}
-
-resource "tls_private_key" "private_key" {
-  algorithm = local.key_algo
 }
