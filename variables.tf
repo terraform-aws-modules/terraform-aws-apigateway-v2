@@ -65,6 +65,12 @@ variable "description" {
   default     = null
 }
 
+variable "default_route_settings" {
+  description = "Settings for default route"
+  type        = map(string)
+  default     = null
+}
+
 variable "disable_execute_api_endpoint" {
   description = "Whether clients can invoke the API by using the default execute-api endpoint. To require that clients use a custom domain name to invoke the API, disable the default endpoint"
   type        = string
