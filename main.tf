@@ -78,7 +78,7 @@ resource "aws_apigatewayv2_stage" "default" {
     content {
       data_trace_enabled       = lookup(default_route_settings.value, "data_trace_enabled", false)
       detailed_metrics_enabled = lookup(default_route_settings.value, "detailed_metrics_enabled", false)
-      logging_level            = lookup(default_route_settings.value, "logging_level", "OFF")
+      logging_level            = lookup(default_route_settings.value, "logging_level", null)
       throttling_burst_limit   = lookup(default_route_settings.value, "throttling_burst_limit", null)
       throttling_rate_limit    = lookup(default_route_settings.value, "throttling_rate_limit", null)
     }
