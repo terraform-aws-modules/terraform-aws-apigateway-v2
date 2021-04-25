@@ -149,7 +149,7 @@ No modules.
 | <a name="input_create_routes_and_integrations"></a> [create\_routes\_and\_integrations](#input\_create\_routes\_and\_integrations) | Whether to create routes and integrations resources | `bool` | `true` | no |
 | <a name="input_create_vpc_link"></a> [create\_vpc\_link](#input\_create\_vpc\_link) | Whether to create VPC links | `bool` | `true` | no |
 | <a name="input_credentials_arn"></a> [credentials\_arn](#input\_credentials\_arn) | Part of quick create. Specifies any credentials required for the integration. Applicable for HTTP APIs. | `string` | `null` | no |
-| <a name="input_default_route_settings"></a> [default\_route\_settings](#input\_default\_route\_settings) | Settings for default route | `map(string)` | `null` | no |
+| <a name="input_default_route_settings"></a> [default\_route\_settings](#input\_default\_route\_settings) | Settings for default route | `map(string)` | `{}` | no |
 | <a name="input_default_stage_access_log_destination_arn"></a> [default\_stage\_access\_log\_destination\_arn](#input\_default\_stage\_access\_log\_destination\_arn) | Default stage's ARN of the CloudWatch Logs log group to receive access logs. Any trailing :* is trimmed from the ARN. | `string` | `null` | no |
 | <a name="input_default_stage_access_log_format"></a> [default\_stage\_access\_log\_format](#input\_default\_stage\_access\_log\_format) | Default stage's single line format of the access logs of data, as specified by selected $context variables. | `string` | `null` | no |
 | <a name="input_default_stage_tags"></a> [default\_stage\_tags](#input\_default\_stage\_tags) | A mapping of tags to assign to the default stage resource. | `map(string)` | `{}` | no |
