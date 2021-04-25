@@ -68,7 +68,7 @@ variable "description" {
 variable "default_route_settings" {
   description = "Settings for default route"
   type        = map(string)
-  default     = null
+  default     = {}
 }
 
 variable "disable_execute_api_endpoint" {
