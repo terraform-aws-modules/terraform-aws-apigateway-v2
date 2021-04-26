@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 
 
 
+<a name="v1.0.0"></a>
+## [v1.0.0] - 2021-04-26
+
+- feat: Shorten outputs (removing this_), added domain name to outputs ([#34](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/34))
+
+
 <a name="v0.16.0"></a>
 ## [v0.16.0] - 2021-04-25
 
@@ -110,7 +116,8 @@ All notable changes to this project will be documented in this file.
 - Adding API Gateway module
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.16.0...HEAD
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.0.0...HEAD
+[v1.0.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.16.0...v1.0.0
 [v0.16.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.15.0...v0.16.0
 [v0.15.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.14.0...v0.15.0
 [v0.14.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.13.0...v0.14.0
