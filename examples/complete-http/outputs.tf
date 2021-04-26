@@ -99,30 +99,30 @@ output "s3_object" {
 }
 
 # API Gateway
-output "this_apigatewayv2_api_api_endpoint" {
+output "apigatewayv2_api_api_endpoint" {
   description = "The URI of the API"
-  value       = module.api_gateway.this_apigatewayv2_api_api_endpoint
+  value       = module.api_gateway.apigatewayv2_api_api_endpoint
 }
 
 # API Gateway - Domain name
-output "this_apigatewayv2_domain_name_id" {
+output "apigatewayv2_domain_name_id" {
   description = "The domain name identifier"
-  value       = module.api_gateway.this_apigatewayv2_domain_name_id
+  value       = module.api_gateway.apigatewayv2_domain_name_id
 }
 
-output "this_apigatewayv2_domain_name_configuration" {
+output "apigatewayv2_domain_name_configuration" {
   description = "The domain name configuration"
-  value       = module.api_gateway.this_apigatewayv2_domain_name_configuration
+  value       = module.api_gateway.apigatewayv2_domain_name_configuration
 }
 
-output "this_apigatewayv2_target_domain_name" {
+output "apigatewayv2_target_domain_name" {
   description = "The target domain name"
-  value       = module.api_gateway.this_apigatewayv2_domain_name_target_domain_name
+  value       = module.api_gateway.apigatewayv2_domain_name_target_domain_name
 }
 
-output "this_apigatewayv2_hosted_zone_id" {
+output "apigatewayv2_hosted_zone_id" {
   description = "The Amazon Route 53 Hosted Zone ID of the endpoint"
-  value       = module.api_gateway.this_apigatewayv2_domain_name_hosted_zone_id
+  value       = module.api_gateway.apigatewayv2_domain_name_hosted_zone_id
 }
 
 # Route53 record
