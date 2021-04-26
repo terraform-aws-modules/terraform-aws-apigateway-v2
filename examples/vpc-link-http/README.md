@@ -50,7 +50,6 @@ Note that this example may create resources which cost money. Run `terraform des
 |------|------|
 | [null_resource.download_package](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [random_pet.this](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) | resource |
-| [null_data_source.downloaded_package](https://registry.terraform.io/providers/hashicorp/null/latest/docs/data-sources/data_source) | data source |
 
 ## Inputs
 
@@ -60,7 +59,7 @@ No inputs.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_this_apigatewayv2_api_endpoint"></a> [this\_apigatewayv2\_api\_endpoint](#output\_this\_apigatewayv2\_api\_endpoint) | The URI of the API |
-| <a name="output_this_apigatewayv2_vpc_link_arn"></a> [this\_apigatewayv2\_vpc\_link\_arn](#output\_this\_apigatewayv2\_vpc\_link\_arn) | The ARN of the VPC Link |
-| <a name="output_this_apigatewayv2_vpc_link_id"></a> [this\_apigatewayv2\_vpc\_link\_id](#output\_this\_apigatewayv2\_vpc\_link\_id) | The identifier of the VPC Link |
+| <a name="output_apigatewayv2_api_endpoint"></a> [apigatewayv2\_api\_endpoint](#output\_apigatewayv2\_api\_endpoint) | The URI of the API |
+| <a name="output_apigatewayv2_vpc_link_arn"></a> [apigatewayv2\_vpc\_link\_arn](#output\_apigatewayv2\_vpc\_link\_arn) | The ARN of the VPC Link |
+| <a name="output_apigatewayv2_vpc_link_id"></a> [apigatewayv2\_vpc\_link\_id](#output\_apigatewayv2\_vpc\_link\_id) | The identifier of the VPC Link |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

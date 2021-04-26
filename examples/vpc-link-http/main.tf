@@ -169,13 +169,6 @@ resource "null_resource" "download_package" {
   }
 }
 
-data "null_data_source" "downloaded_package" {
-  inputs = {
-    id       = null_resource.download_package.id
-    filename = local.downloaded
-  }
-}
-
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "~> 1.0"
@@ -188,7 +181,7 @@ module "lambda_function" {
   publish = true
 
   create_package         = false
-  local_existing_package = data.null_data_source.downloaded_package.outputs["filename"]
+  local_existing_package = local.downloaded
 
   attach_network_policy  = true
   vpc_subnet_ids         = module.vpc.private_subnets
@@ -197,7 +190,7 @@ module "lambda_function" {
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {
       service    = "apigateway"
-      source_arn = "${module.api_gateway.this_apigatewayv2_api_execution_arn}/*/*/*"
+      source_arn = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*/*"
     }
   }
 }

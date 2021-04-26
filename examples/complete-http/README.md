@@ -70,16 +70,16 @@ No inputs.
 |------|-------------|
 | <a name="output_api_endpoint"></a> [api\_endpoint](#output\_api\_endpoint) | FQDN of an API endpoint |
 | <a name="output_api_fqdn"></a> [api\_fqdn](#output\_api\_fqdn) | List of Route53 records |
+| <a name="output_apigatewayv2_api_api_endpoint"></a> [apigatewayv2\_api\_api\_endpoint](#output\_apigatewayv2\_api\_api\_endpoint) | The URI of the API |
+| <a name="output_apigatewayv2_domain_name_configuration"></a> [apigatewayv2\_domain\_name\_configuration](#output\_apigatewayv2\_domain\_name\_configuration) | The domain name configuration |
+| <a name="output_apigatewayv2_domain_name_id"></a> [apigatewayv2\_domain\_name\_id](#output\_apigatewayv2\_domain\_name\_id) | The domain name identifier |
+| <a name="output_apigatewayv2_hosted_zone_id"></a> [apigatewayv2\_hosted\_zone\_id](#output\_apigatewayv2\_hosted\_zone\_id) | The Amazon Route 53 Hosted Zone ID of the endpoint |
+| <a name="output_apigatewayv2_target_domain_name"></a> [apigatewayv2\_target\_domain\_name](#output\_apigatewayv2\_target\_domain\_name) | The target domain name |
 | <a name="output_lambda_cloudwatch_log_group_arn"></a> [lambda\_cloudwatch\_log\_group\_arn](#output\_lambda\_cloudwatch\_log\_group\_arn) | The ARN of the Cloudwatch Log Group |
 | <a name="output_lambda_role_arn"></a> [lambda\_role\_arn](#output\_lambda\_role\_arn) | The ARN of the IAM role created for the Lambda Function |
 | <a name="output_lambda_role_name"></a> [lambda\_role\_name](#output\_lambda\_role\_name) | The name of the IAM role created for the Lambda Function |
 | <a name="output_local_filename"></a> [local\_filename](#output\_local\_filename) | The filename of zip archive deployed (if deployment was from local) |
 | <a name="output_s3_object"></a> [s3\_object](#output\_s3\_object) | The map with S3 object data of zip archive deployed (if deployment was from S3) |
-| <a name="output_this_apigatewayv2_api_api_endpoint"></a> [this\_apigatewayv2\_api\_api\_endpoint](#output\_this\_apigatewayv2\_api\_api\_endpoint) | The URI of the API |
-| <a name="output_this_apigatewayv2_domain_name_configuration"></a> [this\_apigatewayv2\_domain\_name\_configuration](#output\_this\_apigatewayv2\_domain\_name\_configuration) | The domain name configuration |
-| <a name="output_this_apigatewayv2_domain_name_id"></a> [this\_apigatewayv2\_domain\_name\_id](#output\_this\_apigatewayv2\_domain\_name\_id) | The domain name identifier |
-| <a name="output_this_apigatewayv2_hosted_zone_id"></a> [this\_apigatewayv2\_hosted\_zone\_id](#output\_this\_apigatewayv2\_hosted\_zone\_id) | The Amazon Route 53 Hosted Zone ID of the endpoint |
-| <a name="output_this_apigatewayv2_target_domain_name"></a> [this\_apigatewayv2\_target\_domain\_name](#output\_this\_apigatewayv2\_target\_domain\_name) | The target domain name |
 | <a name="output_this_lambda_function_arn"></a> [this\_lambda\_function\_arn](#output\_this\_lambda\_function\_arn) | The ARN of the Lambda Function |
 | <a name="output_this_lambda_function_invoke_arn"></a> [this\_lambda\_function\_invoke\_arn](#output\_this\_lambda\_function\_invoke\_arn) | The Invoke ARN of the Lambda Function |
 | <a name="output_this_lambda_function_kms_key_arn"></a> [this\_lambda\_function\_kms\_key\_arn](#output\_this\_lambda\_function\_kms\_key\_arn) | The ARN for the KMS encryption key of Lambda Function |
