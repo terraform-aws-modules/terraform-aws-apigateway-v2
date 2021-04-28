@@ -25,7 +25,7 @@ resource "random_pet" "this" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = " ~> 2.0"
+  version = " ~> 3.0"
 
   name = "vpc-link-http"
   cidr = "10.0.0.0/16"
@@ -59,7 +59,7 @@ module "api_gateway" {
 
   integrations = {
     "ANY /" = {
-      lambda_arn             = module.lambda_function.this_lambda_function_arn
+      lambda_arn             = module.lambda_function.lambda_function_arn
       payload_format_version = "2.0"
       timeout_milliseconds   = 12000
     }
@@ -73,14 +73,14 @@ module "api_gateway" {
     }
 
     "$default" = {
-      lambda_arn = module.lambda_function.this_lambda_function_arn
+      lambda_arn = module.lambda_function.lambda_function_arn
     }
   }
 
   vpc_links = {
     my-vpc = {
       name               = "example"
-      security_group_ids = [module.api_gateway_security_group.this_security_group_id]
+      security_group_ids = [module.api_gateway_security_group.security_group_id]
       subnet_ids         = module.vpc.public_subnets
     }
   }
@@ -92,7 +92,7 @@ module "api_gateway" {
 
 module "api_gateway_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "~> 3.0"
+  version = "~> 4.0"
 
   name        = "api-gateway-sg-${random_pet.this.id}"
   description = "API Gateway group for example usage"
@@ -110,12 +110,13 @@ module "api_gateway_security_group" {
 ############################
 
 module "alb" {
-  source = "terraform-aws-modules/alb/aws"
+  source  = "terraform-aws-modules/alb/aws"
+  version = "~> 6.0"
 
   name = "alb-${random_pet.this.id}"
 
   vpc_id          = module.vpc.vpc_id
-  security_groups = [module.alb_security_group.this_security_group_id]
+  security_groups = [module.alb_security_group.security_group_id]
   subnets         = module.vpc.public_subnets
 
   http_tcp_listeners = [
@@ -137,7 +138,7 @@ module "alb" {
 
 module "alb_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "~> 3.0"
+  version = "~> 4.0"
 
   name        = "alb-sg-${random_pet.this.id}"
   description = "ALB for example usage"
@@ -171,7 +172,7 @@ resource "null_resource" "download_package" {
 
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 1.0"
+  version = "~> 2.0"
 
   function_name = "${random_pet.this.id}-lambda"
   description   = "My awesome lambda function"
@@ -185,7 +186,7 @@ module "lambda_function" {
 
   attach_network_policy  = true
   vpc_subnet_ids         = module.vpc.private_subnets
-  vpc_security_group_ids = [module.lambda_security_group.this_security_group_id]
+  vpc_security_group_ids = [module.lambda_security_group.security_group_id]
 
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {
@@ -197,7 +198,7 @@ module "lambda_function" {
 
 module "lambda_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "~> 3.0"
+  version = "~> 4.0"
 
   name        = "lambda-sg-${random_pet.this.id}"
   description = "Lambda security group for example usage"
@@ -206,7 +207,7 @@ module "lambda_security_group" {
   computed_ingress_with_source_security_group_id = [
     {
       rule                     = "http-80-tcp"
-      source_security_group_id = module.api_gateway_security_group.this_security_group_id
+      source_security_group_id = module.api_gateway_security_group.security_group_id
     }
   ]
   number_of_computed_ingress_with_source_security_group_id = 1

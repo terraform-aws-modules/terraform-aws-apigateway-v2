@@ -39,7 +39,7 @@ module "api_gateway" {
   }
 
   domain_name                 = local.domain_name
-  domain_name_certificate_arn = module.acm.this_acm_certificate_arn
+  domain_name_certificate_arn = module.acm.acm_certificate_arn
 
   default_stage_access_log_destination_arn = aws_cloudwatch_log_group.logs.arn
   default_stage_access_log_format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
@@ -52,13 +52,13 @@ module "api_gateway" {
 
   integrations = {
     "ANY /" = {
-      lambda_arn             = module.lambda_function.this_lambda_function_arn
+      lambda_arn             = module.lambda_function.lambda_function_arn
       payload_format_version = "2.0"
       timeout_milliseconds   = 12000
     }
 
     "GET /some-route" = {
-      lambda_arn             = module.lambda_function.this_lambda_function_arn
+      lambda_arn             = module.lambda_function.lambda_function_arn
       payload_format_version = "2.0"
       authorization_type     = "JWT"
       authorizer_id          = aws_apigatewayv2_authorizer.some_authorizer.id
@@ -67,11 +67,11 @@ module "api_gateway" {
     "POST /start-step-function" = {
       integration_type    = "AWS_PROXY"
       integration_subtype = "StepFunctions-StartExecution"
-      credentials_arn     = module.step_function.this_role_arn
+      credentials_arn     = module.step_function.role_arn
 
       # Note: jsonencode is used to pass argument as a string
       request_parameters = jsonencode({
-        StateMachineArn = module.step_function.this_state_machine_arn
+        StateMachineArn = module.step_function.state_machine_arn
       })
 
       payload_format_version = "1.0"
@@ -79,13 +79,13 @@ module "api_gateway" {
     }
 
     "$default" = {
-      lambda_arn = module.lambda_function.this_lambda_function_arn
+      lambda_arn = module.lambda_function.lambda_function_arn
     }
 
   }
 
   body = templatefile("api.yaml", {
-    example_function_arn = module.lambda_function.this_lambda_function_arn
+    example_function_arn = module.lambda_function.lambda_function_arn
   })
 
   tags = {
@@ -103,7 +103,7 @@ data "aws_route53_zone" "this" {
 
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"
-  version = "~> 2.0"
+  version = "~> 3.0"
 
   domain_name               = local.domain_name
   zone_id                   = data.aws_route53_zone.this.id
@@ -156,7 +156,7 @@ resource "aws_cognito_user_pool" "this" {
 
 module "step_function" {
   source  = "terraform-aws-modules/step-functions/aws"
-  version = "~> 1.0"
+  version = "~> 2.0"
 
   name = random_pet.this.id
 
@@ -213,7 +213,7 @@ resource "null_resource" "download_package" {
 
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 1.0"
+  version = "~> 2.0"
 
   function_name = "${random_pet.this.id}-lambda"
   description   = "My awesome lambda function"
