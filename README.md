@@ -2,24 +2,6 @@
 
 Terraform module which creates API Gateway version 2 with HTTP/Websocket capabilities.
 
-These types of resources supported:
-
-- [API Gateway](https://www.terraform.io/docs/providers/aws/r/apigatewayv2_api.html)
-- [API Gateway Stage](https://www.terraform.io/docs/providers/aws/r/apigatewayv2_stage.html)
-- [API Gateway Domain Name](https://www.terraform.io/docs/providers/aws/r/apigatewayv2_domain_name.html)
-- [API Gateway API Mapping](https://www.terraform.io/docs/providers/aws/r/apigatewayv2_api_mapping.html)
-- [API Gateway Route](https://www.terraform.io/docs/providers/aws/r/apigatewayv2_route.html)
-- [API Gateway Integration](https://www.terraform.io/docs/providers/aws/r/apigatewayv2_integration.html)
-- [API Gateway VPC Link](https://www.terraform.io/docs/providers/aws/r/apigatewayv2_vpc_link.html)
-
-Not supported, yet:
-
-- [API Gateway Authorizer](https://www.terraform.io/docs/providers/aws/r/apigatewayv2_authorizer.html)
-- [API Gateway Deployment](https://www.terraform.io/docs/providers/aws/r/apigatewayv2_deployment.html)
-- [API Gateway Model](https://www.terraform.io/docs/providers/aws/r/apigatewayv2_model.html)
-- [API Gateway Route Response](https://www.terraform.io/docs/providers/aws/r/apigatewayv2_route_response.html)
-- [API Gateway Integration Response](https://www.terraform.io/docs/providers/aws/r/apigatewayv2_integration_response.html)
-
 This Terraform module is part of [serverless.tf framework](https://serverless.tf), which aims to simplify all operations when working with the serverless in Terraform.
 
 ## Features
@@ -201,4 +183,4 @@ Please reach out to [Betajob](https://www.betajob.com/) if you are looking for c
 
 ## License
 
-Apache 2 Licensed. See LICENSE for full details.
+Apache 2 Licensed. See [LICENSE](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/tree/master/LICENSE) for full details.
