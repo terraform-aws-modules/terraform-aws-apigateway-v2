@@ -4,11 +4,14 @@ Terraform module which creates API Gateway version 2 with HTTP/Websocket capabil
 
 This Terraform module is part of [serverless.tf framework](https://serverless.tf), which aims to simplify all operations when working with the serverless in Terraform.
 
-## Features
+## Supported Features
 
-- [x] Support many of features of HTTP API Gateway, but rather limited support for WebSocket API Gateway
-- [x] Conditional creation for many types of resources
-- [ ] Some features are still missing (especially for WebSocket support)
+- Support many of features of HTTP API Gateway, but rather limited support for WebSocket API Gateway
+- Conditional creation for many types of resources
+
+## Feature Roadmap
+
+- Some features are still missing (especially for WebSocket support)
 
 ## Usage
 
