@@ -7,6 +7,14 @@ All notable changes to this project will be documented in this file.
 
 
 
+<a name="v1.1.0"></a>
+## [v1.1.0] - 2021-05-25
+
+- chore: Remove check boxes that don't render properly in module doc ([#40](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/40))
+- chore: update CI/CD to use stable `terraform-docs` release artifact and discoverable Apache2.0 license ([#38](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/38))
+- chore: Updated versions in README ([#37](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/37))
+
+
 <a name="v1.0.0"></a>
 ## [v1.0.0] - 2021-04-26
 
@@ -116,7 +124,8 @@ All notable changes to this project will be documented in this file.
 - Adding API Gateway module
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.1.0...HEAD
+[v1.1.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.0.0...v1.1.0
 [v1.0.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.16.0...v1.0.0
 [v0.16.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.15.0...v0.16.0
 [v0.15.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.14.0...v0.15.0
