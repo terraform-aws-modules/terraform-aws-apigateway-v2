@@ -158,7 +158,7 @@ resource "aws_apigatewayv2_integration" "this" {
   dynamic "tls_config" {
     for_each = lookup(each.value, "tls_config", null) == null ? [] : [lookup(each.value, "tls_config", null)]
     content {
-      server_name_to_verify    = lookup(each.value, "server_name_to_verify", null)
+      server_name_to_verify    = tls_config.value["server_name_to_verify"]
     }
   }
 }
