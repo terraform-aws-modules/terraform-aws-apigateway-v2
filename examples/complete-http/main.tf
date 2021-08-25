@@ -55,6 +55,9 @@ module "api_gateway" {
       lambda_arn             = module.lambda_function.lambda_function_arn
       payload_format_version = "2.0"
       timeout_milliseconds   = 12000
+      tls_config = {
+        server_name_to_verify = local.domain_name
+      }
     }
 
     "GET /some-route" = {
