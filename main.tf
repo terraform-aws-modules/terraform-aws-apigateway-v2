@@ -154,11 +154,11 @@ resource "aws_apigatewayv2_integration" "this" {
   content_handling_strategy = lookup(each.value, "content_handling_strategy", null)
   credentials_arn           = lookup(each.value, "credentials_arn", null)
   request_parameters        = try(jsondecode(each.value["request_parameters"]), each.value["request_parameters"], null)
-  
+
   dynamic "tls_config" {
-    for_each = lookup(each.value, "tls_config", null) == null ? [] : [lookup(each.value, "tls_config", null)]
+    for_each = lookup(each.value, "tls_config", null) == null ? [] : [try(jsondecode(each.value["tls_config"]), each.value["tls_config"], null)]
     content {
-      server_name_to_verify    = tls_config.value["server_name_to_verify"]
+      server_name_to_verify = tls_config.value["server_name_to_verify"]
     }
   }
 }
