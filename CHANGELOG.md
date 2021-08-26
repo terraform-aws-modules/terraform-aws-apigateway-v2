@@ -7,6 +7,13 @@ All notable changes to this project will be documented in this file.
 
 
 
+<a name="v1.2.0"></a>
+## [v1.2.0] - 2021-08-26
+
+- feat: Add support for tls_config in integrations ([#51](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/51))
+- fix: Fixed source_arn in example (fixes [#41](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/41))
+
+
 <a name="v1.1.0"></a>
 ## [v1.1.0] - 2021-05-25
 
@@ -124,7 +131,8 @@ All notable changes to this project will be documented in this file.
 - Adding API Gateway module
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.2.0...HEAD
+[v1.2.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.0.0...v1.1.0
 [v1.0.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.16.0...v1.0.0
 [v0.16.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.15.0...v0.16.0
