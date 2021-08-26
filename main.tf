@@ -154,6 +154,13 @@ resource "aws_apigatewayv2_integration" "this" {
   content_handling_strategy = lookup(each.value, "content_handling_strategy", null)
   credentials_arn           = lookup(each.value, "credentials_arn", null)
   request_parameters        = try(jsondecode(each.value["request_parameters"]), each.value["request_parameters"], null)
+
+  dynamic "tls_config" {
+    for_each = flatten([try(jsondecode(each.value["tls_config"]), each.value["tls_config"], [])])
+    content {
+      server_name_to_verify = tls_config.value["server_name_to_verify"]
+    }
+  }
 }
 
 # VPC Link (Private API)
