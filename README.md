@@ -138,6 +138,7 @@ No modules.
 | <a name="input_default_route_settings"></a> [default\_route\_settings](#input\_default\_route\_settings) | Settings for default route | `map(string)` | `{}` | no |
 | <a name="input_default_stage_access_log_destination_arn"></a> [default\_stage\_access\_log\_destination\_arn](#input\_default\_stage\_access\_log\_destination\_arn) | Default stage's ARN of the CloudWatch Logs log group to receive access logs. Any trailing :* is trimmed from the ARN. | `string` | `null` | no |
 | <a name="input_default_stage_access_log_format"></a> [default\_stage\_access\_log\_format](#input\_default\_stage\_access\_log\_format) | Default stage's single line format of the access logs of data, as specified by selected $context variables. | `string` | `null` | no |
+| <a name="input_default_stage_name"></a> [default\_stage\_name](#input\_default\_stage\_name) | The name of the default stage | `string` | `"$default"` | no |
 | <a name="input_default_stage_tags"></a> [default\_stage\_tags](#input\_default\_stage\_tags) | A mapping of tags to assign to the default stage resource. | `map(string)` | `{}` | no |
 | <a name="input_description"></a> [description](#input\_description) | The description of the API. | `string` | `null` | no |
 | <a name="input_disable_execute_api_endpoint"></a> [disable\_execute\_api\_endpoint](#input\_disable\_execute\_api\_endpoint) | Whether clients can invoke the API by using the default execute-api endpoint. To require that clients use a custom domain name to invoke the API, disable the default endpoint | `string` | `false` | no |

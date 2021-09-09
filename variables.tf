@@ -145,6 +145,12 @@ variable "tags" {
 
 #####
 # default stage
+variable "default_stage_name" {
+  description = "The name of the default stage"
+  type        = string
+  default     = "$default"
+}
+
 variable "default_stage_access_log_destination_arn" {
   description = "Default stage's ARN of the CloudWatch Logs log group to receive access logs. Any trailing :* is trimmed from the ARN."
   type        = string
