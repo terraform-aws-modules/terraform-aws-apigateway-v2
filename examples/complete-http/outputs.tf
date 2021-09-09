@@ -125,6 +125,11 @@ output "apigatewayv2_hosted_zone_id" {
   value       = module.api_gateway.apigatewayv2_domain_name_hosted_zone_id
 }
 
+output "apigatewayv2_route" {
+  description = "Map containing the routes created and their attributes"
+  value       = module.api_gateway.apigatewayv2_route
+}
+
 # Route53 record
 output "api_fqdn" {
   description = "List of Route53 records"

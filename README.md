@@ -93,14 +93,14 @@ module "api_gateway" {
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.12.26 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.3.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.1 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.35 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.3.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.57.0 |
 
 ## Modules
 
@@ -123,6 +123,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_api_key_selection_expression"></a> [api\_key\_selection\_expression](#input\_api\_key\_selection\_expression) | An API key selection expression. Valid values: $context.authorizer.usageIdentifierKey, $request.header.x-api-key. | `string` | `"$request.header.x-api-key"` | no |
+| <a name="input_api_mapping_key"></a> [api\_mapping\_key](#input\_api\_mapping\_key) | The [API mapping key](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-mapping-template-reference.html) | `string` | `null` | no |
 | <a name="input_api_version"></a> [api\_version](#input\_api\_version) | A version identifier for the API | `string` | `null` | no |
 | <a name="input_body"></a> [body](#input\_body) | An OpenAPI specification that defines the set of routes and integrations to create as part of the HTTP APIs. Supported only for HTTP APIs. | `string` | `null` | no |
 | <a name="input_cors_configuration"></a> [cors\_configuration](#input\_cors\_configuration) | The cross-origin resource sharing (CORS) configuration. Applicable for HTTP APIs. | `any` | `{}` | no |
@@ -143,6 +144,7 @@ No modules.
 | <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | The domain name to use for API gateway | `string` | `null` | no |
 | <a name="input_domain_name_certificate_arn"></a> [domain\_name\_certificate\_arn](#input\_domain\_name\_certificate\_arn) | The ARN of an AWS-managed certificate that will be used by the endpoint for the domain name | `string` | `null` | no |
 | <a name="input_domain_name_tags"></a> [domain\_name\_tags](#input\_domain\_name\_tags) | A mapping of tags to assign to API domain name resource. | `map(string)` | `{}` | no |
+| <a name="input_fail_on_warnings"></a> [fail\_on\_warnings](#input\_fail\_on\_warnings) | Whether warnings should return an error while API Gateway is creating or updating the resource using an OpenAPI specification | `bool` | `null` | no |
 | <a name="input_integrations"></a> [integrations](#input\_integrations) | Map of API gateway routes with integrations | `map(any)` | `{}` | no |
 | <a name="input_mutual_tls_authentication"></a> [mutual\_tls\_authentication](#input\_mutual\_tls\_authentication) | An Amazon S3 URL that specifies the truststore for mutual TLS authentication as well as version, keyed at uri and version | `map(string)` | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the API | `string` | `""` | no |
@@ -162,13 +164,14 @@ No modules.
 | <a name="output_apigatewayv2_api_arn"></a> [apigatewayv2\_api\_arn](#output\_apigatewayv2\_api\_arn) | The ARN of the API |
 | <a name="output_apigatewayv2_api_execution_arn"></a> [apigatewayv2\_api\_execution\_arn](#output\_apigatewayv2\_api\_execution\_arn) | The ARN prefix to be used in an aws\_lambda\_permission's source\_arn attribute or in an aws\_iam\_policy to authorize access to the @connections API. |
 | <a name="output_apigatewayv2_api_id"></a> [apigatewayv2\_api\_id](#output\_apigatewayv2\_api\_id) | The API identifier |
-| <a name="output_apigatewayv2_api_mapping_id"></a> [apigatewayv2\_api\_mapping\_id](#output\_apigatewayv2\_api\_mapping\_id) | The API mapping identifier. |
+| <a name="output_apigatewayv2_api_mapping_id"></a> [apigatewayv2\_api\_mapping\_id](#output\_apigatewayv2\_api\_mapping\_id) | The API mapping identifier |
 | <a name="output_apigatewayv2_domain_name_api_mapping_selection_expression"></a> [apigatewayv2\_domain\_name\_api\_mapping\_selection\_expression](#output\_apigatewayv2\_domain\_name\_api\_mapping\_selection\_expression) | The API mapping selection expression for the domain name |
 | <a name="output_apigatewayv2_domain_name_arn"></a> [apigatewayv2\_domain\_name\_arn](#output\_apigatewayv2\_domain\_name\_arn) | The ARN of the domain name |
 | <a name="output_apigatewayv2_domain_name_configuration"></a> [apigatewayv2\_domain\_name\_configuration](#output\_apigatewayv2\_domain\_name\_configuration) | The domain name configuration |
 | <a name="output_apigatewayv2_domain_name_hosted_zone_id"></a> [apigatewayv2\_domain\_name\_hosted\_zone\_id](#output\_apigatewayv2\_domain\_name\_hosted\_zone\_id) | The Amazon Route 53 Hosted Zone ID of the endpoint |
 | <a name="output_apigatewayv2_domain_name_id"></a> [apigatewayv2\_domain\_name\_id](#output\_apigatewayv2\_domain\_name\_id) | The domain name identifier |
 | <a name="output_apigatewayv2_domain_name_target_domain_name"></a> [apigatewayv2\_domain\_name\_target\_domain\_name](#output\_apigatewayv2\_domain\_name\_target\_domain\_name) | The target domain name |
+| <a name="output_apigatewayv2_route"></a> [apigatewayv2\_route](#output\_apigatewayv2\_route) | Map containing the routes created and their attributes |
 | <a name="output_apigatewayv2_vpc_link_arn"></a> [apigatewayv2\_vpc\_link\_arn](#output\_apigatewayv2\_vpc\_link\_arn) | The map of VPC Link ARNs |
 | <a name="output_apigatewayv2_vpc_link_id"></a> [apigatewayv2\_vpc\_link\_id](#output\_apigatewayv2\_vpc\_link\_id) | The map of VPC Link identifiers |
 | <a name="output_default_apigatewayv2_stage_arn"></a> [default\_apigatewayv2\_stage\_arn](#output\_default\_apigatewayv2\_stage\_arn) | The default stage ARN |

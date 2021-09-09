@@ -131,6 +131,12 @@ variable "api_version" {
   default     = null
 }
 
+variable "fail_on_warnings" {
+  description = "Whether warnings should return an error while API Gateway is creating or updating the resource using an OpenAPI specification"
+  type        = bool
+  default     = null
+}
+
 variable "tags" {
   description = "A mapping of tags to assign to API gateway resources."
   type        = map(string)
@@ -158,7 +164,12 @@ variable "default_stage_tags" {
 }
 
 #####
-# default stage API mapping
+# API mapping
+variable "api_mapping_key" {
+  description = "The [API mapping key](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-mapping-template-reference.html)"
+  type        = string
+  default     = null
+}
 
 ####
 # domain name

@@ -21,7 +21,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.1 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 2.59 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.35 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >= 2.0 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 2.0 |
 | <a name="requirement_tls"></a> [tls](#requirement\_tls) | >= 3.1 |
@@ -30,17 +30,17 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 2.59 |
-| <a name="provider_null"></a> [null](#provider\_null) | >= 2.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | >= 2.0 |
-| <a name="provider_tls"></a> [tls](#provider\_tls) | >= 3.1 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.57.0 |
+| <a name="provider_null"></a> [null](#provider\_null) | 3.1.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | 3.1.0 |
+| <a name="provider_tls"></a> [tls](#provider\_tls) | 3.1.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_acm"></a> [acm](#module\_acm) | terraform-aws-modules/acm/aws | ~> 3.0 |
-| <a name="module_api_gateway"></a> [api\_gateway](#module\_api\_gateway) | ../../ |  |
+| <a name="module_api_gateway"></a> [api\_gateway](#module\_api\_gateway) | ../../ | n/a |
 | <a name="module_lambda_function"></a> [lambda\_function](#module\_lambda\_function) | terraform-aws-modules/lambda/aws | ~> 2.0 |
 | <a name="module_step_function"></a> [step\_function](#module\_step\_function) | terraform-aws-modules/step-functions/aws | ~> 2.0 |
 
@@ -62,7 +62,9 @@ Note that this example may create resources which cost money. Run `terraform des
 
 ## Inputs
 
-No inputs.
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | Custom domain name to use on API Gateway endpoint | `string` | n/a | yes |
 
 ## Outputs
 
@@ -74,6 +76,7 @@ No inputs.
 | <a name="output_apigatewayv2_domain_name_configuration"></a> [apigatewayv2\_domain\_name\_configuration](#output\_apigatewayv2\_domain\_name\_configuration) | The domain name configuration |
 | <a name="output_apigatewayv2_domain_name_id"></a> [apigatewayv2\_domain\_name\_id](#output\_apigatewayv2\_domain\_name\_id) | The domain name identifier |
 | <a name="output_apigatewayv2_hosted_zone_id"></a> [apigatewayv2\_hosted\_zone\_id](#output\_apigatewayv2\_hosted\_zone\_id) | The Amazon Route 53 Hosted Zone ID of the endpoint |
+| <a name="output_apigatewayv2_route"></a> [apigatewayv2\_route](#output\_apigatewayv2\_route) | Map containing the routes created and their attributes |
 | <a name="output_apigatewayv2_target_domain_name"></a> [apigatewayv2\_target\_domain\_name](#output\_apigatewayv2\_target\_domain\_name) | The target domain name |
 | <a name="output_lambda_cloudwatch_log_group_arn"></a> [lambda\_cloudwatch\_log\_group\_arn](#output\_lambda\_cloudwatch\_log\_group\_arn) | The ARN of the Cloudwatch Log Group |
 | <a name="output_lambda_function_arn"></a> [lambda\_function\_arn](#output\_lambda\_function\_arn) | The ARN of the Lambda Function |

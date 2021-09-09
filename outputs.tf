@@ -77,15 +77,15 @@ output "apigatewayv2_domain_name_hosted_zone_id" {
 
 # api mapping
 output "apigatewayv2_api_mapping_id" {
-  description = "The API mapping identifier."
+  description = "The API mapping identifier"
   value       = element(concat(aws_apigatewayv2_api_mapping.this.*.id, [""]), 0)
 }
 
 # route
-# output "apigatewayv2_route_id" {
-#  description = "The default route identifier."
-#  value       = element(concat(aws_apigatewayv2_route.this.*.id, [""]), 0)
-# }
+output "apigatewayv2_route" {
+  description = "Map containing the routes created and their attributes"
+  value       = aws_apigatewayv2_route.this
+}
 
 # VPC link
 output "apigatewayv2_vpc_link_id" {

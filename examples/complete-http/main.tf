@@ -12,8 +12,7 @@ provider "aws" {
 }
 
 locals {
-  domain_name = "terraform-aws-modules.modules.tf" # trimsuffix(data.aws_route53_zone.this.name, ".")
-  subdomain   = "complete-http"
+  subdomain = "complete-http"
 }
 
 ###################
@@ -38,7 +37,7 @@ module "api_gateway" {
     truststore_version = aws_s3_bucket_object.truststore.version_id
   }
 
-  domain_name                 = local.domain_name
+  domain_name                 = var.domain_name
   domain_name_certificate_arn = module.acm.acm_certificate_arn
 
   default_stage_access_log_destination_arn = aws_cloudwatch_log_group.logs.arn
@@ -82,7 +81,7 @@ module "api_gateway" {
     "$default" = {
       lambda_arn = module.lambda_function.lambda_function_arn
       tls_config = jsonencode({
-        server_name_to_verify = local.domain_name
+        server_name_to_verify = var.domain_name
       })
     }
 
@@ -102,16 +101,16 @@ module "api_gateway" {
 ######
 
 data "aws_route53_zone" "this" {
-  name = local.domain_name
+  name = var.domain_name
 }
 
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"
   version = "~> 3.0"
 
-  domain_name               = local.domain_name
+  domain_name               = var.domain_name
   zone_id                   = data.aws_route53_zone.this.id
-  subject_alternative_names = ["${local.subdomain}.${local.domain_name}"]
+  subject_alternative_names = ["${local.subdomain}.${var.domain_name}"]
 }
 
 ##########

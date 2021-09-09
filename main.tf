@@ -6,20 +6,21 @@ resource "aws_apigatewayv2_api" "this" {
   description   = var.description
   protocol_type = var.protocol_type
   version       = var.api_version
-  body          = var.body
+  body          = var.protocol_type == "HTTP" ? var.body : null
 
   route_selection_expression   = var.route_selection_expression
-  api_key_selection_expression = var.api_key_selection_expression
+  api_key_selection_expression = var.protocol_type == "WEBSOCKET" ? var.api_key_selection_expression : null
   disable_execute_api_endpoint = var.disable_execute_api_endpoint
+  fail_on_warnings             = var.protocol_type == "HTTP" ? var.fail_on_warnings : null
 
   /* Start of quick create */
-  route_key       = var.route_key
-  credentials_arn = var.credentials_arn
-  target          = var.target
+  route_key       = var.protocol_type == "HTTP" ? var.route_key : null
+  credentials_arn = var.protocol_type == "HTTP" ? var.credentials_arn : null
+  target          = var.protocol_type == "HTTP" ? var.target : null
   /* End of quick create */
 
   dynamic "cors_configuration" {
-    for_each = length(keys(var.cors_configuration)) == 0 ? [] : [var.cors_configuration]
+    for_each = var.protocol_type != "HTTP" || length(keys(var.cors_configuration)) == 0 ? [] : [var.cors_configuration]
 
     content {
       allow_credentials = lookup(cors_configuration.value, "allow_credentials", null)
@@ -84,18 +85,17 @@ resource "aws_apigatewayv2_stage" "default" {
     }
   }
 
-  #  # bug - https://github.com/terraform-providers/terraform-provider-aws/issues/12893
-  #  dynamic "route_settings" {
-  #    for_each = var.create_routes_and_integrations ? var.integrations : {}
-  #    content {
-  #      route_key = route_settings.key
-  #      data_trace_enabled = lookup(route_settings.value, "data_trace_enabled", null)
-  #      detailed_metrics_enabled         = lookup(route_settings.value, "detailed_metrics_enabled", null)
-  #      logging_level         = lookup(route_settings.value, "logging_level", null)  # Error: error updating API Gateway v2 stage ($default): BadRequestException: Execution logs are not supported on protocolType HTTP
-  #      throttling_burst_limit         = lookup(route_settings.value, "throttling_burst_limit", null)
-  #      throttling_rate_limit         = lookup(route_settings.value, "throttling_rate_limit", null)
-  #    }
-  #  }
+  dynamic "route_settings" {
+    for_each = var.create_routes_and_integrations ? var.integrations : {}
+    content {
+      route_key                = route_settings.key
+      data_trace_enabled       = lookup(route_settings.value, "data_trace_enabled", null)
+      detailed_metrics_enabled = lookup(route_settings.value, "detailed_metrics_enabled", null)
+      logging_level            = lookup(route_settings.value, "logging_level", null) # Error: error updating API Gateway v2 stage ($default): BadRequestException: Execution logs are not supported on protocolType HTTP
+      throttling_burst_limit   = lookup(route_settings.value, "throttling_burst_limit", null)
+      throttling_rate_limit    = lookup(route_settings.value, "throttling_rate_limit", null)
+    }
+  }
 
   tags = merge(var.default_stage_tags, var.tags)
 
@@ -103,15 +103,20 @@ resource "aws_apigatewayv2_stage" "default" {
   lifecycle {
     ignore_changes = [deployment_id]
   }
+
+  depends_on = [
+    aws_apigatewayv2_route.this
+  ]
 }
 
 # Default API mapping
 resource "aws_apigatewayv2_api_mapping" "this" {
   count = var.create && var.create_api_domain_name && var.create_default_stage && var.create_default_stage_api_mapping ? 1 : 0
 
-  api_id      = aws_apigatewayv2_api.this[0].id
-  domain_name = aws_apigatewayv2_domain_name.this[0].id
-  stage       = aws_apigatewayv2_stage.default[0].id
+  api_id          = aws_apigatewayv2_api.this[0].id
+  domain_name     = aws_apigatewayv2_domain_name.this[0].id
+  stage           = aws_apigatewayv2_stage.default[0].id
+  api_mapping_key = var.api_mapping_key
 }
 
 # Routes and integrations
@@ -122,16 +127,22 @@ resource "aws_apigatewayv2_route" "this" {
   route_key = each.key
 
   api_key_required                    = lookup(each.value, "api_key_required", null)
+  authorization_scopes                = try(lookup(each.value, "authorization_scopes", []), [])
   authorization_type                  = lookup(each.value, "authorization_type", "NONE")
   authorizer_id                       = lookup(each.value, "authorizer_id", null)
   model_selection_expression          = lookup(each.value, "model_selection_expression", null)
   operation_name                      = lookup(each.value, "operation_name", null)
+  request_models                      = try(lookup(each.value, "request_models", {}), {})
   route_response_selection_expression = lookup(each.value, "route_response_selection_expression", null)
   target                              = "integrations/${aws_apigatewayv2_integration.this[each.key].id}"
 
-  # Not sure what structure is allowed for these arguments...
-  #  authorization_scopes = lookup(each.value, "authorization_scopes", null)
-  #  request_models  = lookup(each.value, "request_models", null)
+  dynamic "request_parameter" {
+    for_each = lookup(each.value, "request_parameter", null) != null ? each.value.request_parameter : {}
+    content {
+      request_parameter_key = request_parameter.value.request_parameter_key
+      required              = request_parameter.value.required
+    }
+  }
 }
 
 resource "aws_apigatewayv2_integration" "this" {
