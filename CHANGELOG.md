@@ -7,6 +7,13 @@ All notable changes to this project will be documented in this file.
 
 
 
+<a name="v1.3.0"></a>
+## [v1.3.0] - 2021-09-16
+
+- fix: Fixed output when create_api_domain_name is false ([#44](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/44))
+- chore: Fixed GH Action with terraform-docs
+
+
 <a name="v1.2.0"></a>
 ## [v1.2.0] - 2021-08-26
 
@@ -131,7 +138,8 @@ All notable changes to this project will be documented in this file.
 - Adding API Gateway module
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.3.0...HEAD
+[v1.3.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.2.0...v1.3.0
 [v1.2.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.0.0...v1.1.0
 [v1.0.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v0.16.0...v1.0.0
