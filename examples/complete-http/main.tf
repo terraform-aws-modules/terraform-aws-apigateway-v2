@@ -51,6 +51,7 @@ module "api_gateway" {
   }
 
   integrations = {
+
     "ANY /" = {
       lambda_arn             = module.lambda_function.lambda_function_arn
       payload_format_version = "2.0"
@@ -80,6 +81,9 @@ module "api_gateway" {
 
     "$default" = {
       lambda_arn = module.lambda_function.lambda_function_arn
+      tls_config = jsonencode({
+        server_name_to_verify = local.domain_name
+      })
     }
 
   }
