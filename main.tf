@@ -129,9 +129,8 @@ resource "aws_apigatewayv2_route" "this" {
   route_response_selection_expression = lookup(each.value, "route_response_selection_expression", null)
   target                              = "integrations/${aws_apigatewayv2_integration.this[each.key].id}"
 
-  # Not sure what structure is allowed for these arguments...
-  #  authorization_scopes = lookup(each.value, "authorization_scopes", null)
-  #  request_models  = lookup(each.value, "request_models", null)
+  authorization_scopes = try(jsondecode(each.value["authorization_scopes"]), each.value["authorization_scopes"], null)
+  request_models       = try(jsondecode(each.value["request_models"]), each.value["request_models"], null)
 }
 
 resource "aws_apigatewayv2_integration" "this" {
