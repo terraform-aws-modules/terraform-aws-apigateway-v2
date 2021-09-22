@@ -161,6 +161,10 @@ resource "aws_apigatewayv2_integration" "this" {
       server_name_to_verify = tls_config.value["server_name_to_verify"]
     }
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 # VPC Link (Private API)
