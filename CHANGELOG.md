@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 
 
 
+<a name="v1.4.0"></a>
+## [v1.4.0] - 2021-09-23
+
+- Feat: Add create_before_destroy lifecycle to integration resources ([#55](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/55))
+
+
 <a name="v1.3.0"></a>
 ## [v1.3.0] - 2021-09-16
 
@@ -138,7 +144,8 @@ All notable changes to this project will be documented in this file.
 - Adding API Gateway module
 
 
-[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.4.0...HEAD
+[v1.4.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.3.0...v1.4.0
 [v1.3.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.2.0...v1.3.0
 [v1.2.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.0.0...v1.1.0
