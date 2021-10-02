@@ -100,7 +100,7 @@ module "api_gateway" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.35 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.61.0 |
 
 ## Modules
 
