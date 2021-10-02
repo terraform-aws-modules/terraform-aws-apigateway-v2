@@ -18,6 +18,7 @@ locals {
   region = "eu-west-1"
 
   dynamodb_table_name = local.name
+  dynamodb_table_arn  = "arn:aws:dynamodb:${local.region}:${data.aws_caller_identity.current.account_id}:table/${local.dynamodb_table_name}" # hack to avoid race condition
   dynamodb_crud_permissions = {
     effect = "Allow",
     actions = [
@@ -33,8 +34,8 @@ locals {
       "dynamodb:ConditionCheckItem",
     ],
     resources = [
-      module.dynamodb_table.dynamodb_table_arn,
-      "${module.dynamodb_table.dynamodb_table_arn}/index/*"
+      local.dynamodb_table_arn,
+      "${local.dynamodb_table_arn}/index/*"
     ]
   }
 
@@ -84,10 +85,6 @@ resource "aws_iam_role" "cloudwatch" {
   tags = local.tags
 }
 
-########################
-# Websocket API Gateway
-########################
-
 module "connect_lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "~> 2"
@@ -98,8 +95,7 @@ module "connect_lambda_function" {
   handler       = "onConnect.handler"
   runtime       = "nodejs14.x"
   memory_size   = 256
-
-  publish = true
+  publish       = true
 
   environment_variables = {
     TABLE_NAME = local.dynamodb_table_name
@@ -107,8 +103,8 @@ module "connect_lambda_function" {
 
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {
-      service   = "apigateway"
-      principal = "apigateway.amazonaws.com"
+      service    = "apigateway"
+      source_arn = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*"
     }
   }
 
@@ -119,7 +115,6 @@ module "connect_lambda_function" {
 
   tags = local.tags
 }
-
 
 module "disconnect_lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
@@ -131,8 +126,7 @@ module "disconnect_lambda_function" {
   handler       = "onDisconnect.handler"
   runtime       = "nodejs14.x"
   memory_size   = 256
-
-  publish = true
+  publish       = true
 
   environment_variables = {
     TABLE_NAME = local.dynamodb_table_name
@@ -140,8 +134,8 @@ module "disconnect_lambda_function" {
 
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {
-      service   = "apigateway"
-      principal = "apigateway.amazonaws.com"
+      service    = "apigateway"
+      source_arn = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*"
     }
   }
 
@@ -153,7 +147,6 @@ module "disconnect_lambda_function" {
   tags = local.tags
 }
 
-
 module "send_message_lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "~> 2"
@@ -164,8 +157,7 @@ module "send_message_lambda_function" {
   handler       = "sendMessage.handler"
   runtime       = "nodejs14.x"
   memory_size   = 256
-
-  publish = true
+  publish       = true
 
   environment_variables = {
     TABLE_NAME = local.dynamodb_table_name
@@ -173,8 +165,8 @@ module "send_message_lambda_function" {
 
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {
-      service   = "apigateway"
-      principal = "apigateway.amazonaws.com"
+      service    = "apigateway"
+      source_arn = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*"
     }
   }
 
@@ -208,6 +200,10 @@ module "dynamodb_table" {
   tags = local.tags
 }
 
+########################
+# Websocket API Gateway
+########################
+
 module "api_gateway" {
   source = "../../"
 
@@ -229,7 +225,6 @@ module "api_gateway" {
   stage_access_log_format = jsonencode({
     context = {
       domainName              = "$context.domainName"
-      httpMethod              = "$context.httpMethod"
       integrationErrorMessage = "$context.integrationErrorMessage"
       protocol                = "$context.protocol"
       requestId               = "$context.requestId"
@@ -281,8 +276,4 @@ module "api_gateway" {
   }
 
   tags = local.tags
-}
-
-output "wss" {
-  value = "wscat -c ${module.api_gateway.default_apigatewayv2_stage_invoke_url}"
 }

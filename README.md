@@ -6,12 +6,8 @@ This Terraform module is part of [serverless.tf framework](https://serverless.tf
 
 ## Supported Features
 
-- Support many of features of HTTP API Gateway, but rather limited support for WebSocket API Gateway
+- Nearly all features of HTTP API Gateway
 - Conditional creation for many types of resources
-
-## Feature Roadmap
-
-- Some features are still missing (especially for WebSocket support)
 
 ## Usage
 
@@ -36,8 +32,8 @@ module "api_gateway" {
   domain_name_certificate_arn = "arn:aws:acm:eu-west-1:052235179155:certificate/2b3a7ed9-05e1-4f9e-952b-27744ba06da6"
 
   # Access logs
-  default_stage_access_log_destination_arn = "arn:aws:logs:eu-west-1:835367859851:log-group:debug-apigateway"
-  default_stage_access_log_format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
+  stage_access_log_destination_arn = "arn:aws:logs:eu-west-1:835367859851:log-group:debug-apigateway"
+  stage_access_log_format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
 
   # Routes and integrations
   integrations = {
@@ -68,12 +64,12 @@ module "api_gateway" {
 
   create = false # to disable all resources
 
-  create_api_gateway               = false  # to control creation of API Gateway
-  create_api_domain_name           = false  # to control creation of API Gateway Domain Name
-  create_default_stage             = false  # to control creation of "$default" stage
-  create_default_stage_api_mapping = false  # to control creation of "$default" stage and API mapping
-  create_routes_and_integrations   = false  # to control creation of routes and integrations
-  create_vpc_link                  = false  # to control creation of VPC link
+  create_api_gateway             = false  # to control creation of API Gateway
+  create_api_domain_name         = false  # to control creation of API Gateway Domain Name
+  create_stage                   = false  # to control creation of "$default" stage
+  create_stage_api_mapping       = false  # to control creation of "$default" stage and API mapping
+  create_routes_and_integrations = false  # to control creation of routes and integrations
+  create_vpc_link                = false  # to control creation of VPC link
 
   # ... omitted
 }
@@ -87,6 +83,7 @@ module "api_gateway" {
 
 - [Complete HTTP](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/tree/master/examples/complete-http) - Create API Gateway, authorizer, domain name, stage and other resources in various combinations
 - [HTTP with VPC Link](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/tree/master/examples/vpc-link-http) - Create API Gateway with VPC link and integration with resources in VPC (eg. ALB)
+- [Websocket](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/tree/master/examples/websocket) - Create Websocket API
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
@@ -100,7 +97,7 @@ module "api_gateway" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 3.61.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.35 |
 
 ## Modules
 
@@ -173,13 +170,13 @@ No modules.
 | <a name="output_apigatewayv2_domain_name_id"></a> [apigatewayv2\_domain\_name\_id](#output\_apigatewayv2\_domain\_name\_id) | The domain name identifier |
 | <a name="output_apigatewayv2_domain_name_target_domain_name"></a> [apigatewayv2\_domain\_name\_target\_domain\_name](#output\_apigatewayv2\_domain\_name\_target\_domain\_name) | The target domain name |
 | <a name="output_apigatewayv2_route"></a> [apigatewayv2\_route](#output\_apigatewayv2\_route) | Map containing the routes created and their attributes |
+| <a name="output_apigatewayv2_stage_arn"></a> [apigatewayv2\_stage\_arn](#output\_apigatewayv2\_stage\_arn) | The stage ARN |
+| <a name="output_apigatewayv2_stage_domain_name"></a> [apigatewayv2\_stage\_domain\_name](#output\_apigatewayv2\_stage\_domain\_name) | Domain name of the stage (useful for CloudFront distribution) |
+| <a name="output_apigatewayv2_stage_execution_arn"></a> [apigatewayv2\_stage\_execution\_arn](#output\_apigatewayv2\_stage\_execution\_arn) | The ARN prefix to be used in an aws\_lambda\_permission's source\_arn attribute or in an aws\_iam\_policy to authorize access to the @connections API. |
+| <a name="output_apigatewayv2_stage_id"></a> [apigatewayv2\_stage\_id](#output\_apigatewayv2\_stage\_id) | The stage identifier |
+| <a name="output_apigatewayv2_stage_invoke_url"></a> [apigatewayv2\_stage\_invoke\_url](#output\_apigatewayv2\_stage\_invoke\_url) | The URL to invoke the API pointing to the stage |
 | <a name="output_apigatewayv2_vpc_link_arn"></a> [apigatewayv2\_vpc\_link\_arn](#output\_apigatewayv2\_vpc\_link\_arn) | The map of VPC Link ARNs |
 | <a name="output_apigatewayv2_vpc_link_id"></a> [apigatewayv2\_vpc\_link\_id](#output\_apigatewayv2\_vpc\_link\_id) | The map of VPC Link identifiers |
-| <a name="output_default_apigatewayv2_stage_arn"></a> [default\_apigatewayv2\_stage\_arn](#output\_default\_apigatewayv2\_stage\_arn) | The default stage ARN |
-| <a name="output_default_apigatewayv2_stage_domain_name"></a> [default\_apigatewayv2\_stage\_domain\_name](#output\_default\_apigatewayv2\_stage\_domain\_name) | Domain name of the stage (useful for CloudFront distribution) |
-| <a name="output_default_apigatewayv2_stage_execution_arn"></a> [default\_apigatewayv2\_stage\_execution\_arn](#output\_default\_apigatewayv2\_stage\_execution\_arn) | The ARN prefix to be used in an aws\_lambda\_permission's source\_arn attribute or in an aws\_iam\_policy to authorize access to the @connections API. |
-| <a name="output_default_apigatewayv2_stage_id"></a> [default\_apigatewayv2\_stage\_id](#output\_default\_apigatewayv2\_stage\_id) | The default stage identifier |
-| <a name="output_default_apigatewayv2_stage_invoke_url"></a> [default\_apigatewayv2\_stage\_invoke\_url](#output\_default\_apigatewayv2\_stage\_invoke\_url) | The URL to invoke the API pointing to the stage |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 ## Authors

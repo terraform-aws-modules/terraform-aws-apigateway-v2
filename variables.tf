@@ -131,7 +131,6 @@ variable "tags" {
   default     = {}
 }
 
-#####
 # Stage
 variable "stage_name" {
   description = "The name of the stage"
@@ -157,7 +156,6 @@ variable "stage_tags" {
   default     = {}
 }
 
-#####
 # API mapping
 variable "api_mapping_key" {
   description = "The [API mapping key](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-mapping-template-reference.html)"
@@ -165,8 +163,7 @@ variable "api_mapping_key" {
   default     = null
 }
 
-####
-# domain name
+# Domain name
 variable "domain_name" {
   description = "The domain name to use for API gateway"
   type        = string
@@ -191,15 +188,14 @@ variable "mutual_tls_authentication" {
   default     = {}
 }
 
-####
-# routes and integrations
+# Routes and integrations
 variable "integrations" {
   description = "Map of API gateway routes with integrations"
   type        = map(any)
   default     = {}
 }
 
-# vpc link
+# Vpc link
 variable "vpc_links" {
   description = "Map of VPC Links details to create"
   type        = map(any)

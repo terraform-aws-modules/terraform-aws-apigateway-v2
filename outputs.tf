@@ -18,28 +18,27 @@ output "apigatewayv2_api_execution_arn" {
   value       = element(concat(aws_apigatewayv2_api.this.*.execution_arn, [""]), 0)
 }
 
-# default stage
-output "default_apigatewayv2_stage_id" {
-  description = "The default stage identifier"
+output "apigatewayv2_stage_id" {
+  description = "The stage identifier"
   value       = element(concat(aws_apigatewayv2_stage.default.*.id, [""]), 0)
 }
 
-output "default_apigatewayv2_stage_arn" {
-  description = "The default stage ARN"
+output "apigatewayv2_stage_arn" {
+  description = "The stage ARN"
   value       = element(concat(aws_apigatewayv2_stage.default.*.arn, [""]), 0)
 }
 
-output "default_apigatewayv2_stage_execution_arn" {
+output "apigatewayv2_stage_execution_arn" {
   description = "The ARN prefix to be used in an aws_lambda_permission's source_arn attribute or in an aws_iam_policy to authorize access to the @connections API."
   value       = element(concat(aws_apigatewayv2_stage.default.*.execution_arn, [""]), 0)
 }
 
-output "default_apigatewayv2_stage_invoke_url" {
+output "apigatewayv2_stage_invoke_url" {
   description = "The URL to invoke the API pointing to the stage"
   value       = element(concat(aws_apigatewayv2_stage.default.*.invoke_url, [""]), 0)
 }
 
-output "default_apigatewayv2_stage_domain_name" {
+output "apigatewayv2_stage_domain_name" {
   description = "Domain name of the stage (useful for CloudFront distribution)"
   value       = replace(element(concat(aws_apigatewayv2_stage.default.*.invoke_url, [""]), 0), "/^https?://([^/]*).*/", "$1")
 }

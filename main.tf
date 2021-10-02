@@ -58,7 +58,7 @@ resource "aws_apigatewayv2_domain_name" "this" {
   tags = merge(var.domain_name_tags, var.tags)
 }
 
-# Default stage
+# Stage
 resource "aws_apigatewayv2_stage" "default" {
   count = var.create && var.create_stage ? 1 : 0
 
