@@ -127,7 +127,7 @@ resource "aws_apigatewayv2_route" "this" {
   route_key = each.key
 
   api_key_required                    = lookup(each.value, "api_key_required", null)
-  authorization_scopes                = try(lookup(each.value, "authorization_scopes", []), [])
+  authorization_scopes                = try(each.value.authorization_scopes, [])
   authorization_type                  = lookup(each.value, "authorization_type", "NONE")
   authorizer_id                       = lookup(each.value, "authorizer_id", null)
   model_selection_expression          = lookup(each.value, "model_selection_expression", null)
