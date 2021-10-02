@@ -60,17 +60,17 @@ resource "aws_apigatewayv2_domain_name" "this" {
 
 # Default stage
 resource "aws_apigatewayv2_stage" "default" {
-  count = var.create && var.create_default_stage ? 1 : 0
+  count = var.create && var.create_stage ? 1 : 0
 
   api_id      = aws_apigatewayv2_api.this[0].id
-  name        = var.default_stage_name
+  name        = var.stage_name
   auto_deploy = true
 
   dynamic "access_log_settings" {
-    for_each = var.default_stage_access_log_destination_arn != null && var.default_stage_access_log_format != null ? [true] : []
+    for_each = var.stage_access_log_destination_arn != null && var.stage_access_log_format != null ? [true] : []
     content {
-      destination_arn = var.default_stage_access_log_destination_arn
-      format          = var.default_stage_access_log_format
+      destination_arn = var.stage_access_log_destination_arn
+      format          = var.stage_access_log_format
     }
   }
 
@@ -97,7 +97,7 @@ resource "aws_apigatewayv2_stage" "default" {
     }
   }
 
-  tags = merge(var.default_stage_tags, var.tags)
+  tags = merge(var.stage_tags, var.tags)
 
   # Bug in terraform-aws-provider with perpetual diff
   lifecycle {
@@ -111,7 +111,7 @@ resource "aws_apigatewayv2_stage" "default" {
 
 # Default API mapping
 resource "aws_apigatewayv2_api_mapping" "this" {
-  count = var.create && var.create_api_domain_name && var.create_default_stage && var.create_default_stage_api_mapping ? 1 : 0
+  count = var.create && var.create_api_domain_name && var.create_stage && var.create_stage_api_mapping ? 1 : 0
 
   api_id          = aws_apigatewayv2_api.this[0].id
   domain_name     = aws_apigatewayv2_domain_name.this[0].id

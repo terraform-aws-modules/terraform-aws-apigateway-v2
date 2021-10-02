@@ -11,9 +11,32 @@ provider "aws" {
   skip_requesting_account_id = false
 }
 
+data "aws_caller_identity" "current" {}
+
 locals {
   name   = "websocket"
   region = "eu-west-1"
+
+  dynamodb_table_name = local.name
+  dynamodb_crud_permissions = {
+    effect = "Allow",
+    actions = [
+      "dynamodb:GetItem",
+      "dynamodb:DeleteItem",
+      "dynamodb:PutItem",
+      "dynamodb:Scan",
+      "dynamodb:Query",
+      "dynamodb:UpdateItem",
+      "dynamodb:BatchWriteItem",
+      "dynamodb:BatchGetItem",
+      "dynamodb:DescribeTable",
+      "dynamodb:ConditionCheckItem",
+    ],
+    resources = [
+      module.dynamodb_table.dynamodb_table_arn,
+      "${module.dynamodb_table.dynamodb_table_arn}/index/*"
+    ]
+  }
 
   tags = {
     Name        = local.name
@@ -79,7 +102,7 @@ module "connect_lambda_function" {
   publish = true
 
   environment_variables = {
-    TABLE_NAME = module.dynamodb_table.dynamodb_table_id
+    TABLE_NAME = local.dynamodb_table_name
   }
 
   allowed_triggers = {
@@ -91,25 +114,7 @@ module "connect_lambda_function" {
 
   attach_policy_statements = true
   policy_statements = {
-    dynamodb = {
-      effect = "Allow",
-      actions = [
-        "dynamodb:GetItem",
-        "dynamodb:DeleteItem",
-        "dynamodb:PutItem",
-        "dynamodb:Scan",
-        "dynamodb:Query",
-        "dynamodb:UpdateItem",
-        "dynamodb:BatchWriteItem",
-        "dynamodb:BatchGetItem",
-        "dynamodb:DescribeTable",
-        "dynamodb:ConditionCheckItem",
-      ],
-      resources = [
-        module.dynamodb_table.dynamodb_table_arn,
-        "${module.dynamodb_table.dynamodb_table_arn}/index/*"
-      ]
-    }
+    dynamodb = local.dynamodb_crud_permissions
   }
 
   tags = local.tags
@@ -130,7 +135,7 @@ module "disconnect_lambda_function" {
   publish = true
 
   environment_variables = {
-    TABLE_NAME = module.dynamodb_table.dynamodb_table_id
+    TABLE_NAME = local.dynamodb_table_name
   }
 
   allowed_triggers = {
@@ -142,25 +147,7 @@ module "disconnect_lambda_function" {
 
   attach_policy_statements = true
   policy_statements = {
-    dynamodb = {
-      effect = "Allow",
-      actions = [
-        "dynamodb:GetItem",
-        "dynamodb:DeleteItem",
-        "dynamodb:PutItem",
-        "dynamodb:Scan",
-        "dynamodb:Query",
-        "dynamodb:UpdateItem",
-        "dynamodb:BatchWriteItem",
-        "dynamodb:BatchGetItem",
-        "dynamodb:DescribeTable",
-        "dynamodb:ConditionCheckItem",
-      ],
-      resources = [
-        module.dynamodb_table.dynamodb_table_arn,
-        "${module.dynamodb_table.dynamodb_table_arn}/index/*"
-      ]
-    }
+    dynamodb = local.dynamodb_crud_permissions
   }
 
   tags = local.tags
@@ -181,7 +168,7 @@ module "send_message_lambda_function" {
   publish = true
 
   environment_variables = {
-    TABLE_NAME = module.dynamodb_table.dynamodb_table_id
+    TABLE_NAME = local.dynamodb_table_name
   }
 
   allowed_triggers = {
@@ -198,25 +185,7 @@ module "send_message_lambda_function" {
       actions   = ["execute-api:ManageConnections"],
       resources = ["${module.api_gateway.apigatewayv2_api_execution_arn}/*"]
     }
-    dynamodb = {
-      effect = "Allow",
-      actions = [
-        "dynamodb:GetItem",
-        "dynamodb:DeleteItem",
-        "dynamodb:PutItem",
-        "dynamodb:Scan",
-        "dynamodb:Query",
-        "dynamodb:UpdateItem",
-        "dynamodb:BatchWriteItem",
-        "dynamodb:BatchGetItem",
-        "dynamodb:DescribeTable",
-        "dynamodb:ConditionCheckItem",
-      ],
-      resources = [
-        module.dynamodb_table.dynamodb_table_arn,
-        "${module.dynamodb_table.dynamodb_table_arn}/index/*"
-      ]
-    }
+    dynamodb = local.dynamodb_crud_permissions
   }
 
   tags = local.tags
@@ -226,12 +195,12 @@ module "dynamodb_table" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
   version = "~> 1"
 
-  name     = local.name
-  hash_key = "connection_id"
+  name     = local.dynamodb_table_name
+  hash_key = "connectionId"
 
   attributes = [
     {
-      name = "connection_id"
+      name = "connectionId"
       type = "S"
     }
   ]
@@ -247,17 +216,17 @@ module "api_gateway" {
   protocol_type              = "WEBSOCKET"
   route_selection_expression = "$request.body.action"
 
-  default_stage_name     = "Prod"
+  stage_name             = "Prod"
   create_api_domain_name = false
 
   default_route_settings = {
     detailed_metrics_enabled = true
-    throttling_burst_limit   = 5000
-    throttling_rate_limit    = 10000
+    throttling_burst_limit   = 50
+    throttling_rate_limit    = 100
   }
 
-  default_stage_access_log_destination_arn = aws_cloudwatch_log_group.logs.arn
-  default_stage_access_log_format = jsonencode({
+  stage_access_log_destination_arn = aws_cloudwatch_log_group.logs.arn
+  stage_access_log_format = jsonencode({
     context = {
       domainName              = "$context.domainName"
       httpMethod              = "$context.httpMethod"
@@ -286,22 +255,28 @@ module "api_gateway" {
 
   integrations = {
     "$connect" = {
-      operation_name   = "ConnectRoute"
-      integration_type = "AWS_PROXY"
-      route_key        = "$connect"
-      lambda_arn       = module.connect_lambda_function.lambda_function_invoke_arn
+      operation_name         = "ConnectRoute"
+      integration_type       = "AWS_PROXY"
+      route_key              = "$connect"
+      lambda_arn             = module.connect_lambda_function.lambda_function_invoke_arn
+      throttling_burst_limit = 50
+      throttling_rate_limit  = 100
     },
     "$disconnect" = {
-      operation_name   = "DisconnectRoute"
-      integration_type = "AWS_PROXY"
-      route_key        = "$disconnect"
-      lambda_arn       = module.disconnect_lambda_function.lambda_function_invoke_arn
+      operation_name         = "DisconnectRoute"
+      integration_type       = "AWS_PROXY"
+      route_key              = "$disconnect"
+      lambda_arn             = module.disconnect_lambda_function.lambda_function_invoke_arn
+      throttling_burst_limit = 50
+      throttling_rate_limit  = 100
     },
     "sendmessage" = {
-      operation_name   = "SendRoute"
-      integration_type = "AWS_PROXY"
-      route_key        = "sendmessage"
-      lambda_arn       = module.send_message_lambda_function.lambda_function_invoke_arn
+      operation_name         = "SendRoute"
+      integration_type       = "AWS_PROXY"
+      route_key              = "sendmessage"
+      lambda_arn             = module.send_message_lambda_function.lambda_function_invoke_arn
+      throttling_burst_limit = 50
+      throttling_rate_limit  = 100
     },
   }
 
@@ -309,5 +284,5 @@ module "api_gateway" {
 }
 
 output "wss" {
-  value = module.api_gateway.default_apigatewayv2_stage_invoke_url
+  value = "wscat -c ${module.api_gateway.default_apigatewayv2_stage_invoke_url}"
 }

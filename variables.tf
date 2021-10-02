@@ -10,29 +10,17 @@ variable "create_api_gateway" {
   default     = true
 }
 
-variable "create_default_stage" {
+variable "create_stage" {
   description = "Whether to create default stage"
   type        = bool
   default     = true
 }
 
-variable "create_default_stage_api_mapping" {
+variable "create_stage_api_mapping" {
   description = "Whether to create default stage API mapping"
   type        = bool
   default     = true
 }
-
-# variable "create_stage" {
-#   description = "Whether to create custom stage"
-#   type        = bool
-#   default     = false
-# }
-#
-# variable "create_stage_api_mapping" {
-#   description = "Whether to create stage API mapping"
-#   type        = bool
-#   default     = false
-# }
 
 variable "create_api_domain_name" {
   description = "Whether to create API domain name resource"
@@ -144,27 +132,27 @@ variable "tags" {
 }
 
 #####
-# default stage
-variable "default_stage_name" {
-  description = "The name of the default stage"
+# Stage
+variable "stage_name" {
+  description = "The name of the stage"
   type        = string
   default     = "$default"
 }
 
-variable "default_stage_access_log_destination_arn" {
-  description = "Default stage's ARN of the CloudWatch Logs log group to receive access logs. Any trailing :* is trimmed from the ARN."
+variable "stage_access_log_destination_arn" {
+  description = "The stage's ARN of the CloudWatch Logs log group to receive access logs. Any trailing :* is trimmed from the ARN."
   type        = string
   default     = null
 }
 
-variable "default_stage_access_log_format" {
-  description = "Default stage's single line format of the access logs of data, as specified by selected $context variables."
+variable "stage_access_log_format" {
+  description = "The stage's single line format of the access logs of data, as specified by selected $context variables."
   type        = string
   default     = null
 }
 
-variable "default_stage_tags" {
-  description = "A mapping of tags to assign to the default stage resource."
+variable "stage_tags" {
+  description = "A mapping of tags to assign to the stage resource."
   type        = map(string)
   default     = {}
 }
