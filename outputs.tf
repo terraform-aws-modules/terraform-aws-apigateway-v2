@@ -67,12 +67,12 @@ output "apigatewayv2_domain_name_configuration" {
 
 output "apigatewayv2_domain_name_target_domain_name" {
   description = "The target domain name"
-  value       = var.create_api_domain_name ? lookup(tomap(element(element(concat(aws_apigatewayv2_domain_name.this.*.domain_name_configuration, [""]), 0), 0)), "target_domain_name", "") : ""
+  value       = try(aws_apigatewayv2_domain_name.this[0].domain_name_configuration[0].target_domain_name, "")
 }
 
 output "apigatewayv2_domain_name_hosted_zone_id" {
   description = "The Amazon Route 53 Hosted Zone ID of the endpoint"
-  value       = var.create_api_domain_name ? lookup(tomap(element(element(concat(aws_apigatewayv2_domain_name.this.*.domain_name_configuration, [""]), 0), 0)), "hosted_zone_id", "") : ""
+  value       = try(aws_apigatewayv2_domain_name.this[0].domain_name_configuration[0].hosted_zone_id, "")
 }
 
 # api mapping
