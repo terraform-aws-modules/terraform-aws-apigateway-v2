@@ -84,6 +84,22 @@ module "api_gateway" {
       tls_config = jsonencode({
         server_name_to_verify = local.domain_name
       })
+
+      response_parameters = jsonencode([
+        {
+          status_code = 500
+          mappings = {
+            "append:header.header1" = "$context.requestId"
+            "overwrite:statuscode"  = "403"
+          }
+        },
+        {
+          status_code = 404
+          mappings = {
+            "append:header.error" = "$stageVariables.environmentId"
+          }
+        }
+      ])
     }
 
   }
