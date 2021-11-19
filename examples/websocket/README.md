@@ -61,7 +61,7 @@ connected (press CTRL+C to quit)
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_api_gateway"></a> [api\_gateway](#module\_api\_gateway) | ../../ |  |
+| <a name="module_api_gateway"></a> [api\_gateway](#module\_api\_gateway) | ../../ | n/a |
 | <a name="module_connect_lambda_function"></a> [connect\_lambda\_function](#module\_connect\_lambda\_function) | terraform-aws-modules/lambda/aws | ~> 2 |
 | <a name="module_disconnect_lambda_function"></a> [disconnect\_lambda\_function](#module\_disconnect\_lambda\_function) | terraform-aws-modules/lambda/aws | ~> 2 |
 | <a name="module_dynamodb_table"></a> [dynamodb\_table](#module\_dynamodb\_table) | terraform-aws-modules/dynamodb-table/aws | ~> 1 |
