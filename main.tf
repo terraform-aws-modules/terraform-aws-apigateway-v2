@@ -173,6 +173,14 @@ resource "aws_apigatewayv2_integration" "this" {
     }
   }
 
+  dynamic "response_parameters" {
+    for_each = flatten([try(jsondecode(each.value["response_parameters"]), each.value["response_parameters"], [])])
+    content {
+      status_code = response_parameters.value["status_code"]
+      mappings    = response_parameters.value["mappings"]
+    }
+  }
+
   lifecycle {
     create_before_destroy = true
   }
