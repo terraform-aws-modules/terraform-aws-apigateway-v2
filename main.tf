@@ -98,8 +98,9 @@ resource "aws_apigatewayv2_stage" "this" {
       data_trace_enabled       = lookup(default_route_settings.value, "data_trace_enabled", false)
       detailed_metrics_enabled = lookup(default_route_settings.value, "detailed_metrics_enabled", false)
       logging_level            = lookup(default_route_settings.value, "logging_level", null)
-      throttling_burst_limit   = lookup(default_route_settings.value, "throttling_burst_limit", null)
-      throttling_rate_limit    = lookup(default_route_settings.value, "throttling_rate_limit", null)
+      # See https://github.com/hashicorp/terraform-provider-aws/issues/5690
+      throttling_burst_limit = lookup(default_route_settings.value, "throttling_burst_limit", "-1")
+      throttling_rate_limit  = lookup(default_route_settings.value, "throttling_rate_limit", "-1")
     }
   }
 
@@ -109,9 +110,10 @@ resource "aws_apigatewayv2_stage" "this" {
       route_key                = route_settings.key
       data_trace_enabled       = lookup(route_settings.value, "data_trace_enabled", null)
       detailed_metrics_enabled = lookup(route_settings.value, "detailed_metrics_enabled", null)
-      logging_level            = lookup(route_settings.value, "logging_level", null) # Error: error updating API Gateway v2 stage ($default): BadRequestException: Execution logs are not supported on protocolType HTTP
-      throttling_burst_limit   = lookup(route_settings.value, "throttling_burst_limit", null)
-      throttling_rate_limit    = lookup(route_settings.value, "throttling_rate_limit", null)
+      logging_level            = lookup(route_settings.value, "logging_level", null)
+      # See https://github.com/hashicorp/terraform-provider-aws/issues/5690
+      throttling_burst_limit = lookup(route_settings.value, "throttling_burst_limit", "-1")
+      throttling_rate_limit  = lookup(route_settings.value, "throttling_rate_limit", "-1")
     }
   }
 
