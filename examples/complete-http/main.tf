@@ -200,10 +200,12 @@ module "api_gateway" {
   domain_name                 = var.domain_name
   domain_name_certificate_arn = module.acm.acm_certificate_arn
 
-  stage_access_log_destination_arn = aws_cloudwatch_log_group.logs.arn
-  stage_access_log_format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
+  stage_access_log_settings = {
+    destination_arn = aws_cloudwatch_log_group.logs.arn
+    format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
+  }
 
-  default_route_settings = {
+  stage_default_route_settings = {
     detailed_metrics_enabled = true
     throttling_burst_limit   = 100
     throttling_rate_limit    = 100

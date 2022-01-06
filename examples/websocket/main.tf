@@ -211,38 +211,40 @@ module "api_gateway" {
   stage_name             = "Prod"
   create_api_domain_name = false
 
-  default_route_settings = {
+  stage_default_route_settings = {
     detailed_metrics_enabled = true
     throttling_burst_limit   = 50
     throttling_rate_limit    = 100
   }
 
-  stage_access_log_destination_arn = aws_cloudwatch_log_group.logs.arn
-  stage_access_log_format = jsonencode({
-    context = {
-      domainName              = "$context.domainName"
-      integrationErrorMessage = "$context.integrationErrorMessage"
-      protocol                = "$context.protocol"
-      requestId               = "$context.requestId"
-      requestTime             = "$context.requestTime"
-      responseLength          = "$context.responseLength"
-      routeKey                = "$context.routeKey"
-      stage                   = "$context.stage"
-      status                  = "$context.status"
-      error = {
-        message       = "$context.error.message"
-        messageString = "$context.error.messageString"
-        responseType  = "$context.error.responseType"
+  stage_access_log_settings = {
+    destination_arn = aws_cloudwatch_log_group.logs.arn
+    format = jsonencode({
+      context = {
+        domainName              = "$context.domainName"
+        integrationErrorMessage = "$context.integrationErrorMessage"
+        protocol                = "$context.protocol"
+        requestId               = "$context.requestId"
+        requestTime             = "$context.requestTime"
+        responseLength          = "$context.responseLength"
+        routeKey                = "$context.routeKey"
+        stage                   = "$context.stage"
+        status                  = "$context.status"
+        error = {
+          message       = "$context.error.message"
+          messageString = "$context.error.messageString"
+          responseType  = "$context.error.responseType"
+        }
+        identity = {
+          sourceIP = "$context.identity.sourceIp"
+        }
+        integration = {
+          error             = "$context.integration.error"
+          integrationStatus = "$context.integration.integrationStatus"
+        }
       }
-      identity = {
-        sourceIP = "$context.identity.sourceIp"
-      }
-      integration = {
-        error             = "$context.integration.error"
-        integrationStatus = "$context.integration.integrationStatus"
-      }
-    }
-  })
+    })
+  }
 
   integrations = {
     "$connect" = {

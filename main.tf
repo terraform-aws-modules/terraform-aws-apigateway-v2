@@ -23,7 +23,7 @@ resource "aws_apigatewayv2_api" "this" {
   /* End of quick create */
 
   dynamic "cors_configuration" {
-    for_each = var.protocol_type != "HTTP" || length(keys(var.cors_configuration)) == 0 ? [] : [var.cors_configuration]
+    for_each = var.protocol_type == "HTTP" && length(keys(var.cors_configuration)) > 0 ? [var.cors_configuration] : []
 
     content {
       allow_credentials = lookup(cors_configuration.value, "allow_credentials", null)
@@ -82,25 +82,29 @@ resource "aws_apigatewayv2_stage" "this" {
 
   api_id      = aws_apigatewayv2_api.this[0].id
   name        = var.stage_name
-  auto_deploy = true
+  description = var.stage_description
+
+  auto_deploy           = var.protocol_type == "HTTP" ? true : null
+  client_certificate_id = var.protocol_type == "WEBSOCKET" ? var.stage_client_certificate_id : null
+  stage_variables       = var.stage_variables
 
   dynamic "access_log_settings" {
-    for_each = var.stage_access_log_destination_arn != null && var.stage_access_log_format != null ? [true] : []
+    for_each = length(keys(var.stage_access_log_settings)) == 2 ? [var.stage_access_log_settings] : []
     content {
-      destination_arn = var.stage_access_log_destination_arn
-      format          = var.stage_access_log_format
+      destination_arn = access_log_settings.value.destination_arn
+      format          = access_log_settings.value.format
     }
   }
 
   dynamic "default_route_settings" {
-    for_each = length(keys(var.default_route_settings)) == 0 ? [] : [var.default_route_settings]
+    for_each = length(keys(var.stage_default_route_settings)) > 0 ? [var.stage_default_route_settings] : []
     content {
       data_trace_enabled       = lookup(default_route_settings.value, "data_trace_enabled", false)
       detailed_metrics_enabled = lookup(default_route_settings.value, "detailed_metrics_enabled", false)
       logging_level            = lookup(default_route_settings.value, "logging_level", null)
-      # See https://github.com/hashicorp/terraform-provider-aws/issues/5690
-      throttling_burst_limit = lookup(default_route_settings.value, "throttling_burst_limit", "-1")
-      throttling_rate_limit  = lookup(default_route_settings.value, "throttling_rate_limit", "-1")
+      # See https://github.com/hashicorp/terraform-provider-aws/issues/14742
+      throttling_burst_limit = lookup(default_route_settings.value, "throttling_burst_limit", null)
+      throttling_rate_limit  = lookup(default_route_settings.value, "throttling_rate_limit", null)
     }
   }
 
@@ -111,18 +115,18 @@ resource "aws_apigatewayv2_stage" "this" {
       data_trace_enabled       = lookup(route_settings.value, "data_trace_enabled", null)
       detailed_metrics_enabled = lookup(route_settings.value, "detailed_metrics_enabled", null)
       logging_level            = lookup(route_settings.value, "logging_level", null)
-      # See https://github.com/hashicorp/terraform-provider-aws/issues/5690
-      throttling_burst_limit = lookup(route_settings.value, "throttling_burst_limit", "-1")
-      throttling_rate_limit  = lookup(route_settings.value, "throttling_rate_limit", "-1")
+      # See https://github.com/hashicorp/terraform-provider-aws/issues/14742
+      throttling_burst_limit = lookup(route_settings.value, "throttling_burst_limit", null)
+      throttling_rate_limit  = lookup(route_settings.value, "throttling_rate_limit", null)
     }
   }
 
   tags = merge(var.stage_tags, var.tags)
 
-  # Bug in terraform-aws-provider with perpetual diff
-  lifecycle {
-    ignore_changes = [deployment_id]
-  }
+  # # Bug in terraform-aws-provider with perpetual diff
+  # lifecycle {
+  #   ignore_changes = [deployment_id]
+  # }
 
   depends_on = [
     aws_apigatewayv2_route.this
@@ -134,7 +138,8 @@ resource "aws_apigatewayv2_stage" "this" {
 ################################################################################
 
 resource "aws_apigatewayv2_route" "this" {
-  for_each = var.create && var.create_routes_and_integrations ? var.integrations : {}
+  # body == null see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_api#aws_apigatewayv2_integration
+  for_each = var.create && var.create_routes_and_integrations && var.body == null ? var.integrations : {}
 
   api_id    = aws_apigatewayv2_api.this[0].id
   route_key = each.key
@@ -163,7 +168,8 @@ resource "aws_apigatewayv2_route" "this" {
 ################################################################################
 
 resource "aws_apigatewayv2_integration" "this" {
-  for_each = var.create && var.create_routes_and_integrations ? var.integrations : {}
+  # body == null see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_api#aws_apigatewayv2_integration
+  for_each = var.create && var.create_routes_and_integrations && var.body == null ? var.integrations : {}
 
   api_id      = aws_apigatewayv2_api.this[0].id
   description = lookup(each.value, "description", null)
