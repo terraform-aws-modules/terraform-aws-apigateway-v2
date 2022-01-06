@@ -130,7 +130,7 @@ module "lambda_function" {
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {
       service    = "apigateway"
-      source_arn = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*/*"
+      source_arn = "${module.api_gateway.api_execution_arn}/*/*/*"
     }
   }
 

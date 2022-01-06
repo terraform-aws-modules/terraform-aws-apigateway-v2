@@ -88,7 +88,7 @@ module "connect_lambda_function" {
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {
       service    = "apigateway"
-      source_arn = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*"
+      source_arn = "${module.api_gateway.api_execution_arn}/*/*"
     }
   }
 
@@ -123,7 +123,7 @@ module "disconnect_lambda_function" {
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {
       service    = "apigateway"
-      source_arn = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*"
+      source_arn = "${module.api_gateway.api_execution_arn}/*/*"
     }
   }
 
@@ -158,7 +158,7 @@ module "send_message_lambda_function" {
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {
       service    = "apigateway"
-      source_arn = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*"
+      source_arn = "${module.api_gateway.api_execution_arn}/*/*"
     }
   }
 
@@ -167,7 +167,7 @@ module "send_message_lambda_function" {
     manage_connections = {
       effect    = "Allow",
       actions   = ["execute-api:ManageConnections"],
-      resources = ["${module.api_gateway.apigatewayv2_api_execution_arn}/*"]
+      resources = ["${module.api_gateway.api_execution_arn}/*"]
     }
     dynamodb = local.dynamodb_crud_permissions
   }

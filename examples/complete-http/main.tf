@@ -40,14 +40,14 @@ resource "aws_route53_record" "api" {
   type    = "A"
 
   alias {
-    name                   = module.api_gateway.apigatewayv2_domain_name_configuration[0].target_domain_name
-    zone_id                = module.api_gateway.apigatewayv2_domain_name_configuration[0].hosted_zone_id
+    name                   = module.api_gateway.domain_name_configuration[0].target_domain_name
+    zone_id                = module.api_gateway.domain_name_configuration[0].hosted_zone_id
     evaluate_target_health = false
   }
 }
 
 resource "aws_apigatewayv2_authorizer" "some_authorizer" {
-  api_id           = module.api_gateway.apigatewayv2_api_id
+  api_id           = module.api_gateway.api_id
   authorizer_type  = "JWT"
   identity_sources = ["$request.header.Authorization"]
   name             = local.name
@@ -68,7 +68,8 @@ module "step_function" {
   source  = "terraform-aws-modules/step-functions/aws"
   version = "~> 2.0"
 
-  name = local.name
+  name      = local.name
+  role_name = "${local.name}-step-function"
 
   definition = <<-EOT
   {
@@ -130,7 +131,7 @@ module "lambda_function" {
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {
       service    = "apigateway"
-      source_arn = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*"
+      source_arn = "${module.api_gateway.api_execution_arn}/*/*"
     }
   }
 

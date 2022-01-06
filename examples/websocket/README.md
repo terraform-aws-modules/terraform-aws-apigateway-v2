@@ -81,21 +81,22 @@ No inputs.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_apigatewayv2_api_api_endpoint"></a> [apigatewayv2\_api\_api\_endpoint](#output\_apigatewayv2\_api\_api\_endpoint) | The URI of the API |
-| <a name="output_apigatewayv2_api_arn"></a> [apigatewayv2\_api\_arn](#output\_apigatewayv2\_api\_arn) | The ARN of the API |
-| <a name="output_apigatewayv2_api_execution_arn"></a> [apigatewayv2\_api\_execution\_arn](#output\_apigatewayv2\_api\_execution\_arn) | The ARN prefix to be used in an aws\_lambda\_permission's source\_arn attribute or in an aws\_iam\_policy to authorize access to the @connections API. |
-| <a name="output_apigatewayv2_api_id"></a> [apigatewayv2\_api\_id](#output\_apigatewayv2\_api\_id) | The API identifier |
-| <a name="output_apigatewayv2_api_mapping_id"></a> [apigatewayv2\_api\_mapping\_id](#output\_apigatewayv2\_api\_mapping\_id) | The API mapping identifier |
-| <a name="output_apigatewayv2_domain_name_api_mapping_selection_expression"></a> [apigatewayv2\_domain\_name\_api\_mapping\_selection\_expression](#output\_apigatewayv2\_domain\_name\_api\_mapping\_selection\_expression) | The API mapping selection expression for the domain name |
-| <a name="output_apigatewayv2_domain_name_arn"></a> [apigatewayv2\_domain\_name\_arn](#output\_apigatewayv2\_domain\_name\_arn) | The ARN of the domain name |
-| <a name="output_apigatewayv2_domain_name_configuration"></a> [apigatewayv2\_domain\_name\_configuration](#output\_apigatewayv2\_domain\_name\_configuration) | The domain name configuration |
-| <a name="output_apigatewayv2_domain_name_hosted_zone_id"></a> [apigatewayv2\_domain\_name\_hosted\_zone\_id](#output\_apigatewayv2\_domain\_name\_hosted\_zone\_id) | The Amazon Route 53 Hosted Zone ID of the endpoint |
-| <a name="output_apigatewayv2_domain_name_id"></a> [apigatewayv2\_domain\_name\_id](#output\_apigatewayv2\_domain\_name\_id) | The domain name identifier |
-| <a name="output_apigatewayv2_domain_name_target_domain_name"></a> [apigatewayv2\_domain\_name\_target\_domain\_name](#output\_apigatewayv2\_domain\_name\_target\_domain\_name) | The target domain name |
-| <a name="output_apigatewayv2_route"></a> [apigatewayv2\_route](#output\_apigatewayv2\_route) | Map containing the routes created and their attributes |
-| <a name="output_apigatewayv2_stage_arn"></a> [apigatewayv2\_stage\_arn](#output\_apigatewayv2\_stage\_arn) | The default stage ARN |
-| <a name="output_apigatewayv2_stage_domain_name"></a> [apigatewayv2\_stage\_domain\_name](#output\_apigatewayv2\_stage\_domain\_name) | Domain name of the stage (useful for CloudFront distribution) |
-| <a name="output_apigatewayv2_stage_execution_arn"></a> [apigatewayv2\_stage\_execution\_arn](#output\_apigatewayv2\_stage\_execution\_arn) | The ARN prefix to be used in an aws\_lambda\_permission's source\_arn attribute or in an aws\_iam\_policy to authorize access to the @connections API. |
-| <a name="output_apigatewayv2_stage_id"></a> [apigatewayv2\_stage\_id](#output\_apigatewayv2\_stage\_id) | The default stage identifier |
-| <a name="output_apigatewayv2_stage_invoke_url"></a> [apigatewayv2\_stage\_invoke\_url](#output\_apigatewayv2\_stage\_invoke\_url) | The URL to invoke the API pointing to the stage |
+| <a name="output_api_arn"></a> [api\_arn](#output\_api\_arn) | The ARN of the API |
+| <a name="output_api_endpoint"></a> [api\_endpoint](#output\_api\_endpoint) | The URI of the API |
+| <a name="output_api_execution_arn"></a> [api\_execution\_arn](#output\_api\_execution\_arn) | The ARN prefix to be used in an aws\_lambda\_permission's source\_arn attribute or in an aws\_iam\_policy to authorize access to the @connections API. |
+| <a name="output_api_id"></a> [api\_id](#output\_api\_id) | The API identifier |
+| <a name="output_api_mapping_id"></a> [api\_mapping\_id](#output\_api\_mapping\_id) | The API mapping identifier |
+| <a name="output_domain_name_api_mapping_selection_expression"></a> [domain\_name\_api\_mapping\_selection\_expression](#output\_domain\_name\_api\_mapping\_selection\_expression) | The API mapping selection expression for the domain name |
+| <a name="output_domain_name_arn"></a> [domain\_name\_arn](#output\_domain\_name\_arn) | The ARN of the domain name |
+| <a name="output_domain_name_configuration"></a> [domain\_name\_configuration](#output\_domain\_name\_configuration) | The domain name configuration |
+| <a name="output_domain_name_hosted_zone_id"></a> [domain\_name\_hosted\_zone\_id](#output\_domain\_name\_hosted\_zone\_id) | The Amazon Route 53 Hosted Zone ID of the endpoint |
+| <a name="output_domain_name_id"></a> [domain\_name\_id](#output\_domain\_name\_id) | The domain name identifier |
+| <a name="output_domain_name_target_domain_name"></a> [domain\_name\_target\_domain\_name](#output\_domain\_name\_target\_domain\_name) | The target domain name |
+| <a name="output_integrations"></a> [integrations](#output\_integrations) | Map of the integrations created and their attributes |
+| <a name="output_routes"></a> [routes](#output\_routes) | Map of the routes created and their attributes |
+| <a name="output_stage_arn"></a> [stage\_arn](#output\_stage\_arn) | The stage ARN |
+| <a name="output_stage_execution_arn"></a> [stage\_execution\_arn](#output\_stage\_execution\_arn) | The ARN prefix to be used in an aws\_lambda\_permission's source\_arn attribute or in an aws\_iam\_policy to authorize access to the @connections API. |
+| <a name="output_stage_id"></a> [stage\_id](#output\_stage\_id) | The stage identifier |
+| <a name="output_stage_invoke_url"></a> [stage\_invoke\_url](#output\_stage\_invoke\_url) | The URL to invoke the API pointing to the stage |
+| <a name="output_vpc_links"></a> [vpc\_links](#output\_vpc\_links) | Map of VPC links created and their attributes |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->

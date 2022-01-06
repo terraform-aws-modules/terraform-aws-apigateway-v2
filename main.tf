@@ -1,4 +1,7 @@
+################################################################################
 # API Gateway
+################################################################################
+
 resource "aws_apigatewayv2_api" "this" {
   count = var.create && var.create_api_gateway ? 1 : 0
 
@@ -35,7 +38,19 @@ resource "aws_apigatewayv2_api" "this" {
   tags = var.tags
 }
 
-# Domain name
+resource "aws_apigatewayv2_api_mapping" "this" {
+  count = var.create && var.create_api_domain_name && var.create_stage && var.create_stage_api_mapping ? 1 : 0
+
+  api_id          = aws_apigatewayv2_api.this[0].id
+  domain_name     = aws_apigatewayv2_domain_name.this[0].id
+  stage           = aws_apigatewayv2_stage.this[0].id
+  api_mapping_key = var.api_mapping_key
+}
+
+################################################################################
+# Domain Name
+################################################################################
+
 resource "aws_apigatewayv2_domain_name" "this" {
   count = var.create && var.create_api_domain_name ? 1 : 0
 
@@ -58,8 +73,11 @@ resource "aws_apigatewayv2_domain_name" "this" {
   tags = merge(var.domain_name_tags, var.tags)
 }
 
-# Stage
-resource "aws_apigatewayv2_stage" "default" {
+################################################################################
+# API Gateway Stage
+################################################################################
+
+resource "aws_apigatewayv2_stage" "this" {
   count = var.create && var.create_stage ? 1 : 0
 
   api_id      = aws_apigatewayv2_api.this[0].id
@@ -109,17 +127,10 @@ resource "aws_apigatewayv2_stage" "default" {
   ]
 }
 
-# Default API mapping
-resource "aws_apigatewayv2_api_mapping" "this" {
-  count = var.create && var.create_api_domain_name && var.create_stage && var.create_stage_api_mapping ? 1 : 0
+################################################################################
+# Route(s)
+################################################################################
 
-  api_id          = aws_apigatewayv2_api.this[0].id
-  domain_name     = aws_apigatewayv2_domain_name.this[0].id
-  stage           = aws_apigatewayv2_stage.default[0].id
-  api_mapping_key = var.api_mapping_key
-}
-
-# Routes and integrations
 resource "aws_apigatewayv2_route" "this" {
   for_each = var.create && var.create_routes_and_integrations ? var.integrations : {}
 
@@ -144,6 +155,10 @@ resource "aws_apigatewayv2_route" "this" {
     }
   }
 }
+
+################################################################################
+# Integration(s)
+################################################################################
 
 resource "aws_apigatewayv2_integration" "this" {
   for_each = var.create && var.create_routes_and_integrations ? var.integrations : {}
@@ -186,7 +201,10 @@ resource "aws_apigatewayv2_integration" "this" {
   }
 }
 
-# VPC Link (Private API)
+################################################################################
+# VPC Link
+################################################################################
+
 resource "aws_apigatewayv2_vpc_link" "this" {
   for_each = var.create && var.create_vpc_link ? var.vpc_links : {}
 
