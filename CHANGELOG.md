@@ -1,11 +1,13 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file.
 
-<a name="unreleased"></a>
-## [Unreleased]
+## [1.5.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.5.0...v1.5.1) (2021-11-22)
 
 
+### Bug Fixes
+
+* update CI/CD process to enable auto-release workflow ([#60](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/60)) ([55f5c1d](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/55f5c1d74b4b61cf228f66c2d4a7f940e90f01b7))
 
 <a name="v1.5.0"></a>
 ## [v1.5.0] - 2021-11-01
