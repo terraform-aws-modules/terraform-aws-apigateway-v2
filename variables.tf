@@ -1,8 +1,18 @@
 variable "create" {
-  description = "Controls if API Gateway resources should be created"
+  description = "Controls if resources should be created"
   type        = bool
   default     = true
 }
+
+variable "tags" {
+  description = "A mapping of tags to assign to API gateway resources"
+  type        = map(string)
+  default     = {}
+}
+
+################################################################################
+# API Gateway
+################################################################################
 
 variable "create_api_gateway" {
   description = "Whether to create API Gateway"
@@ -10,37 +20,6 @@ variable "create_api_gateway" {
   default     = true
 }
 
-variable "create_stage" {
-  description = "Whether to create default stage"
-  type        = bool
-  default     = true
-}
-
-variable "create_stage_api_mapping" {
-  description = "Whether to create default stage API mapping"
-  type        = bool
-  default     = true
-}
-
-variable "create_api_domain_name" {
-  description = "Whether to create API domain name resource"
-  type        = bool
-  default     = true
-}
-
-variable "create_routes_and_integrations" {
-  description = "Whether to create routes and integrations resources"
-  type        = bool
-  default     = true
-}
-
-variable "create_vpc_link" {
-  description = "Whether to create VPC links"
-  type        = bool
-  default     = true
-}
-
-# API Gateway
 variable "name" {
   description = "The name of the API"
   type        = string
@@ -48,7 +27,7 @@ variable "name" {
 }
 
 variable "description" {
-  description = "The description of the API."
+  description = "The description of the API"
   type        = string
   default     = null
 }
@@ -72,43 +51,43 @@ variable "protocol_type" {
 }
 
 variable "api_key_selection_expression" {
-  description = "An API key selection expression. Valid values: $context.authorizer.usageIdentifierKey, $request.header.x-api-key."
+  description = "An API key selection expression. Valid values: $context.authorizer.usageIdentifierKey, $request.header.x-api-key"
   type        = string
   default     = "$request.header.x-api-key"
 }
 
 variable "route_key" {
-  description = "Part of quick create. Specifies any route key. Applicable for HTTP APIs."
+  description = "Part of quick create. Specifies any route key. Applicable for HTTP APIs"
   type        = string
   default     = null
 }
 
 variable "route_selection_expression" {
-  description = "The route selection expression for the API."
+  description = "The route selection expression for the API"
   type        = string
   default     = "$request.method $request.path"
 }
 
 variable "cors_configuration" {
-  description = "The cross-origin resource sharing (CORS) configuration. Applicable for HTTP APIs."
+  description = "The cross-origin resource sharing (CORS) configuration. Applicable for HTTP APIs"
   type        = any
   default     = {}
 }
 
 variable "credentials_arn" {
-  description = "Part of quick create. Specifies any credentials required for the integration. Applicable for HTTP APIs."
+  description = "Part of quick create. Specifies any credentials required for the integration. Applicable for HTTP APIs"
   type        = string
   default     = null
 }
 
 variable "target" {
-  description = "Part of quick create. Quick create produces an API with an integration, a default catch-all route, and a default stage which is configured to automatically deploy changes. For HTTP integrations, specify a fully qualified URL. For Lambda integrations, specify a function ARN. The type of the integration will be HTTP_PROXY or AWS_PROXY, respectively. Applicable for HTTP APIs."
+  description = "Part of quick create. Quick create produces an API with an integration, a default catch-all route, and a default stage which is configured to automatically deploy changes. For HTTP integrations, specify a fully qualified URL. For Lambda integrations, specify a function ARN. The type of the integration will be HTTP_PROXY or AWS_PROXY, respectively. Applicable for HTTP APIs"
   type        = string
   default     = null
 }
 
 variable "body" {
-  description = "An OpenAPI specification that defines the set of routes and integrations to create as part of the HTTP APIs. Supported only for HTTP APIs."
+  description = "An OpenAPI specification that defines the set of routes and integrations to create as part of the HTTP APIs. Supported only for HTTP APIs"
   type        = string
   default     = null
 }
@@ -125,13 +104,28 @@ variable "fail_on_warnings" {
   default     = null
 }
 
-variable "tags" {
-  description = "A mapping of tags to assign to API gateway resources."
-  type        = map(string)
-  default     = {}
+variable "create_stage_api_mapping" {
+  description = "Whether to create default stage API mapping"
+  type        = bool
+  default     = true
 }
 
-# Stage
+variable "api_mapping_key" {
+  description = "The [API mapping key](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-mapping-template-reference.html)"
+  type        = string
+  default     = null
+}
+
+################################################################################
+# API Gateway Stage
+################################################################################
+
+variable "create_stage" {
+  description = "Whether to create default stage"
+  type        = bool
+  default     = true
+}
+
 variable "stage_name" {
   description = "The name of the stage"
   type        = string
@@ -139,31 +133,33 @@ variable "stage_name" {
 }
 
 variable "stage_access_log_destination_arn" {
-  description = "The stage's ARN of the CloudWatch Logs log group to receive access logs. Any trailing :* is trimmed from the ARN."
+  description = "The stage's ARN of the CloudWatch Logs log group to receive access logs. Any trailing :* is trimmed from the ARN"
   type        = string
   default     = null
 }
 
 variable "stage_access_log_format" {
-  description = "The stage's single line format of the access logs of data, as specified by selected $context variables."
+  description = "The stage's single line format of the access logs of data, as specified by selected $context variables"
   type        = string
   default     = null
 }
 
 variable "stage_tags" {
-  description = "A mapping of tags to assign to the stage resource."
+  description = "A mapping of tags to assign to the stage resource"
   type        = map(string)
   default     = {}
 }
 
-# API mapping
-variable "api_mapping_key" {
-  description = "The [API mapping key](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-mapping-template-reference.html)"
-  type        = string
-  default     = null
+################################################################################
+# Domain Name
+################################################################################
+
+variable "create_api_domain_name" {
+  description = "Whether to create API domain name resource"
+  type        = bool
+  default     = true
 }
 
-# Domain name
 variable "domain_name" {
   description = "The domain name to use for API gateway"
   type        = string
@@ -177,7 +173,7 @@ variable "domain_name_certificate_arn" {
 }
 
 variable "domain_name_tags" {
-  description = "A mapping of tags to assign to API domain name resource."
+  description = "A mapping of tags to assign to API domain name resource"
   type        = map(string)
   default     = {}
 }
@@ -188,14 +184,32 @@ variable "mutual_tls_authentication" {
   default     = {}
 }
 
-# Routes and integrations
+################################################################################
+# Integration(s)
+################################################################################
+
+variable "create_routes_and_integrations" {
+  description = "Whether to create routes and integrations resources"
+  type        = bool
+  default     = true
+}
+
 variable "integrations" {
   description = "Map of API gateway routes with integrations"
   type        = map(any)
   default     = {}
 }
 
-# Vpc link
+################################################################################
+# VPC Link
+################################################################################
+
+variable "create_vpc_link" {
+  description = "Whether to create VPC links"
+  type        = bool
+  default     = true
+}
+
 variable "vpc_links" {
   description = "Map of VPC Links details to create"
   type        = map(any)
