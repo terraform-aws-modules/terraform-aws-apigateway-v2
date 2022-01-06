@@ -1,24 +1,12 @@
 provider "aws" {
   region = local.region
-
-  # Make it faster by skipping something
-  skip_get_ec2_platforms      = true
-  skip_metadata_api_check     = true
-  skip_region_validation      = true
-  skip_credentials_validation = true
-
-  # skip_requesting_account_id should be disabled to generate valid ARN in apigatewayv2_api_execution_arn
-  skip_requesting_account_id = false
 }
 
-data "aws_caller_identity" "current" {}
-
 locals {
-  name   = "websocket"
+  name   = "ex-${replace(basename(path.cwd), "_", "-")}"
   region = "eu-west-1"
 
   dynamodb_table_name = local.name
-  dynamodb_table_arn  = "arn:aws:dynamodb:${local.region}:${data.aws_caller_identity.current.account_id}:table/${local.dynamodb_table_name}" # hack to avoid race condition
   dynamodb_crud_permissions = {
     effect = "Allow",
     actions = [
@@ -34,8 +22,8 @@ locals {
       "dynamodb:ConditionCheckItem",
     ],
     resources = [
-      local.dynamodb_table_arn,
-      "${local.dynamodb_table_arn}/index/*"
+      module.dynamodb_table.dynamodb_table_arn,
+      "${module.dynamodb_table.dynamodb_table_arn}/index/*"
     ]
   }
 
@@ -45,16 +33,12 @@ locals {
   }
 }
 
-##################
-# Extra resources
-##################
-
-resource "random_pet" "this" {
-  length = 2
-}
+################################################################################
+# Supporting Resources
+################################################################################
 
 resource "aws_cloudwatch_log_group" "logs" {
-  name = random_pet.this.id
+  name = local.name
 }
 
 resource "aws_api_gateway_account" "logs" {
@@ -113,6 +97,10 @@ module "connect_lambda_function" {
     dynamodb = local.dynamodb_crud_permissions
   }
 
+  depends_on = [
+    module.dynamodb_table
+  ]
+
   tags = local.tags
 }
 
@@ -143,6 +131,10 @@ module "disconnect_lambda_function" {
   policy_statements = {
     dynamodb = local.dynamodb_crud_permissions
   }
+
+  depends_on = [
+    module.dynamodb_table
+  ]
 
   tags = local.tags
 }
@@ -180,6 +172,10 @@ module "send_message_lambda_function" {
     dynamodb = local.dynamodb_crud_permissions
   }
 
+  depends_on = [
+    module.dynamodb_table
+  ]
+
   tags = local.tags
 }
 
@@ -200,14 +196,14 @@ module "dynamodb_table" {
   tags = local.tags
 }
 
-########################
-# Websocket API Gateway
-########################
+################################################################################
+# API Gateway Module
+################################################################################
 
 module "api_gateway" {
   source = "../../"
 
-  name                       = random_pet.this.id
+  name                       = local.name
   description                = "My awesome AWS Websocket API Gateway"
   protocol_type              = "WEBSOCKET"
   route_selection_expression = "$request.body.action"

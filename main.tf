@@ -48,7 +48,7 @@ resource "aws_apigatewayv2_domain_name" "this" {
   }
 
   dynamic "mutual_tls_authentication" {
-    for_each = length(keys(var.mutual_tls_authentication)) == 0 ? [] : [var.mutual_tls_authentication]
+    for_each = can(var.mutual_tls_authentication.truststore_uri) ? [] : [var.mutual_tls_authentication]
     content {
       truststore_uri     = mutual_tls_authentication.value.truststore_uri
       truststore_version = lookup(mutual_tls_authentication.value, "truststore_version", null)
@@ -137,7 +137,7 @@ resource "aws_apigatewayv2_route" "this" {
   target                              = "integrations/${aws_apigatewayv2_integration.this[each.key].id}"
 
   dynamic "request_parameter" {
-    for_each = lookup(each.value, "request_parameter", null) != null ? each.value.request_parameter : {}
+    for_each = can(each.value.request_parameter) ? each.value.request_parameter : {}
     content {
       request_parameter_key = request_parameter.value.request_parameter_key
       required              = request_parameter.value.required
@@ -157,27 +157,27 @@ resource "aws_apigatewayv2_integration" "this" {
   integration_uri     = lookup(each.value, "lambda_arn", lookup(each.value, "integration_uri", null))
 
   connection_type = lookup(each.value, "connection_type", "INTERNET")
-  connection_id   = try(aws_apigatewayv2_vpc_link.this[each.value["vpc_link"]].id, lookup(each.value, "connection_id", null))
+  connection_id   = try(aws_apigatewayv2_vpc_link.this[each.value.vpc_link].id, lookup(each.value, "connection_id", null))
 
   payload_format_version    = lookup(each.value, "payload_format_version", null)
   timeout_milliseconds      = lookup(each.value, "timeout_milliseconds", null)
   passthrough_behavior      = lookup(each.value, "passthrough_behavior", null)
   content_handling_strategy = lookup(each.value, "content_handling_strategy", null)
   credentials_arn           = lookup(each.value, "credentials_arn", null)
-  request_parameters        = try(jsondecode(each.value["request_parameters"]), each.value["request_parameters"], null)
+  request_parameters        = try(jsondecode(each.value.request_parameters), each.value.request_parameters, null)
 
   dynamic "tls_config" {
-    for_each = flatten([try(jsondecode(each.value["tls_config"]), each.value["tls_config"], [])])
+    for_each = flatten([try(jsondecode(each.value.tls_config), each.value.tls_config, [])])
     content {
-      server_name_to_verify = tls_config.value["server_name_to_verify"]
+      server_name_to_verify = tls_config.value.server_name_to_verify
     }
   }
 
   dynamic "response_parameters" {
-    for_each = flatten([try(jsondecode(each.value["response_parameters"]), each.value["response_parameters"], [])])
+    for_each = flatten([try(jsondecode(each.value.response_parameters), each.value.response_parameters, [])])
     content {
-      status_code = response_parameters.value["status_code"]
-      mappings    = response_parameters.value["mappings"]
+      status_code = response_parameters.value.status_code
+      mappings    = response_parameters.value.mappings
     }
   }
 
@@ -191,8 +191,8 @@ resource "aws_apigatewayv2_vpc_link" "this" {
   for_each = var.create && var.create_vpc_link ? var.vpc_links : {}
 
   name               = lookup(each.value, "name", each.key)
-  security_group_ids = each.value["security_group_ids"]
-  subnet_ids         = each.value["subnet_ids"]
+  security_group_ids = each.value.security_group_ids
+  subnet_ids         = each.value.subnet_ids
 
   tags = merge(var.tags, var.vpc_link_tags, lookup(each.value, "tags", {}))
 }
