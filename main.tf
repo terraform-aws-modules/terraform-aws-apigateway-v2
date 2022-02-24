@@ -114,6 +114,16 @@ resource "aws_apigatewayv2_api_mapping" "this" {
   stage       = aws_apigatewayv2_stage.default[0].id
 }
 
+resource "aws_apigatewayv2_authorizer" "this" {
+  for_each                          = var.create && var.create_routes_and_integrations ? { for k, v in var.integrations : k => v.authorizer if lookup(v, "authorization_type", "NONE") == "CUSTOM" } : {}
+  name                              = format("%s-authorizer", lookup(each.value, "name", var.name))
+  api_id                            = aws_apigatewayv2_api.this[0].id
+  authorizer_type                   = lookup(each.value, "authorizer_type", "REQUEST")
+  authorizer_uri                    = lookup(each.value, "authorizer_uri", null)
+  identity_sources                  = lookup(each.value, "identity_sources", ["route.request.header.Auth"])
+  authorizer_payload_format_version = lookup(each.value, "authorizer_payload_format_version", lookup(each.value, "authorizer_type", "REQUEST") == "REQUEST" ? "2.0" : null)
+}
+
 # Routes and integrations
 resource "aws_apigatewayv2_route" "this" {
   for_each = var.create && var.create_routes_and_integrations ? var.integrations : {}
@@ -123,7 +133,7 @@ resource "aws_apigatewayv2_route" "this" {
 
   api_key_required                    = lookup(each.value, "api_key_required", null)
   authorization_type                  = lookup(each.value, "authorization_type", "NONE")
-  authorizer_id                       = lookup(each.value, "authorizer_id", null)
+  authorizer_id                       = try(aws_apigatewayv2_authorizer.this[each.key].id, lookup(each.value, "authorizer_id", null))
   model_selection_expression          = lookup(each.value, "model_selection_expression", null)
   operation_name                      = lookup(each.value, "operation_name", null)
   route_response_selection_expression = lookup(each.value, "route_response_selection_expression", null)
