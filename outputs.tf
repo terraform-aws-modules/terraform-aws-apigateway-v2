@@ -97,3 +97,8 @@ output "apigatewayv2_vpc_link_arn" {
   description = "The map of VPC Link ARNs"
   value       = { for k, v in aws_apigatewayv2_vpc_link.this : k => v.arn }
 }
+
+output "apigatewayv2_authorizer_id" {
+  description = "The map of Authorizer IDs"
+  value       = { for k, v in aws_apigatewayv2_authorizer.this : k => v.id }
+}

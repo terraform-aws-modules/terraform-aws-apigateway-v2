@@ -122,6 +122,8 @@ resource "aws_apigatewayv2_authorizer" "this" {
   authorizer_uri                    = lookup(each.value, "authorizer_uri", null)
   identity_sources                  = lookup(each.value, "identity_sources", ["route.request.header.Auth"])
   authorizer_payload_format_version = lookup(each.value, "authorizer_payload_format_version", lookup(each.value, "authorizer_type", "REQUEST") == "REQUEST" ? "2.0" : null)
+  authorizer_credentials_arn        = lookup(each.value, "authorizer_credentials_arn", null)
+  enable_simple_responses           = lookup(each.value, "enable_simple_responses", var.protocol_type == "HTTP" ? true : null)
 }
 
 # Routes and integrations
