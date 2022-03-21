@@ -58,6 +58,72 @@ module "api_gateway" {
 }
 ```
 
+### Example Authorizers
+
+```hcl
+module "api_gateway" {
+  source = "terraform-aws-modules/apigateway-v2/aws"
+
+  name          = "dev-http"
+  description   = "My awesome HTTP API Gateway"
+  protocol_type = "HTTP"
+
+  cors_configuration = {
+    allow_headers = ["content-type", "x-amz-date", "authorization", "x-api-key", "x-amz-security-token", "x-amz-user-agent"]
+    allow_methods = ["*"]
+    allow_origins = ["*"]
+  }
+
+  # Custom domain
+  domain_name                 = "terraform-aws-modules.modules.tf"
+  domain_name_certificate_arn = "arn:aws:acm:eu-west-1:052235179155:certificate/2b3a7ed9-05e1-4f9e-952b-27744ba06da6"
+
+  # Access logs
+  default_stage_access_log_destination_arn = "arn:aws:logs:eu-west-1:835367859851:log-group:debug-apigateway"
+  default_stage_access_log_format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
+
+  authorizers ={
+
+    "azure" = {
+      authorizer_type  = "JWT"
+      identity_sources = "$request.header.Authorization"
+      name             = "azure-auth"
+      audience         = var.azure_client_id
+      issuer           = "https://sts.windows.net/${var.azure_authority}/"
+    }
+
+    "okta" = {
+      authorizer_type  = "JWT"
+      identity_sources = "$request.header.Authorization"
+      name             = "okta-auth"
+      audience         = var.okta_client_id
+      issuer           = "https://${var.okta_tenant_domain}/oauth2/default/"
+    }
+  }
+
+  # Routes and integrations
+  integrations = {
+    "GET /genomicrecord-userauth" = {
+      integration_type      = "HTTP_PROXY"
+      integration_uri       = "some url"
+      timeout_milliseconds  = 12000
+      authorizer_key        = "azure"
+    }
+
+    "GET /genomicrecord-okta" = {
+      integration_type      = "HTTP_PROXY"
+      integration_uri       = "some url"
+      timeout_milliseconds  = 12000
+      authorizer            = "okta" 
+    }
+  }
+
+  tags = {
+    Name = "http-apigateway"
+  }
+}
+```
+
 ## Conditional creation
 
 Sometimes you need to have a way to create resources conditionally but Terraform does not allow usage of `count` inside `module` block, so the solution is to specify `create` arguments.
