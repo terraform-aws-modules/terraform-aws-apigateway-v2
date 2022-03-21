@@ -123,7 +123,7 @@ resource "aws_apigatewayv2_route" "this" {
 
   api_key_required                    = lookup(each.value, "api_key_required", null)
   authorization_type                  = lookup(each.value, "authorization_type", "NONE")
-  authorizer_id                       = lookup(each.value, "authorizer_id", null)
+  authorizer_id                       = try(aws_apigatewayv2_authorizer.this[lookup(each.value, "authorizer_key", null)].id, lookup(each.value, "authorizer_id", null))
   model_selection_expression          = lookup(each.value, "model_selection_expression", null)
   operation_name                      = lookup(each.value, "operation_name", null)
   route_response_selection_expression = lookup(each.value, "route_response_selection_expression", null)
@@ -133,6 +133,8 @@ resource "aws_apigatewayv2_route" "this" {
   #  authorization_scopes = lookup(each.value, "authorization_scopes", null)
   #  request_models  = lookup(each.value, "request_models", null)
 }
+
+
 
 resource "aws_apigatewayv2_integration" "this" {
   for_each = var.create && var.create_routes_and_integrations ? var.integrations : {}
@@ -172,6 +174,27 @@ resource "aws_apigatewayv2_integration" "this" {
 
   lifecycle {
     create_before_destroy = true
+  }
+}
+
+# Authorizers
+resource "aws_apigatewayv2_authorizer" "this" {
+  for_each = var.create && var.create_routes_and_integrations ? var.authorizers : {}
+
+  api_id    = aws_apigatewayv2_api.this[0].id
+
+  authorizer_type  = lookup(each.value, "authorizer_type", null)
+  identity_sources = [lookup(each.value, "identity_sources", null)]
+  name             = lookup(each.value, "name", null)
+  authorizer_uri   = lookup(each.value, "authorizer_uri", null)
+  authorizer_payload_format_version = lookup(each.value, "authorizer_payload_format_version", null)
+
+  dynamic "jwt_configuration" {
+    for_each = lookup(each.value, "audience", null) == null ? tolist([]) : tolist([lookup(each.value, "audience", null)])
+    content {
+      audience = [lookup(each.value, "audience", null)]
+      issuer   = lookup(each.value, "issuer", null)
+    }
   }
 }
 

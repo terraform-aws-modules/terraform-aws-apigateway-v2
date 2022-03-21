@@ -194,6 +194,13 @@ variable "integrations" {
   default     = {}
 }
 
+# authorrizers
+variable "authorizers" {
+  description = "Map of API gateway authorizers"
+  type        = map(any)
+  default     = {}
+}
+
 # vpc link
 variable "vpc_links" {
   description = "Map of VPC Links details to create"
