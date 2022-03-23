@@ -50,6 +50,16 @@ module "api_gateway" {
     throttling_rate_limit    = 100
   }
 
+  authorizers ={
+    "azure" = {
+      authorizer_type  = "JWT"
+      identity_sources = "$request.header.Authorization"
+      name             = "azure-auth"
+      audience         = "d6a38afd-45d6-4874-d1aa-3c5c558aqcc2"
+      issuer           = "https://sts.windows.net/aRee026e-8f37-410e-8869-72d9154873e4/"
+    }
+  }
+
   integrations = {
 
     "ANY /" = {
@@ -63,6 +73,12 @@ module "api_gateway" {
       payload_format_version = "2.0"
       authorization_type     = "JWT"
       authorizer_id          = aws_apigatewayv2_authorizer.some_authorizer.id
+    }
+
+    "GET /some-route-with-authorizer" = {
+      lambda_arn             = module.lambda_function.lambda_function_arn
+      payload_format_version = "2.0"
+      authorizer_key        = "azure"
     }
 
     "POST /start-step-function" = {

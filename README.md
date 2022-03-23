@@ -88,29 +88,28 @@ module "api_gateway" {
       authorizer_type  = "JWT"
       identity_sources = "$request.header.Authorization"
       name             = "azure-auth"
-      audience         = var.azure_client_id
-      issuer           = "https://sts.windows.net/${var.azure_authority}/"
+      audience         = "d6a38afd-45d6-4874-d1aa-3c5c558aqcc2"
+      issuer           = "https://sts.windows.net/aRee026e-8f37-410e-8869-72d9154873e4/"
     }
 
     "okta" = {
       authorizer_type  = "JWT"
       identity_sources = "$request.header.Authorization"
       name             = "okta-auth"
-      audience         = var.okta_client_id
-      issuer           = "https://${var.okta_tenant_domain}/oauth2/default/"
+      issuer           = "https://domainame.okta.com/oauth2/default/"
     }
   }
 
   # Routes and integrations
   integrations = {
-    "GET /genomicrecord-userauth" = {
+    "GET /endpoint-userauth" = {
       integration_type      = "HTTP_PROXY"
       integration_uri       = "some url"
       timeout_milliseconds  = 12000
       authorizer_key        = "azure"
     }
 
-    "GET /genomicrecord-okta" = {
+    "GET /endpoint-okta" = {
       integration_type      = "HTTP_PROXY"
       integration_uri       = "some url"
       timeout_milliseconds  = 12000
