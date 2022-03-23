@@ -190,7 +190,7 @@ resource "aws_apigatewayv2_authorizer" "this" {
   authorizer_payload_format_version = lookup(each.value, "authorizer_payload_format_version", null)
 
   dynamic "jwt_configuration" {
-    for_each = lookup(each.value, "audience", null) == null ? tolist([]) : tolist([lookup(each.value, "audience", null)])
+    for_each = try(flatten(tolist(each.value.audience)), [])
     content {
       audience = [lookup(each.value, "audience", null)]
       issuer   = lookup(each.value, "issuer", null)
