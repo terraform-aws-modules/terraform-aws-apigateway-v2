@@ -184,7 +184,7 @@ resource "aws_apigatewayv2_authorizer" "this" {
   api_id    = aws_apigatewayv2_api.this[0].id
 
   authorizer_type  = lookup(each.value, "authorizer_type", null)
-  identity_sources = [lookup(each.value, "identity_sources", null)]
+  identity_sources = try(flatten(tolist(each.value.identity_sources)), null)
   name             = lookup(each.value, "name", null)
   authorizer_uri   = lookup(each.value, "authorizer_uri", null)
   authorizer_payload_format_version = lookup(each.value, "authorizer_payload_format_version", null)
