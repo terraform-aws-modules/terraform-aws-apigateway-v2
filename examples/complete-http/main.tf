@@ -50,6 +50,16 @@ module "api_gateway" {
     throttling_rate_limit    = 100
   }
 
+  authorizers = {
+    "cognito" = {
+      authorizer_type  = "JWT"
+      identity_sources = "$request.header.Authorization"
+      name             = "cognito"
+      audience         = ["d6a38afd-45d6-4874-d1aa-3c5c558aqcc2"]
+      issuer           = "https://${aws_cognito_user_pool.this.endpoint}"
+    }
+  }
+
   integrations = {
 
     "ANY /" = {
@@ -63,6 +73,12 @@ module "api_gateway" {
       payload_format_version = "2.0"
       authorization_type     = "JWT"
       authorizer_id          = aws_apigatewayv2_authorizer.some_authorizer.id
+    }
+
+    "GET /some-route-with-authorizer" = {
+      lambda_arn             = module.lambda_function.lambda_function_arn
+      payload_format_version = "2.0"
+      authorizer_key         = "cognito"
     }
 
     "POST /start-step-function" = {
@@ -259,7 +275,7 @@ module "lambda_function" {
 
 resource "aws_s3_bucket" "truststore" {
   bucket = "${random_pet.this.id}-truststore"
-  acl    = "private"
+  #  acl    = "private"
 }
 
 resource "aws_s3_bucket_object" "truststore" {
