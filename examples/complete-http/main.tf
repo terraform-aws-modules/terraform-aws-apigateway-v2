@@ -50,13 +50,13 @@ module "api_gateway" {
     throttling_rate_limit    = 100
   }
 
-  authorizers ={
-    "azure" = {
+  authorizers = {
+    "cognito" = {
       authorizer_type  = "JWT"
       identity_sources = "$request.header.Authorization"
-      name             = "azure-auth"
-      audience         = "d6a38afd-45d6-4874-d1aa-3c5c558aqcc2"
-      issuer           = "https://sts.windows.net/aRee026e-8f37-410e-8869-72d9154873e4/"
+      name             = "cognito"
+      audience         = ["d6a38afd-45d6-4874-d1aa-3c5c558aqcc2"]
+      issuer           = "https://${aws_cognito_user_pool.this.endpoint}"
     }
   }
 
@@ -78,7 +78,7 @@ module "api_gateway" {
     "GET /some-route-with-authorizer" = {
       lambda_arn             = module.lambda_function.lambda_function_arn
       payload_format_version = "2.0"
-      authorizer_key        = "azure"
+      authorizer_key         = "cognito"
     }
 
     "POST /start-step-function" = {
@@ -275,7 +275,7 @@ module "lambda_function" {
 
 resource "aws_s3_bucket" "truststore" {
   bucket = "${random_pet.this.id}-truststore"
-  acl    = "private"
+  #  acl    = "private"
 }
 
 resource "aws_s3_bucket_object" "truststore" {

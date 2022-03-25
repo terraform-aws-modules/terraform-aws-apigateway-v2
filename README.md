@@ -46,74 +46,25 @@ module "api_gateway" {
       payload_format_version = "2.0"
       timeout_milliseconds   = 12000
     }
+    
+    "GET /some-route-with-authorizer" = {
+      integration_type = "HTTP_PROXY"
+      integration_uri  = "some url"
+      authorizer_key   = "azure"
+    }
 
     "$default" = {
       lambda_arn = "arn:aws:lambda:eu-west-1:052235179155:function:my-default-function"
     }
   }
 
-  tags = {
-    Name = "http-apigateway"
-  }
-}
-```
-
-### Example Authorizers
-
-```hcl
-module "api_gateway" {
-  source = "terraform-aws-modules/apigateway-v2/aws"
-
-  name          = "dev-http"
-  description   = "My awesome HTTP API Gateway"
-  protocol_type = "HTTP"
-
-  cors_configuration = {
-    allow_headers = ["content-type", "x-amz-date", "authorization", "x-api-key", "x-amz-security-token", "x-amz-user-agent"]
-    allow_methods = ["*"]
-    allow_origins = ["*"]
-  }
-
-  # Custom domain
-  domain_name                 = "terraform-aws-modules.modules.tf"
-  domain_name_certificate_arn = "arn:aws:acm:eu-west-1:052235179155:certificate/2b3a7ed9-05e1-4f9e-952b-27744ba06da6"
-
-  # Access logs
-  default_stage_access_log_destination_arn = "arn:aws:logs:eu-west-1:835367859851:log-group:debug-apigateway"
-  default_stage_access_log_format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
-
-  authorizers ={
-
+  authorizers = {
     "azure" = {
       authorizer_type  = "JWT"
       identity_sources = "$request.header.Authorization"
       name             = "azure-auth"
-      audience         = "d6a38afd-45d6-4874-d1aa-3c5c558aqcc2"
-      issuer           = "https://sts.windows.net/aRee026e-8f37-410e-8869-72d9154873e4/"
-    }
-
-    "okta" = {
-      authorizer_type  = "JWT"
-      identity_sources = "$request.header.Authorization"
-      name             = "okta-auth"
-      issuer           = "https://domainame.okta.com/oauth2/default/"
-    }
-  }
-
-  # Routes and integrations
-  integrations = {
-    "GET /endpoint-userauth" = {
-      integration_type      = "HTTP_PROXY"
-      integration_uri       = "some url"
-      timeout_milliseconds  = 12000
-      authorizer_key        = "azure"
-    }
-
-    "GET /endpoint-okta" = {
-      integration_type      = "HTTP_PROXY"
-      integration_uri       = "some url"
-      timeout_milliseconds  = 12000
-      authorizer            = "okta" 
+      audience         = ["d6a38afd-45d6-4874-d1aa-3c5c558aqcc2"]
+      issuer           = "https://sts.windows.net/aaee026e-8f37-410e-8869-72d9154873e4/"
     }
   }
 
@@ -177,6 +128,7 @@ No modules.
 |------|------|
 | [aws_apigatewayv2_api.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_api) | resource |
 | [aws_apigatewayv2_api_mapping.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_api_mapping) | resource |
+| [aws_apigatewayv2_authorizer.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_authorizer) | resource |
 | [aws_apigatewayv2_domain_name.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_domain_name) | resource |
 | [aws_apigatewayv2_integration.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_integration) | resource |
 | [aws_apigatewayv2_route.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_route) | resource |
@@ -189,6 +141,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_api_key_selection_expression"></a> [api\_key\_selection\_expression](#input\_api\_key\_selection\_expression) | An API key selection expression. Valid values: $context.authorizer.usageIdentifierKey, $request.header.x-api-key. | `string` | `"$request.header.x-api-key"` | no |
 | <a name="input_api_version"></a> [api\_version](#input\_api\_version) | A version identifier for the API | `string` | `null` | no |
+| <a name="input_authorizers"></a> [authorizers](#input\_authorizers) | Map of API gateway authorizers | `map(any)` | `{}` | no |
 | <a name="input_body"></a> [body](#input\_body) | An OpenAPI specification that defines the set of routes and integrations to create as part of the HTTP APIs. Supported only for HTTP APIs. | `string` | `null` | no |
 | <a name="input_cors_configuration"></a> [cors\_configuration](#input\_cors\_configuration) | The cross-origin resource sharing (CORS) configuration. Applicable for HTTP APIs. | `any` | `{}` | no |
 | <a name="input_create"></a> [create](#input\_create) | Controls if API Gateway resources should be created | `bool` | `true` | no |
