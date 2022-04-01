@@ -125,6 +125,7 @@ resource "aws_apigatewayv2_route" "this" {
   route_key = each.key
 
   api_key_required                    = try(each.value.api_key_required, null)
+  authorization_scopes                = try(split(",", each.value.authorization_scopes), null)
   authorization_type                  = try(each.value.authorization_type, "NONE")
   authorizer_id                       = try(aws_apigatewayv2_authorizer.this[each.value.authorizer_key].id, each.value.authorizer_id, null)
   model_selection_expression          = try(each.value.model_selection_expression, null)
@@ -132,9 +133,8 @@ resource "aws_apigatewayv2_route" "this" {
   route_response_selection_expression = try(each.value.route_response_selection_expression, null)
   target                              = "integrations/${aws_apigatewayv2_integration.this[each.key].id}"
 
-  # Not sure what structure is allowed for these arguments...
-  #  authorization_scopes = try(each.value.authorization_scopes, null)
-  #  request_models  = try(each.value.request_models, null)
+  # Have been added to the docs. But is WEBSOCKET only(not yet supported)
+  # request_models  = try(each.value.request_models, null)
 }
 
 resource "aws_apigatewayv2_integration" "this" {
