@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [1.6.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.6.0...v1.6.1) (2022-04-01)
+
+
+### Bug Fixes
+
+* Add support for passing authorization_scopes on routes with JWT authorizer ([#67](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/67)) ([c2b8d6b](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/c2b8d6bd8b11fa83ccd13f3ccc74844d328f59ad))
+
 ## [1.6.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.5.1...v1.6.0) (2022-03-25)
 
 
