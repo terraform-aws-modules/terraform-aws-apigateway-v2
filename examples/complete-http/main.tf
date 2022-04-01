@@ -85,14 +85,14 @@ module "api_gateway" {
       lambda_arn             = module.lambda_function.lambda_function_arn
       payload_format_version = "2.0"
       authorizer_key         = "cognito"
-      authorization_scopes   = ["tf/something.relevant.read"] # Should comply with the resource server configuration part of the cognito user pool
+      authorization_scopes   = "tf/something.relevant.read,tf/something.relevant.write" # Should comply with the resource server configuration part of the cognito user pool
     }
 
     "GET /some-route-with-authorizer-and-different-scope" = {
       lambda_arn             = module.lambda_function.lambda_function_arn
       payload_format_version = "2.0"
       authorizer_key         = "cognito"
-      authorization_scopes   = ["tf/something.relevant.write"] # Should comply with the resource server configuration part of the cognito user pool
+      authorization_scopes   = "tf/something.relevant.write" # Should comply with the resource server configuration part of the cognito user pool
     }
 
     "POST /start-step-function" = {
