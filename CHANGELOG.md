@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.7.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.6.1...v1.7.0) (2022-04-06)
+
+
+### Features
+
+* Added support for ttl in authorizer resource ([#68](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/68)) ([ce1faf9](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/ce1faf96b191228bf891864f50d284078f54b0a0))
+
 ### [1.6.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.6.0...v1.6.1) (2022-04-01)
 
 
