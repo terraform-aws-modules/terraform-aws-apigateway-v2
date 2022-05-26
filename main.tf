@@ -192,6 +192,7 @@ resource "aws_apigatewayv2_authorizer" "this" {
   authorizer_uri                    = try(each.value.authorizer_uri, null)
   authorizer_payload_format_version = try(each.value.authorizer_payload_format_version, null)
   authorizer_result_ttl_in_seconds  = try(each.value.authorizer_result_ttl_in_seconds, null)
+  enable_simple_responses           = try(each.value.enable_simple_responses, false)
 
   dynamic "jwt_configuration" {
     for_each = length(try(each.value.audience, [each.value.issuer], [])) > 0 ? [true] : []
