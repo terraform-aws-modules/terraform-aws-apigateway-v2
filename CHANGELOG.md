@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.8.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.7.0...v1.8.0) (2022-05-27)
+
+
+### Features
+
+* Added enable_simple_responses and authorizer_credentials_arn to authorizers ([#71](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/71)) ([1467b95](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/1467b95c8309d82332857a9c2790ca25f2edc2ec))
+
 ## [1.7.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.6.1...v1.7.0) (2022-04-06)
 
 
