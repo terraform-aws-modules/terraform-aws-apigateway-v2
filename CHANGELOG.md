@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.9.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.8.0...v1.9.0) (2022-06-13)
+
+
+### Features
+
+* Add pass-through of ownership_verification_certificate_arn to domain_name ([#72](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/72)) ([5709873](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/57098730dc48785f0836f9eb322008b054f91134))
+
 ## [1.8.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.7.0...v1.8.0) (2022-05-27)
 
 
