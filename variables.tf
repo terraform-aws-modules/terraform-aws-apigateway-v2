@@ -174,6 +174,12 @@ variable "domain_name_certificate_arn" {
   default     = null
 }
 
+variable "domain_name_ownership_verification_certificate_arn" {
+  description = "ARN of the AWS-issued certificate used to validate custom domain ownership (when certificate_arn is issued via an ACM Private CA or mutual_tls_authentication is configured with an ACM-imported certificate.)"
+  type        = string
+  default     = null
+}
+
 variable "domain_name_tags" {
   description = "A mapping of tags to assign to API domain name resource."
   type        = map(string)

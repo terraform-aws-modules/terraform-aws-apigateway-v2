@@ -41,9 +41,10 @@ resource "aws_apigatewayv2_domain_name" "this" {
   domain_name = var.domain_name
 
   domain_name_configuration {
-    certificate_arn = var.domain_name_certificate_arn
-    endpoint_type   = "REGIONAL"
-    security_policy = "TLS_1_2"
+    certificate_arn                        = var.domain_name_certificate_arn
+    ownership_verification_certificate_arn = var.domain_name_ownership_verification_certificate_arn
+    endpoint_type                          = "REGIONAL"
+    security_policy                        = "TLS_1_2"
   }
 
   dynamic "mutual_tls_authentication" {
