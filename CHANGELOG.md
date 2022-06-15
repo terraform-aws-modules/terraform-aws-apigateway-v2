@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.9.0...v2.0.0) (2022-06-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* Upgraded AWS provider to v4 everywhere (#74)
+
+### Features
+
+* Upgraded AWS provider to v4 everywhere ([#74](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/74)) ([2f8ad61](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/2f8ad61a8668eb7559115f31e62c502ed2ea09c3))
+
 ## [1.9.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.8.0...v1.9.0) (2022-06-13)
 
 
