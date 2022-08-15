@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v2.0.0...v2.1.0) (2022-08-15)
+
+
+### Features
+
+* Added API GW Authorizer IDs to outputs ([#76](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/76)) ([05da6b1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/05da6b19a0150d2d39db97968fa7214e9e4fa580))
+
 ## [2.0.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.9.0...v2.0.0) (2022-06-15)
 
 
