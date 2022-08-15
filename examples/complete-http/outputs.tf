@@ -135,3 +135,8 @@ output "api_endpoint" {
   description = "FQDN of an API endpoint"
   value       = "https://${aws_route53_record.api.fqdn}"
 }
+
+output "authorizer_id" {
+  description = "API Gateway Authorizer ID"
+  value       = lookup(module.api_gateway.apigatewayv2_authorizer_id, "cognito")
+}
