@@ -182,6 +182,7 @@ No modules.
 | <a name="output_apigatewayv2_api_execution_arn"></a> [apigatewayv2\_api\_execution\_arn](#output\_apigatewayv2\_api\_execution\_arn) | The ARN prefix to be used in an aws\_lambda\_permission's source\_arn attribute or in an aws\_iam\_policy to authorize access to the @connections API. |
 | <a name="output_apigatewayv2_api_id"></a> [apigatewayv2\_api\_id](#output\_apigatewayv2\_api\_id) | The API identifier |
 | <a name="output_apigatewayv2_api_mapping_id"></a> [apigatewayv2\_api\_mapping\_id](#output\_apigatewayv2\_api\_mapping\_id) | The API mapping identifier. |
+| <a name="output_apigatewayv2_authorizer_id"></a> [apigatewayv2\_authorizer\_id](#output\_apigatewayv2\_authorizer\_id) | The map of API Gateway Authorizer identifiers |
 | <a name="output_apigatewayv2_domain_name_api_mapping_selection_expression"></a> [apigatewayv2\_domain\_name\_api\_mapping\_selection\_expression](#output\_apigatewayv2\_domain\_name\_api\_mapping\_selection\_expression) | The API mapping selection expression for the domain name |
 | <a name="output_apigatewayv2_domain_name_arn"></a> [apigatewayv2\_domain\_name\_arn](#output\_apigatewayv2\_domain\_name\_arn) | The ARN of the domain name |
 | <a name="output_apigatewayv2_domain_name_configuration"></a> [apigatewayv2\_domain\_name\_configuration](#output\_apigatewayv2\_domain\_name\_configuration) | The domain name configuration |

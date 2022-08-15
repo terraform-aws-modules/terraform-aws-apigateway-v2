@@ -135,3 +135,8 @@ output "api_endpoint" {
   description = "FQDN of an API endpoint"
   value       = "https://${aws_route53_record.api.fqdn}"
 }
+
+output "apigatewayv2_authorizer_id" {
+  description = "The map of API Gateway Authorizer identifiers"
+  value       = module.api_gateway.apigatewayv2_authorizer_id
+}

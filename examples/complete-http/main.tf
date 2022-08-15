@@ -304,7 +304,6 @@ resource "tls_private_key" "private_key" {
 }
 
 resource "tls_self_signed_cert" "example" {
-  key_algorithm     = tls_private_key.private_key.algorithm
   is_ca_certificate = true
   private_key_pem   = tls_private_key.private_key.private_key_pem
 
