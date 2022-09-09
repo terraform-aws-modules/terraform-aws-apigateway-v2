@@ -34,8 +34,8 @@ module "api_gateway" {
   }
 
   mutual_tls_authentication = {
-    truststore_uri     = "s3://${aws_s3_bucket.truststore.bucket}/${aws_s3_bucket_object.truststore.id}"
-    truststore_version = aws_s3_bucket_object.truststore.version_id
+    truststore_uri     = "s3://${aws_s3_bucket.truststore.bucket}/${aws_s3_object.truststore.id}"
+    truststore_version = aws_s3_object.truststore.version_id
   }
 
   domain_name                 = local.domain_name
@@ -265,7 +265,7 @@ resource "null_resource" "download_package" {
 
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 2.0"
+  version = "~> 3.0"
 
   function_name = "${random_pet.this.id}-lambda"
   description   = "My awesome lambda function"
@@ -294,7 +294,7 @@ resource "aws_s3_bucket" "truststore" {
   #  acl    = "private"
 }
 
-resource "aws_s3_bucket_object" "truststore" {
+resource "aws_s3_object" "truststore" {
   bucket                 = aws_s3_bucket.truststore.bucket
   key                    = "truststore.pem"
   server_side_encryption = "AES256"
