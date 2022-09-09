@@ -73,6 +73,8 @@ module "api_gateway" {
       payload_format_version = "2.0"
       authorization_type     = "JWT"
       authorizer_id          = aws_apigatewayv2_authorizer.some_authorizer.id
+      throttling_rate_limit  = 80
+      throttling_burst_limit = 40
     }
 
     "GET /some-route-with-authorizer" = {
