@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.2.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v2.1.0...v2.2.0) (2022-09-12)
+
+
+### Features
+
+* Enable route_settings in default stage ([#80](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/80)) ([a13ef33](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/a13ef3308fc0b4efef53f7fefb8bc7f8012a8336))
+
 ## [2.1.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v2.0.0...v2.1.0) (2022-08-15)
 
 
