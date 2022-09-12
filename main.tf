@@ -80,26 +80,28 @@ resource "aws_apigatewayv2_stage" "default" {
     for_each = length(keys(var.default_route_settings)) == 0 ? [] : [var.default_route_settings]
 
     content {
-      data_trace_enabled       = try(default_route_settings.value.data_trace_enabled, false)
+      data_trace_enabled = try(default_route_settings.value.data_trace_enabled, false) # supported in Websocket APIGateway only
+      logging_level      = try(default_route_settings.value.logging_level, null)       # supported in Websocket APIGateway only
+
       detailed_metrics_enabled = try(default_route_settings.value.detailed_metrics_enabled, false)
-      logging_level            = try(default_route_settings.value.logging_level, null)
       throttling_burst_limit   = try(default_route_settings.value.throttling_burst_limit, null)
       throttling_rate_limit    = try(default_route_settings.value.throttling_rate_limit, null)
     }
   }
 
-  #  # bug - https://github.com/terraform-providers/terraform-provider-aws/issues/12893
-  #  dynamic "route_settings" {
-  #    for_each = var.create_routes_and_integrations ? var.integrations : {}
-  #    content {
-  #      route_key = route_settings.key
-  #      data_trace_enabled = try(route_settings.value.data_trace_enabled, null)
-  #      detailed_metrics_enabled         = try(route_settings.value.detailed_metrics_enabled, null)
-  #      logging_level         = try(route_settings.value.logging_level, null)  # Error: error updating API Gateway v2 stage ($default): BadRequestException: Execution logs are not supported on protocolType HTTP
-  #      throttling_burst_limit         = try(route_settings.value.throttling_burst_limit, null)
-  #      throttling_rate_limit         = try(route_settings.value.throttling_rate_limit, null)
-  #    }
-  #  }
+  dynamic "route_settings" {
+    for_each = { for k, v in var.integrations : k => v if var.create_routes_and_integrations && length(setintersection(["data_trace_enabled", "detailed_metrics_enabled", "logging_level", "throttling_burst_limit", "throttling_rate_limit"], keys(v))) > 0 }
+
+    content {
+      route_key          = route_settings.key
+      data_trace_enabled = try(route_settings.value.data_trace_enabled, var.default_route_settings["data_trace_enabled"], false) # supported in Websocket APIGateway only
+      logging_level      = try(route_settings.value.logging_level, var.default_route_settings["logging_level"], null)            # supported in Websocket APIGateway only
+
+      detailed_metrics_enabled = try(route_settings.value.detailed_metrics_enabled, var.default_route_settings["detailed_metrics_enabled"], false)
+      throttling_burst_limit   = try(route_settings.value.throttling_burst_limit, var.default_route_settings["throttling_burst_limit"], null)
+      throttling_rate_limit    = try(route_settings.value.throttling_rate_limit, var.default_route_settings["throttling_rate_limit"], null)
+    }
+  }
 
   tags = merge(var.default_stage_tags, var.tags)
 

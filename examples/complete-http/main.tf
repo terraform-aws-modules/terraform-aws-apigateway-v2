@@ -34,8 +34,8 @@ module "api_gateway" {
   }
 
   mutual_tls_authentication = {
-    truststore_uri     = "s3://${aws_s3_bucket.truststore.bucket}/${aws_s3_bucket_object.truststore.id}"
-    truststore_version = aws_s3_bucket_object.truststore.version_id
+    truststore_uri     = "s3://${aws_s3_bucket.truststore.bucket}/${aws_s3_object.truststore.id}"
+    truststore_version = aws_s3_object.truststore.version_id
   }
 
   domain_name                 = local.domain_name
@@ -69,10 +69,13 @@ module "api_gateway" {
     }
 
     "GET /some-route" = {
-      lambda_arn             = module.lambda_function.lambda_function_arn
-      payload_format_version = "2.0"
-      authorization_type     = "JWT"
-      authorizer_id          = aws_apigatewayv2_authorizer.some_authorizer.id
+      lambda_arn               = module.lambda_function.lambda_function_arn
+      payload_format_version   = "2.0"
+      authorization_type       = "JWT"
+      authorizer_id            = aws_apigatewayv2_authorizer.some_authorizer.id
+      throttling_rate_limit    = 80
+      throttling_burst_limit   = 40
+      detailed_metrics_enabled = true
     }
 
     "GET /some-route-with-authorizer" = {
@@ -84,6 +87,7 @@ module "api_gateway" {
     "GET /some-route-with-authorizer-and-scope" = {
       lambda_arn             = module.lambda_function.lambda_function_arn
       payload_format_version = "2.0"
+      authorization_type     = "JWT"
       authorizer_key         = "cognito"
       authorization_scopes   = "tf/something.relevant.read,tf/something.relevant.write" # Should comply with the resource server configuration part of the cognito user pool
     }
@@ -91,6 +95,7 @@ module "api_gateway" {
     "GET /some-route-with-authorizer-and-different-scope" = {
       lambda_arn             = module.lambda_function.lambda_function_arn
       payload_format_version = "2.0"
+      authorization_type     = "JWT"
       authorizer_key         = "cognito"
       authorization_scopes   = "tf/something.relevant.write" # Should comply with the resource server configuration part of the cognito user pool
     }
@@ -263,7 +268,7 @@ resource "null_resource" "download_package" {
 
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 2.0"
+  version = "~> 3.0"
 
   function_name = "${random_pet.this.id}-lambda"
   description   = "My awesome lambda function"
@@ -292,7 +297,7 @@ resource "aws_s3_bucket" "truststore" {
   #  acl    = "private"
 }
 
-resource "aws_s3_bucket_object" "truststore" {
+resource "aws_s3_object" "truststore" {
   bucket                 = aws_s3_bucket.truststore.bucket
   key                    = "truststore.pem"
   server_side_encryption = "AES256"
