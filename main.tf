@@ -80,23 +80,26 @@ resource "aws_apigatewayv2_stage" "default" {
     for_each = length(keys(var.default_route_settings)) == 0 ? [] : [var.default_route_settings]
 
     content {
-      data_trace_enabled       = try(default_route_settings.value.data_trace_enabled, false) # supported in Websocket APIGateway only
+      data_trace_enabled = try(default_route_settings.value.data_trace_enabled, false) # supported in Websocket APIGateway only
+      logging_level      = try(default_route_settings.value.logging_level, null)       # supported in Websocket APIGateway only
+
       detailed_metrics_enabled = try(default_route_settings.value.detailed_metrics_enabled, false)
-      logging_level            = try(default_route_settings.value.logging_level, null) # supported in Websocket APIGateway only
       throttling_burst_limit   = try(default_route_settings.value.throttling_burst_limit, null)
       throttling_rate_limit    = try(default_route_settings.value.throttling_rate_limit, null)
     }
   }
 
   dynamic "route_settings" {
-    for_each = var.create_routes_and_integrations ? { for k, v in var.integrations : k => v if length(compact([tostring(try(v.data_trace_enabled, "")), tostring(try(v.detailed_metrics_enabled, "")), tostring(try(v.logging_level, "")), tostring(try(v.throttling_rate_limit, "")), tostring(try(v.throttling_burst_limit, ""))])) > 0 } : {}
+    for_each = { for k, v in var.integrations : k => v if var.create_routes_and_integrations && length(setintersection(["data_trace_enabled", "detailed_metrics_enabled", "logging_level", "throttling_burst_limit", "throttling_rate_limit"], keys(v))) > 0 }
+
     content {
-      route_key                = route_settings.key
-      data_trace_enabled       = try(route_settings.value.data_trace_enabled, try(var.default_route_settings["data_trace_enabled"], false))
-      detailed_metrics_enabled = try(route_settings.value.detailed_metrics_enabled, try(var.default_route_settings["detailed_metrics_enabled"], false))
-      logging_level            = try(route_settings.value.logging_level, try(var.default_route_settings["logging_level"], null))
-      throttling_burst_limit   = try(route_settings.value.throttling_burst_limit, try(var.default_route_settings["throttling_burst_limit"], null))
-      throttling_rate_limit    = try(route_settings.value.throttling_rate_limit, try(var.default_route_settings["throttling_rate_limit"], null))
+      route_key          = route_settings.key
+      data_trace_enabled = try(route_settings.value.data_trace_enabled, var.default_route_settings["data_trace_enabled"], false) # supported in Websocket APIGateway only
+      logging_level      = try(route_settings.value.logging_level, var.default_route_settings["logging_level"], null)            # supported in Websocket APIGateway only
+
+      detailed_metrics_enabled = try(route_settings.value.detailed_metrics_enabled, var.default_route_settings["detailed_metrics_enabled"], false)
+      throttling_burst_limit   = try(route_settings.value.throttling_burst_limit, var.default_route_settings["throttling_burst_limit"], null)
+      throttling_rate_limit    = try(route_settings.value.throttling_rate_limit, var.default_route_settings["throttling_rate_limit"], null)
     }
   }
 

@@ -69,12 +69,13 @@ module "api_gateway" {
     }
 
     "GET /some-route" = {
-      lambda_arn             = module.lambda_function.lambda_function_arn
-      payload_format_version = "2.0"
-      authorization_type     = "JWT"
-      authorizer_id          = aws_apigatewayv2_authorizer.some_authorizer.id
-      throttling_rate_limit  = 80
-      throttling_burst_limit = 40
+      lambda_arn               = module.lambda_function.lambda_function_arn
+      payload_format_version   = "2.0"
+      authorization_type       = "JWT"
+      authorizer_id            = aws_apigatewayv2_authorizer.some_authorizer.id
+      throttling_rate_limit    = 80
+      throttling_burst_limit   = 40
+      detailed_metrics_enabled = true
     }
 
     "GET /some-route-with-authorizer" = {
