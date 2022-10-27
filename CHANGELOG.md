@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+### [2.2.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v2.2.0...v2.2.1) (2022-10-27)
+
+
+### Bug Fixes
+
+* Update CI configuration files to use latest version ([#84](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/84)) ([13bd65e](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/13bd65e192cb39f25a7e7bd281470dd1f7c073bd))
+
 ## [2.2.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v2.1.0...v2.2.0) (2022-09-12)
 
 
