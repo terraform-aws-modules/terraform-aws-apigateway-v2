@@ -216,12 +216,6 @@ variable "integrations" {
 # VPC Link
 ################################################################################
 
-variable "create_vpc_link" {
-  description = "Whether to create VPC links"
-  type        = bool
-  default     = true
-}
-
 variable "vpc_links" {
   description = "Map of VPC Links details to create"
   type        = map(any)
@@ -231,5 +225,17 @@ variable "vpc_links" {
 variable "vpc_link_tags" {
   description = "A map of tags to add to the VPC Link"
   type        = map(string)
+  default     = {}
+}
+
+variable "domain_name_ownership_verification_certificate_arn" {
+  description = "ARN of the AWS-issued certificate used to validate custom domain ownership (when certificate_arn is issued via an ACM Private CA or mutual_tls_authentication is configured with an ACM-imported certificate.)"
+  type        = string
+  default     = null
+}
+
+variable "authorizers" {
+  description = "Map of API gateway authorizers"
+  type        = map(any)
   default     = {}
 }

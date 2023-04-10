@@ -2,6 +2,80 @@
 
 All notable changes to this project will be documented in this file.
 
+### [2.2.2](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v2.2.1...v2.2.2) (2023-01-24)
+
+
+### Bug Fixes
+
+* Use a version for  to avoid GitHub API rate limiting on CI workflows ([#85](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/85)) ([9229fa2](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/9229fa2ec7f01f9187b0ddcae3a29929e8146417))
+
+### [2.2.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v2.2.0...v2.2.1) (2022-10-27)
+
+
+### Bug Fixes
+
+* Update CI configuration files to use latest version ([#84](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/84)) ([13bd65e](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/13bd65e192cb39f25a7e7bd281470dd1f7c073bd))
+
+## [2.2.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v2.1.0...v2.2.0) (2022-09-12)
+
+
+### Features
+
+* Enable route_settings in default stage ([#80](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/80)) ([a13ef33](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/a13ef3308fc0b4efef53f7fefb8bc7f8012a8336))
+
+## [2.1.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v2.0.0...v2.1.0) (2022-08-15)
+
+
+### Features
+
+* Added API GW Authorizer IDs to outputs ([#76](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/76)) ([05da6b1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/05da6b19a0150d2d39db97968fa7214e9e4fa580))
+
+## [2.0.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.9.0...v2.0.0) (2022-06-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* Upgraded AWS provider to v4 everywhere (#74)
+
+### Features
+
+* Upgraded AWS provider to v4 everywhere ([#74](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/74)) ([2f8ad61](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/2f8ad61a8668eb7559115f31e62c502ed2ea09c3))
+
+## [1.9.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.8.0...v1.9.0) (2022-06-13)
+
+
+### Features
+
+* Add pass-through of ownership_verification_certificate_arn to domain_name ([#72](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/72)) ([5709873](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/57098730dc48785f0836f9eb322008b054f91134))
+
+## [1.8.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.7.0...v1.8.0) (2022-05-27)
+
+
+### Features
+
+* Added enable_simple_responses and authorizer_credentials_arn to authorizers ([#71](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/71)) ([1467b95](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/1467b95c8309d82332857a9c2790ca25f2edc2ec))
+
+## [1.7.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.6.1...v1.7.0) (2022-04-06)
+
+
+### Features
+
+* Added support for ttl in authorizer resource ([#68](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/68)) ([ce1faf9](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/ce1faf96b191228bf891864f50d284078f54b0a0))
+
+### [1.6.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.6.0...v1.6.1) (2022-04-01)
+
+
+### Bug Fixes
+
+* Add support for passing authorization_scopes on routes with JWT authorizer ([#67](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/67)) ([c2b8d6b](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/c2b8d6bd8b11fa83ccd13f3ccc74844d328f59ad))
+
+## [1.6.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.5.1...v1.6.0) (2022-03-25)
+
+
+### Features
+
+* Added support for Authorizers ([#64](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/64)) ([5cd32e0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/5cd32e0360c866c25d8a8c6300e638143335a665))
+
 ## [1.5.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v1.5.0...v1.5.1) (2021-11-22)
 
 

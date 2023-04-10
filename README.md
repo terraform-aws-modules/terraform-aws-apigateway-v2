@@ -45,8 +45,24 @@ module "api_gateway" {
       timeout_milliseconds   = 12000
     }
 
+    "GET /some-route-with-authorizer" = {
+      integration_type = "HTTP_PROXY"
+      integration_uri  = "some url"
+      authorizer_key   = "azure"
+    }
+
     "$default" = {
       lambda_arn = "arn:aws:lambda:eu-west-1:052235179155:function:my-default-function"
+    }
+  }
+
+  authorizers = {
+    "azure" = {
+      authorizer_type  = "JWT"
+      identity_sources = "$request.header.Authorization"
+      name             = "azure-auth"
+      audience         = ["d6a38afd-45d6-4874-d1aa-3c5c558aqcc2"]
+      issuer           = "https://sts.windows.net/aaee026e-8f37-410e-8869-72d9154873e4/"
     }
   }
 
@@ -93,13 +109,13 @@ module "api_gateway" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.1 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.35 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.35 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.0 |
 
 ## Modules
 
@@ -111,6 +127,7 @@ No modules.
 |------|------|
 | [aws_apigatewayv2_api.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_api) | resource |
 | [aws_apigatewayv2_api_mapping.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_api_mapping) | resource |
+| [aws_apigatewayv2_authorizer.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_authorizer) | resource |
 | [aws_apigatewayv2_domain_name.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_domain_name) | resource |
 | [aws_apigatewayv2_integration.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_integration) | resource |
 | [aws_apigatewayv2_route.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_route) | resource |
@@ -124,6 +141,7 @@ No modules.
 | <a name="input_api_key_selection_expression"></a> [api\_key\_selection\_expression](#input\_api\_key\_selection\_expression) | An API key selection expression. Valid values: `$context.authorizer.usageIdentifierKey`, `$request.header.x-api-key`. Defaults to `$request.header.x-api-key`. Applicable for WebSocket APIs | `string` | `null` | no |
 | <a name="input_api_mapping_key"></a> [api\_mapping\_key](#input\_api\_mapping\_key) | The [API mapping key](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-mapping-template-reference.html) | `string` | `null` | no |
 | <a name="input_api_version"></a> [api\_version](#input\_api\_version) | A version identifier for the API. Must be between 1 and 64 characters in length | `string` | `null` | no |
+| <a name="input_authorizers"></a> [authorizers](#input\_authorizers) | Map of API gateway authorizers | `map(any)` | `{}` | no |
 | <a name="input_body"></a> [body](#input\_body) | An OpenAPI specification that defines the set of routes and integrations to create as part of the HTTP APIs. Supported only for HTTP APIs | `string` | `null` | no |
 | <a name="input_cors_configuration"></a> [cors\_configuration](#input\_cors\_configuration) | The cross-origin resource sharing (CORS) configuration. Applicable for HTTP APIs | `any` | `{}` | no |
 | <a name="input_create"></a> [create](#input\_create) | Controls if resources should be created | `bool` | `true` | no |
@@ -138,6 +156,7 @@ No modules.
 | <a name="input_disable_execute_api_endpoint"></a> [disable\_execute\_api\_endpoint](#input\_disable\_execute\_api\_endpoint) | Whether clients can invoke the API by using the default execute-api endpoint. By default, clients can invoke the API with the default `{api_id}.execute-api.{region}.amazonaws.com endpoint`. To require that clients use a custom domain name to invoke the API, disable the default endpoint | `bool` | `null` | no |
 | <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | The domain name to use for API gateway | `string` | `null` | no |
 | <a name="input_domain_name_certificate_arn"></a> [domain\_name\_certificate\_arn](#input\_domain\_name\_certificate\_arn) | The ARN of an AWS-managed certificate that will be used by the endpoint for the domain name. AWS Certificate Manager is the only supported source | `string` | `null` | no |
+| <a name="input_domain_name_ownership_verification_certificate_arn"></a> [domain\_name\_ownership\_verification\_certificate\_arn](#input\_domain\_name\_ownership\_verification\_certificate\_arn) | ARN of the AWS-issued certificate used to validate custom domain ownership (when certificate\_arn is issued via an ACM Private CA or mutual\_tls\_authentication is configured with an ACM-imported certificate.) | `string` | `null` | no |
 | <a name="input_domain_name_tags"></a> [domain\_name\_tags](#input\_domain\_name\_tags) | A map of additional tags to assign to API domain name resource | `map(string)` | `{}` | no |
 | <a name="input_fail_on_warnings"></a> [fail\_on\_warnings](#input\_fail\_on\_warnings) | Whether warnings should return an error while API Gateway is creating or updating the resource using an OpenAPI specification. Defaults to `false`. Applicable for HTTP APIs | `bool` | `null` | no |
 | <a name="input_integrations"></a> [integrations](#input\_integrations) | Map of API gateway routes with integrations | `map(any)` | `{}` | no |
@@ -167,6 +186,7 @@ No modules.
 | <a name="output_api_execution_arn"></a> [api\_execution\_arn](#output\_api\_execution\_arn) | The ARN prefix to be used in an aws\_lambda\_permission's source\_arn attribute or in an aws\_iam\_policy to authorize access to the @connections API. |
 | <a name="output_api_id"></a> [api\_id](#output\_api\_id) | The API identifier |
 | <a name="output_api_mapping_id"></a> [api\_mapping\_id](#output\_api\_mapping\_id) | The API mapping identifier |
+| <a name="output_apigatewayv2_authorizer_id"></a> [apigatewayv2\_authorizer\_id](#output\_apigatewayv2\_authorizer\_id) | The map of API Gateway Authorizer identifiers |
 | <a name="output_domain_name_api_mapping_selection_expression"></a> [domain\_name\_api\_mapping\_selection\_expression](#output\_domain\_name\_api\_mapping\_selection\_expression) | The API mapping selection expression for the domain name |
 | <a name="output_domain_name_arn"></a> [domain\_name\_arn](#output\_domain\_name\_arn) | The ARN of the domain name |
 | <a name="output_domain_name_configuration"></a> [domain\_name\_configuration](#output\_domain\_name\_configuration) | The domain name configuration |

@@ -111,3 +111,8 @@ output "vpc_links" {
   description = "Map of VPC links created and their attributes"
   value       = module.api_gateway.vpc_links
 }
+
+output "apigatewayv2_authorizer_id" {
+  description = "The map of API Gateway Authorizer identifiers"
+  value       = module.api_gateway.apigatewayv2_authorizer_id
+}

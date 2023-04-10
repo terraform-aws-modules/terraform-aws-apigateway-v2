@@ -16,22 +16,20 @@ resource "aws_apigatewayv2_api" "this" {
   disable_execute_api_endpoint = var.disable_execute_api_endpoint
   fail_on_warnings             = var.protocol_type == "HTTP" ? var.fail_on_warnings : null
 
-  /* Start of quick create */
   route_key       = var.protocol_type == "HTTP" ? var.route_key : null
   credentials_arn = var.protocol_type == "HTTP" ? var.credentials_arn : null
   target          = var.protocol_type == "HTTP" ? var.target : null
-  /* End of quick create */
 
   dynamic "cors_configuration" {
     for_each = var.protocol_type == "HTTP" && length(keys(var.cors_configuration)) > 0 ? [var.cors_configuration] : []
 
     content {
-      allow_credentials = lookup(cors_configuration.value, "allow_credentials", null)
-      allow_headers     = lookup(cors_configuration.value, "allow_headers", null)
-      allow_methods     = lookup(cors_configuration.value, "allow_methods", null)
-      allow_origins     = lookup(cors_configuration.value, "allow_origins", null)
-      expose_headers    = lookup(cors_configuration.value, "expose_headers", null)
-      max_age           = lookup(cors_configuration.value, "max_age", null)
+      allow_credentials = try(cors_configuration.value.allow_credentials, null)
+      allow_headers     = try(cors_configuration.value.allow_headers, null)
+      allow_methods     = try(cors_configuration.value.allow_methods, null)
+      allow_origins     = try(cors_configuration.value.allow_origins, null)
+      expose_headers    = try(cors_configuration.value.expose_headers, null)
+      max_age           = try(cors_configuration.value.max_age, null)
     }
   }
 
@@ -57,16 +55,18 @@ resource "aws_apigatewayv2_domain_name" "this" {
   domain_name = var.domain_name
 
   domain_name_configuration {
-    certificate_arn = var.domain_name_certificate_arn
-    endpoint_type   = "REGIONAL"
-    security_policy = "TLS_1_2"
+    certificate_arn                        = var.domain_name_certificate_arn
+    ownership_verification_certificate_arn = var.domain_name_ownership_verification_certificate_arn
+    endpoint_type                          = "REGIONAL"
+    security_policy                        = "TLS_1_2"
   }
 
   dynamic "mutual_tls_authentication" {
-    for_each = can(var.mutual_tls_authentication.truststore_uri) ? [] : [var.mutual_tls_authentication]
+    for_each = length(var.mutual_tls_authentication) > 0 ? [var.mutual_tls_authentication] : []
+
     content {
       truststore_uri     = mutual_tls_authentication.value.truststore_uri
-      truststore_version = lookup(mutual_tls_authentication.value, "truststore_version", null)
+      truststore_version = try(mutual_tls_authentication.value.truststore_version, null)
     }
   }
 
@@ -89,7 +89,8 @@ resource "aws_apigatewayv2_stage" "this" {
   stage_variables       = var.stage_variables
 
   dynamic "access_log_settings" {
-    for_each = length(keys(var.stage_access_log_settings)) == 2 ? [var.stage_access_log_settings] : []
+    for_each = length(var.stage_access_log_settings) > 0 ? [var.stage_access_log_settings] : []
+
     content {
       destination_arn = access_log_settings.value.destination_arn
       format          = access_log_settings.value.format
@@ -97,7 +98,8 @@ resource "aws_apigatewayv2_stage" "this" {
   }
 
   dynamic "default_route_settings" {
-    for_each = length(keys(var.stage_default_route_settings)) > 0 ? [var.stage_default_route_settings] : []
+    for_each = length(var.stage_default_route_settings) > 0 ? [var.stage_default_route_settings] : []
+
     content {
       data_trace_enabled       = lookup(default_route_settings.value, "data_trace_enabled", false)
       detailed_metrics_enabled = lookup(default_route_settings.value, "detailed_metrics_enabled", false)
@@ -109,7 +111,8 @@ resource "aws_apigatewayv2_stage" "this" {
   }
 
   dynamic "route_settings" {
-    for_each = var.create_routes_and_integrations ? var.integrations : {}
+    for_each = { for k, v in var.integrations : k => v if var.create_routes_and_integrations }
+
     content {
       route_key                = route_settings.key
       data_trace_enabled       = lookup(route_settings.value, "data_trace_enabled", null)
@@ -122,11 +125,6 @@ resource "aws_apigatewayv2_stage" "this" {
   }
 
   tags = merge(var.stage_tags, var.tags)
-
-  # # Bug in terraform-aws-provider with perpetual diff
-  # lifecycle {
-  #   ignore_changes = [deployment_id]
-  # }
 
   depends_on = [
     aws_apigatewayv2_route.this
@@ -168,16 +166,15 @@ resource "aws_apigatewayv2_route" "this" {
 ################################################################################
 
 resource "aws_apigatewayv2_integration" "this" {
-  # body == null see https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_api#aws_apigatewayv2_integration
   for_each = var.create && var.create_routes_and_integrations && var.body == null ? var.integrations : {}
 
   api_id      = aws_apigatewayv2_api.this[0].id
-  description = lookup(each.value, "description", null)
+  description = try(each.value.description, null)
 
-  integration_type    = lookup(each.value, "integration_type", lookup(each.value, "lambda_arn", "") != "" ? "AWS_PROXY" : "MOCK")
-  integration_subtype = lookup(each.value, "integration_subtype", null)
-  integration_method  = lookup(each.value, "integration_method", lookup(each.value, "integration_subtype", null) == null ? "POST" : null)
-  integration_uri     = lookup(each.value, "lambda_arn", lookup(each.value, "integration_uri", null))
+  integration_type    = try(each.value.integration_type, try(each.value.lambda_arn, "") != "" ? "AWS_PROXY" : "MOCK")
+  integration_subtype = try(each.value.integration_subtype, null)
+  integration_method  = try(each.value.integration_method, try(each.value.integration_subtype, null) == null ? "POST" : null)
+  integration_uri     = try(each.value.lambda_arn, try(each.value.integration_uri, null))
 
   connection_type = lookup(each.value, "connection_type", "INTERNET")
   connection_id   = try(aws_apigatewayv2_vpc_link.this[each.value.vpc_link].id, lookup(each.value, "connection_id", null))
@@ -198,6 +195,7 @@ resource "aws_apigatewayv2_integration" "this" {
 
   dynamic "response_parameters" {
     for_each = flatten([try(jsondecode(each.value.response_parameters), each.value.response_parameters, [])])
+
     content {
       status_code = response_parameters.value.status_code
       mappings    = response_parameters.value.mappings
@@ -214,11 +212,40 @@ resource "aws_apigatewayv2_integration" "this" {
 ################################################################################
 
 resource "aws_apigatewayv2_vpc_link" "this" {
-  for_each = var.create && var.create_vpc_link ? var.vpc_links : {}
+  for_each = { for k, v in var.vpc_links : k => v if var.create }
 
   name               = lookup(each.value, "name", each.key)
   security_group_ids = each.value.security_group_ids
   subnet_ids         = each.value.subnet_ids
 
-  tags = merge(var.tags, var.vpc_link_tags, lookup(each.value, "tags", {}))
+  tags = merge(var.tags, var.vpc_link_tags, try(each.value.tags, {}))
+}
+
+
+################################################################################
+# Authorizer
+################################################################################
+
+resource "aws_apigatewayv2_authorizer" "this" {
+  for_each = { for k, v in var.authorizers : k => v if var.create && var.create_routes_and_integrations }
+
+  api_id = aws_apigatewayv2_api.this[0].id
+
+  authorizer_type                   = try(each.value.authorizer_type, null)
+  identity_sources                  = try(flatten([each.value.identity_sources]), null)
+  name                              = try(each.value.name, null)
+  authorizer_uri                    = try(each.value.authorizer_uri, null)
+  authorizer_payload_format_version = try(each.value.authorizer_payload_format_version, null)
+  authorizer_result_ttl_in_seconds  = try(each.value.authorizer_result_ttl_in_seconds, null)
+  authorizer_credentials_arn        = try(each.value.authorizer_credentials_arn, null)
+  enable_simple_responses           = try(each.value.enable_simple_responses, null)
+
+  dynamic "jwt_configuration" {
+    for_each = length(try(each.value.audience, [each.value.issuer], [])) > 0 ? [true] : []
+
+    content {
+      audience = try(each.value.audience, null)
+      issuer   = try(each.value.issuer, null)
+    }
+  }
 }

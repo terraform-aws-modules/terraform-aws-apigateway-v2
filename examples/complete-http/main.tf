@@ -193,8 +193,9 @@ module "api_gateway" {
   }
 
   mutual_tls_authentication = {
-    truststore_uri     = "s3://${aws_s3_bucket.truststore.bucket}/${aws_s3_bucket_object.truststore.id}"
-    truststore_version = aws_s3_bucket_object.truststore.version_id
+    truststore_uri     = "s3://${aws_s3_bucket.truststore.bucket}/${aws_s3_object.truststore.id}"
+    truststore_version = aws_s3_object.truststore.version_id
+    /* Start of quick create */
   }
 
   domain_name                 = var.domain_name
@@ -211,6 +212,16 @@ module "api_gateway" {
     throttling_rate_limit    = 100
   }
 
+  authorizers = {
+    "cognito" = {
+      authorizer_type  = "JWT"
+      identity_sources = "$request.header.Authorization"
+      name             = "cognito"
+      audience         = ["d6a38afd-45d6-4874-d1aa-3c5c558aqcc2"]
+      issuer           = "https://${aws_cognito_user_pool.this.endpoint}"
+    }
+  }
+
   integrations = {
 
     "ANY /" = {
@@ -220,10 +231,35 @@ module "api_gateway" {
     }
 
     "GET /some-route" = {
+      lambda_arn               = module.lambda_function.lambda_function_arn
+      payload_format_version   = "2.0"
+      authorization_type       = "JWT"
+      authorizer_id            = aws_apigatewayv2_authorizer.some_authorizer.id
+      throttling_rate_limit    = 80
+      throttling_burst_limit   = 40
+      detailed_metrics_enabled = true
+    }
+
+    "GET /some-route-with-authorizer" = {
+      lambda_arn             = module.lambda_function.lambda_function_arn
+      payload_format_version = "2.0"
+      authorizer_key         = "cognito"
+    }
+
+    "GET /some-route-with-authorizer-and-scope" = {
       lambda_arn             = module.lambda_function.lambda_function_arn
       payload_format_version = "2.0"
       authorization_type     = "JWT"
-      authorizer_id          = aws_apigatewayv2_authorizer.some_authorizer.id
+      authorizer_key         = "cognito"
+      authorization_scopes   = "tf/something.relevant.read,tf/something.relevant.write" # Should comply with the resource server configuration part of the cognito user pool
+    }
+
+    "GET /some-route-with-authorizer-and-different-scope" = {
+      lambda_arn             = module.lambda_function.lambda_function_arn
+      payload_format_version = "2.0"
+      authorization_type     = "JWT"
+      authorizer_key         = "cognito"
+      authorization_scopes   = "tf/something.relevant.write" # Should comply with the resource server configuration part of the cognito user pool
     }
 
     "POST /start-step-function" = {

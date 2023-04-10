@@ -111,3 +111,8 @@ output "vpc_links" {
   description = "Map of VPC links created and their attributes"
   value       = aws_apigatewayv2_vpc_link.this
 }
+
+output "apigatewayv2_authorizer_id" {
+  description = "The map of API Gateway Authorizer identifiers"
+  value       = { for k, v in aws_apigatewayv2_authorizer.this : k => v.id }
+}
