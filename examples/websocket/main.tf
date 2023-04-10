@@ -46,10 +46,12 @@ module "api_gateway" {
   protocol_type              = "WEBSOCKET"
   route_selection_expression = "$request.body.action"
 
-  stage_name = "Prod"
+  stage_name = "prod"
 
   stage_default_route_settings = {
+    data_trace_enabled       = true
     detailed_metrics_enabled = true
+    logging_level            = "INFO"
     throttling_burst_limit   = 50
     throttling_rate_limit    = 100
   }
@@ -118,35 +120,7 @@ module "api_gateway" {
 ################################################################################
 
 resource "aws_cloudwatch_log_group" "logs" {
-  name = local.name
-}
-
-resource "aws_api_gateway_account" "logs" {
-  cloudwatch_role_arn = aws_iam_role.cloudwatch.arn
-}
-
-resource "aws_iam_role" "cloudwatch" {
-  name = "api_gateway_cloudwatch_global"
-
-  assume_role_policy = <<-EOT
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Sid": "",
-        "Effect": "Allow",
-        "Principal": {
-          "Service": "apigateway.amazonaws.com"
-        },
-        "Action": "sts:AssumeRole"
-      }
-    ]
-  }
-  EOT
-
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"]
-
-  tags = local.tags
+  name = "/stage/${local.name}"
 }
 
 module "connect_lambda_function" {
@@ -157,18 +131,18 @@ module "connect_lambda_function" {
   description   = "Websocket onConnect handler"
   source_path   = ["function/onConnect.js"]
   handler       = "onConnect.handler"
-  runtime       = "nodejs16.x"
+  runtime       = "nodejs18.x"
   memory_size   = 256
   publish       = true
 
   environment_variables = {
-    TABLE_NAME = local.dynamodb_table_name
+    TABLE_NAME = module.dynamodb_table.dynamodb_table_id
   }
 
   allowed_triggers = {
-    AllowExecutionFromAPIGateway = {
-      service    = "apigateway"
-      source_arn = "${module.api_gateway.api_execution_arn}/*/*"
+    apigateway = {
+      principal  = "apigateway.amazonaws.com"
+      source_arn = "${module.api_gateway.api_execution_arn}/*"
     }
   }
 
@@ -176,10 +150,6 @@ module "connect_lambda_function" {
   policy_statements = {
     dynamodb = local.dynamodb_crud_permissions
   }
-
-  depends_on = [
-    module.dynamodb_table
-  ]
 
   tags = local.tags
 }
@@ -192,18 +162,18 @@ module "disconnect_lambda_function" {
   description   = "Websocket onDisconnect handler"
   source_path   = ["function/onDisconnect.js"]
   handler       = "onDisconnect.handler"
-  runtime       = "nodejs16.x"
+  runtime       = "nodejs18.x"
   memory_size   = 256
   publish       = true
 
   environment_variables = {
-    TABLE_NAME = local.dynamodb_table_name
+    TABLE_NAME = module.dynamodb_table.dynamodb_table_id
   }
 
   allowed_triggers = {
-    AllowExecutionFromAPIGateway = {
-      service    = "apigateway"
-      source_arn = "${module.api_gateway.api_execution_arn}/*/*"
+    apigateway = {
+      principal  = "apigateway.amazonaws.com"
+      source_arn = "${module.api_gateway.api_execution_arn}/*"
     }
   }
 
@@ -211,10 +181,6 @@ module "disconnect_lambda_function" {
   policy_statements = {
     dynamodb = local.dynamodb_crud_permissions
   }
-
-  depends_on = [
-    module.dynamodb_table
-  ]
 
   tags = local.tags
 }
@@ -232,13 +198,13 @@ module "send_message_lambda_function" {
   publish       = true
 
   environment_variables = {
-    TABLE_NAME = local.dynamodb_table_name
+    TABLE_NAME = module.dynamodb_table.dynamodb_table_id
   }
 
   allowed_triggers = {
-    AllowExecutionFromAPIGateway = {
-      service    = "apigateway"
-      source_arn = "${module.api_gateway.api_execution_arn}/*/*"
+    apigateway = {
+      principal  = "apigateway.amazonaws.com"
+      source_arn = "${module.api_gateway.api_execution_arn}/*"
     }
   }
 
@@ -251,10 +217,6 @@ module "send_message_lambda_function" {
     }
     dynamodb = local.dynamodb_crud_permissions
   }
-
-  depends_on = [
-    module.dynamodb_table
-  ]
 
   tags = local.tags
 }

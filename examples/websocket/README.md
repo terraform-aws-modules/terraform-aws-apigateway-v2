@@ -69,9 +69,7 @@ connected (press CTRL+C to quit)
 
 | Name | Type |
 |------|------|
-| [aws_api_gateway_account.logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_account) | resource |
 | [aws_cloudwatch_log_group.logs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
-| [aws_iam_role.cloudwatch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 
 ## Inputs
 
