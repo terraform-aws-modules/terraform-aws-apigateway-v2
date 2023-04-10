@@ -46,8 +46,7 @@ module "api_gateway" {
   protocol_type              = "WEBSOCKET"
   route_selection_expression = "$request.body.action"
 
-  stage_name             = "Prod"
-  create_api_domain_name = false
+  stage_name = "Prod"
 
   stage_default_route_settings = {
     detailed_metrics_enabled = true
@@ -152,13 +151,13 @@ resource "aws_iam_role" "cloudwatch" {
 
 module "connect_lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 2"
+  version = "~> 4.0"
 
   function_name = "${local.name}-onConnect"
   description   = "Websocket onConnect handler"
   source_path   = ["function/onConnect.js"]
   handler       = "onConnect.handler"
-  runtime       = "nodejs14.x"
+  runtime       = "nodejs16.x"
   memory_size   = 256
   publish       = true
 
@@ -187,13 +186,13 @@ module "connect_lambda_function" {
 
 module "disconnect_lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 2"
+  version = "~> 4.0"
 
   function_name = "${local.name}-onDisconnect"
   description   = "Websocket onDisconnect handler"
   source_path   = ["function/onDisconnect.js"]
   handler       = "onDisconnect.handler"
-  runtime       = "nodejs14.x"
+  runtime       = "nodejs16.x"
   memory_size   = 256
   publish       = true
 
@@ -222,13 +221,13 @@ module "disconnect_lambda_function" {
 
 module "send_message_lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 2"
+  version = "~> 4.0"
 
   function_name = "${local.name}-sendMessage"
   description   = "Websocket sendMessage handler"
   source_path   = ["function/sendMessage.js"]
   handler       = "sendMessage.handler"
-  runtime       = "nodejs14.x"
+  runtime       = "nodejs16.x"
   memory_size   = 256
   publish       = true
 
@@ -262,7 +261,7 @@ module "send_message_lambda_function" {
 
 module "dynamodb_table" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "~> 1"
+  version = "~> 3.0"
 
   name     = local.dynamodb_table_name
   hash_key = "connectionId"

@@ -8,7 +8,7 @@ output "api_id" {
 }
 
 output "api_endpoint" {
-  description = "The URI of the API"
+  description = "URI of the API, of the form `https://{api-id}.execute-api.{region}.amazonaws.com` for HTTP APIs and `wss://{api-id}.execute-api.{region}.amazonaws.com` for WebSocket APIs"
   value       = module.api_gateway.api_endpoint
 }
 
@@ -18,13 +18,17 @@ output "api_arn" {
 }
 
 output "api_execution_arn" {
-  description = "The ARN prefix to be used in an aws_lambda_permission's source_arn attribute or in an aws_iam_policy to authorize access to the @connections API."
+  description = "The ARN prefix to be used in an `aws_lambda_permission`'s `source_arn` attribute or in an `aws_iam_policy` to authorize access to the `@connections` API"
   value       = module.api_gateway.api_execution_arn
 }
 
-output "api_mapping_id" {
-  description = "The API mapping identifier"
-  value       = module.api_gateway.api_mapping_id
+################################################################################
+# Authorizer(s)
+################################################################################
+
+output "authorizers" {
+  description = "Map of API Gateway Authorizer(s) created and their attributes"
+  value       = module.api_gateway.authorizers
 }
 
 ################################################################################
@@ -62,7 +66,25 @@ output "domain_name_hosted_zone_id" {
 }
 
 ################################################################################
-# API Gateway Stage
+# Integration(s)
+################################################################################
+
+output "integrations" {
+  description = "Map of the integrations created and their attributes"
+  value       = module.api_gateway.integrations
+}
+
+################################################################################
+# Route(s)
+################################################################################
+
+output "routes" {
+  description = "Map of the routes created and their attributes"
+  value       = module.api_gateway.routes
+}
+
+################################################################################
+# Stage
 ################################################################################
 
 output "stage_id" {
@@ -76,31 +98,13 @@ output "stage_arn" {
 }
 
 output "stage_execution_arn" {
-  description = "The ARN prefix to be used in an aws_lambda_permission's source_arn attribute or in an aws_iam_policy to authorize access to the @connections API."
+  description = "The ARN prefix to be used in an aws_lambda_permission's source_arn attribute or in an aws_iam_policy to authorize access to the @connections API"
   value       = module.api_gateway.stage_execution_arn
 }
 
 output "stage_invoke_url" {
   description = "The URL to invoke the API pointing to the stage"
   value       = module.api_gateway.stage_invoke_url
-}
-
-################################################################################
-# Route(s)
-################################################################################
-
-output "routes" {
-  description = "Map of the routes created and their attributes"
-  value       = module.api_gateway.routes
-}
-
-################################################################################
-# Integration(s)
-################################################################################
-
-output "integrations" {
-  description = "Map of the integrations created and their attributes"
-  value       = module.api_gateway.integrations
 }
 
 ################################################################################

@@ -38,8 +38,6 @@ module "api_gateway" {
     allow_origins = ["*"]
   }
 
-  create_api_domain_name = false
-
   integrations = {
     "ANY /" = {
       lambda_arn             = module.lambda_function.lambda_function_arn
@@ -164,7 +162,7 @@ resource "null_resource" "download_package" {
 
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 2.0"
+  version = "~> 4.0"
 
   function_name = local.name
   description   = "My awesome lambda function"

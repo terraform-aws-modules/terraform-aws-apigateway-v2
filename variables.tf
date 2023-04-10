@@ -14,50 +14,26 @@ variable "tags" {
 # API Gateway
 ################################################################################
 
-variable "create_api_gateway" {
-  description = "Whether to create API Gateway"
-  type        = bool
-  default     = true
+variable "api_key_selection_expression" {
+  description = "An API key selection expression. Valid values: `$context.authorizer.usageIdentifierKey`, `$request.header.x-api-key`. Defaults to `$request.header.x-api-key`. Applicable for WebSocket APIs"
+  type        = string
+  default     = null
 }
 
-variable "name" {
-  description = "The name of the API. Must be less than or equal to 128 characters in length"
+variable "cors_configuration" {
+  description = "The cross-origin resource sharing (CORS) configuration. Applicable for HTTP APIs"
+  type        = any
+  default     = {}
+}
+
+variable "credentials_arn" {
+  description = "Part of quick create. Specifies any credentials required for the integration. Applicable for HTTP APIs"
   type        = string
-  default     = ""
+  default     = null
 }
 
 variable "description" {
   description = "The description of the API. Must be less than or equal to 1024 characters in length"
-  type        = string
-  default     = null
-}
-
-variable "protocol_type" {
-  description = "The API protocol. Valid values: `HTTP`, `WEBSOCKET`"
-  type        = string
-  default     = "HTTP"
-}
-
-variable "api_version" {
-  description = "A version identifier for the API. Must be between 1 and 64 characters in length"
-  type        = string
-  default     = null
-}
-
-variable "body" {
-  description = "An OpenAPI specification that defines the set of routes and integrations to create as part of the HTTP APIs. Supported only for HTTP APIs"
-  type        = string
-  default     = null
-}
-
-variable "route_selection_expression" {
-  description = "The route selection expression for the API. Defaults to `$request.method $request.path`"
-  type        = string
-  default     = null
-}
-
-variable "api_key_selection_expression" {
-  description = "An API key selection expression. Valid values: `$context.authorizer.usageIdentifierKey`, `$request.header.x-api-key`. Defaults to `$request.header.x-api-key`. Applicable for WebSocket APIs"
   type        = string
   default     = null
 }
@@ -74,14 +50,32 @@ variable "fail_on_warnings" {
   default     = null
 }
 
+variable "name" {
+  description = "The name of the API. Must be less than or equal to 128 characters in length"
+  type        = string
+  default     = ""
+}
+
+variable "body" {
+  description = "An OpenAPI specification that defines the set of routes and integrations to create as part of the HTTP APIs. Supported only for HTTP APIs"
+  type        = string
+  default     = null
+}
+
+variable "protocol_type" {
+  description = "The API protocol. Valid values: `HTTP`, `WEBSOCKET`"
+  type        = string
+  default     = "HTTP"
+}
+
 variable "route_key" {
   description = "Part of quick create. Specifies any route key. Applicable for HTTP APIs"
   type        = string
   default     = null
 }
 
-variable "credentials_arn" {
-  description = "Part of quick create. Specifies any credentials required for the integration. Applicable for HTTP APIs"
+variable "route_selection_expression" {
+  description = "The route selection expression for the API. Defaults to `$request.method $request.path`"
   type        = string
   default     = null
 }
@@ -92,16 +86,10 @@ variable "target" {
   default     = null
 }
 
-variable "cors_configuration" {
-  description = "The cross-origin resource sharing (CORS) configuration. Applicable for HTTP APIs"
-  type        = any
-  default     = {}
-}
-
-variable "create_stage_api_mapping" {
-  description = "Whether to create/enable API mapping"
-  type        = bool
-  default     = true
+variable "api_version" {
+  description = "A version identifier for the API. Must be between 1 and 64 characters in length"
+  type        = string
+  default     = null
 }
 
 variable "api_mapping_key" {
@@ -111,13 +99,23 @@ variable "api_mapping_key" {
 }
 
 ################################################################################
+# Authorizer(s)
+################################################################################
+
+variable "authorizers" {
+  description = "Map of API gateway authorizers to create"
+  type        = any
+  default     = {}
+}
+
+################################################################################
 # Domain Name
 ################################################################################
 
-variable "create_api_domain_name" {
+variable "create_domain_name" {
   description = "Whether to create API domain name resource"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "domain_name" {
@@ -132,66 +130,14 @@ variable "domain_name_certificate_arn" {
   default     = null
 }
 
+variable "domain_name_ownership_verification_certificate_arn" {
+  description = "ARN of the AWS-issued certificate used to validate custom domain ownership (when certificate_arn is issued via an ACM Private CA or mutual_tls_authentication is configured with an ACM-imported certificate.)"
+  type        = string
+  default     = null
+}
+
 variable "mutual_tls_authentication" {
   description = "The mutual TLS authentication configuration for the domain name"
-  type        = map(string)
-  default     = {}
-}
-
-variable "domain_name_tags" {
-  description = "A map of additional tags to assign to API domain name resource"
-  type        = map(string)
-  default     = {}
-}
-
-################################################################################
-# API Gateway Stage
-################################################################################
-
-variable "create_stage" {
-  description = "Whether to create default stage"
-  type        = bool
-  default     = true
-}
-
-variable "stage_name" {
-  description = "The name of the stage. Must be between 1 and 128 characters in length"
-  type        = string
-  default     = "$default"
-}
-
-variable "stage_description" {
-  description = "The description for the stage. Must be less than or equal to 1024 characters in length"
-  type        = string
-  default     = null
-}
-
-variable "stage_client_certificate_id" {
-  description = "The identifier of a client certificate for the stage. Use the `aws_api_gateway_client_certificate` resource to configure a client certificate. Supported only for WebSocket APIs"
-  type        = string
-  default     = null
-}
-
-variable "stage_variables" {
-  description = "A map that defines the stage variables for the stage"
-  type        = map(string)
-  default     = {}
-}
-
-variable "stage_access_log_settings" {
-  description = "Settings for logging access in this stage. Use the aws_api_gateway_account resource to configure [permissions for CloudWatch Logging](https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html#set-up-access-logging-permissions)"
-  type        = map(string)
-  default     = {}
-}
-
-variable "stage_default_route_settings" {
-  description = "The default route settings for the stage"
-  type        = map(string)
-  default     = {}
-}
-
-variable "stage_tags" {
-  description = "A mapping of tags to assign to the stage resource"
   type        = map(string)
   default     = {}
 }
@@ -208,7 +154,59 @@ variable "create_routes_and_integrations" {
 
 variable "integrations" {
   description = "Map of API gateway routes with integrations"
-  type        = map(any)
+  type        = any
+  default     = {}
+}
+
+################################################################################
+# Stage
+################################################################################
+
+variable "create_stage" {
+  description = "Whether to create default stage"
+  type        = bool
+  default     = true
+}
+
+variable "stage_access_log_settings" {
+  description = "Settings for logging access in this stage. Use the aws_api_gateway_account resource to configure [permissions for CloudWatch Logging](https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html#set-up-access-logging-permissions)"
+  type        = map(string)
+  default     = {}
+}
+
+variable "stage_client_certificate_id" {
+  description = "The identifier of a client certificate for the stage. Use the `aws_api_gateway_client_certificate` resource to configure a client certificate. Supported only for WebSocket APIs"
+  type        = string
+  default     = null
+}
+
+variable "stage_default_route_settings" {
+  description = "The default route settings for the stage"
+  type        = map(string)
+  default     = {}
+}
+
+variable "stage_description" {
+  description = "The description for the stage. Must be less than or equal to 1024 characters in length"
+  type        = string
+  default     = null
+}
+
+variable "stage_name" {
+  description = "The name of the stage. Must be between 1 and 128 characters in length"
+  type        = string
+  default     = "$default"
+}
+
+variable "stage_variables" {
+  description = "A map that defines the stage variables for the stage"
+  type        = map(string)
+  default     = {}
+}
+
+variable "stage_tags" {
+  description = "A mapping of tags to assign to the stage resource"
+  type        = map(string)
   default     = {}
 }
 
@@ -217,25 +215,13 @@ variable "integrations" {
 ################################################################################
 
 variable "vpc_links" {
-  description = "Map of VPC Links details to create"
-  type        = map(any)
+  description = "Map of VPC Link definitions to create"
+  type        = any
   default     = {}
 }
 
 variable "vpc_link_tags" {
-  description = "A map of tags to add to the VPC Link"
+  description = "A map of tags to add to the VPC Links created"
   type        = map(string)
-  default     = {}
-}
-
-variable "domain_name_ownership_verification_certificate_arn" {
-  description = "ARN of the AWS-issued certificate used to validate custom domain ownership (when certificate_arn is issued via an ACM Private CA or mutual_tls_authentication is configured with an ACM-imported certificate.)"
-  type        = string
-  default     = null
-}
-
-variable "authorizers" {
-  description = "Map of API gateway authorizers"
-  type        = map(any)
   default     = {}
 }

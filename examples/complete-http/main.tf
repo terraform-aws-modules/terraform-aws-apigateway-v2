@@ -24,9 +24,11 @@ locals {
 module "api_gateway" {
   source = "../../"
 
-  name          = local.name
-  description   = "My awesome HTTP API Gateway"
-  protocol_type = "HTTP"
+  name        = local.name
+  description = "My awesome HTTP API Gateway"
+
+  protocol_type      = "HTTP"
+  create_domain_name = true
 
   cors_configuration = {
     allow_headers = ["content-type", "x-amz-date", "authorization", "x-api-key", "x-amz-security-token", "x-amz-user-agent"]
@@ -58,8 +60,10 @@ module "api_gateway" {
       authorizer_type  = "JWT"
       identity_sources = "$request.header.Authorization"
       name             = "cognito"
-      audience         = ["d6a38afd-45d6-4874-d1aa-3c5c558aqcc2"]
-      issuer           = "https://${aws_cognito_user_pool.this.endpoint}"
+      jwt_configuration = {
+        audience = ["d6a38afd-45d6-4874-d1aa-3c5c558aqcc2"]
+        issuer   = "https://${aws_cognito_user_pool.this.endpoint}"
+      }
     }
   }
 
@@ -75,7 +79,7 @@ module "api_gateway" {
       lambda_arn               = module.lambda_function.lambda_function_arn
       payload_format_version   = "2.0"
       authorization_type       = "JWT"
-      authorizer_id            = aws_apigatewayv2_authorizer.some_authorizer.id
+      authorizer_key           = "cognito"
       throttling_rate_limit    = 80
       throttling_burst_limit   = 40
       detailed_metrics_enabled = true
@@ -92,7 +96,7 @@ module "api_gateway" {
       payload_format_version = "2.0"
       authorization_type     = "JWT"
       authorizer_key         = "cognito"
-      authorization_scopes   = "tf/something.relevant.read,tf/something.relevant.write" # Should comply with the resource server configuration part of the cognito user pool
+      authorization_scopes   = ["user.id", "user.email"]
     }
 
     "GET /some-route-with-authorizer-and-different-scope" = {
@@ -100,7 +104,7 @@ module "api_gateway" {
       payload_format_version = "2.0"
       authorization_type     = "JWT"
       authorizer_key         = "cognito"
-      authorization_scopes   = "tf/something.relevant.write" # Should comply with the resource server configuration part of the cognito user pool
+      authorization_scopes   = ["user.id", "user.email"]
     }
 
     "POST /start-step-function" = {
@@ -180,18 +184,6 @@ resource "aws_route53_record" "api" {
   }
 }
 
-resource "aws_apigatewayv2_authorizer" "some_authorizer" {
-  api_id           = module.api_gateway.api_id
-  authorizer_type  = "JWT"
-  identity_sources = ["$request.header.Authorization"]
-  name             = local.name
-
-  jwt_configuration {
-    audience = ["example"]
-    issuer   = "https://${aws_cognito_user_pool.this.endpoint}"
-  }
-}
-
 resource "aws_cognito_user_pool" "this" {
   name = local.name
 
@@ -246,7 +238,7 @@ resource "null_resource" "download_package" {
 
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 2.0"
+  version = "~> 4.0"
 
   function_name = local.name
   description   = "My awesome lambda function"
