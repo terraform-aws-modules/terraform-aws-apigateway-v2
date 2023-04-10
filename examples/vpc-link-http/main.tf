@@ -2,17 +2,73 @@ provider "aws" {
   region = local.region
 }
 
+data "aws_availability_zones" "available" {}
+
 locals {
-  name   = "ex-${replace(basename(path.cwd), "_", "-")}"
+  name   = "ex-${basename(path.cwd)}"
   region = "eu-west-1"
+
+  vpc_cidr = "10.0.0.0/16"
+  azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
   package_url = "https://raw.githubusercontent.com/terraform-aws-modules/terraform-aws-lambda/master/examples/fixtures/python3.8-zip/existing_package.zip"
   downloaded  = "downloaded_package_${md5(local.package_url)}.zip"
 
   tags = {
-    Name        = local.name
-    Environment = "dev"
+    Example    = local.name
+    GithubRepo = "terraform-aws-apigateway-v2"
+    GithubOrg  = "terraform-aws-modules"
   }
+}
+
+################################################################################
+# API Gateway Module
+################################################################################
+
+module "api_gateway" {
+  source = "../../"
+
+  name          = local.name
+  description   = "HTTP API Gateway with VPC links"
+  protocol_type = "HTTP"
+
+  cors_configuration = {
+    allow_headers = ["content-type", "x-amz-date", "authorization", "x-api-key", "x-amz-security-token", "x-amz-user-agent"]
+    allow_methods = ["*"]
+    allow_origins = ["*"]
+  }
+
+  create_api_domain_name = false
+
+  integrations = {
+    "ANY /" = {
+      lambda_arn             = module.lambda_function.lambda_function_arn
+      payload_format_version = "2.0"
+      timeout_milliseconds   = 12000
+    }
+
+    "GET /alb-internal-route" = {
+      connection_type    = "VPC_LINK"
+      vpc_link           = "my-vpc"
+      integration_uri    = module.alb.http_tcp_listener_arns[0]
+      integration_type   = "HTTP_PROXY"
+      integration_method = "ANY"
+    }
+
+    "$default" = {
+      lambda_arn = module.lambda_function.lambda_function_arn
+    }
+  }
+
+  vpc_links = {
+    my-vpc = {
+      name               = local.name
+      security_group_ids = [module.api_gateway_security_group.security_group_id]
+      subnet_ids         = module.vpc.public_subnets
+    }
+  }
+
+  tags = local.tags
 }
 
 ################################################################################
@@ -21,17 +77,14 @@ locals {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = " ~> 3.0"
+  version = "~> 4.0"
 
   name = local.name
-  cidr = "10.0.0.0/16"
+  cidr = local.vpc_cidr
 
-  azs             = ["${local.region}a", "${local.region}b", "${local.region}c"]
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
-
-  enable_nat_gateway = false
-  single_nat_gateway = true
+  azs             = local.azs
+  private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 4, k)]
+  public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 48)]
 
   tags = local.tags
 }
@@ -154,56 +207,6 @@ module "lambda_security_group" {
   number_of_computed_ingress_with_source_security_group_id = 1
 
   egress_rules = ["all-all"]
-
-  tags = local.tags
-}
-
-################################################################################
-# API Gateway Module
-################################################################################
-
-module "api_gateway" {
-  source = "../../"
-
-  name          = local.name
-  description   = "HTTP API Gateway with VPC links"
-  protocol_type = "HTTP"
-
-  cors_configuration = {
-    allow_headers = ["content-type", "x-amz-date", "authorization", "x-api-key", "x-amz-security-token", "x-amz-user-agent"]
-    allow_methods = ["*"]
-    allow_origins = ["*"]
-  }
-
-  create_api_domain_name = false
-
-  integrations = {
-    "ANY /" = {
-      lambda_arn             = module.lambda_function.lambda_function_arn
-      payload_format_version = "2.0"
-      timeout_milliseconds   = 12000
-    }
-
-    "GET /alb-internal-route" = {
-      connection_type    = "VPC_LINK"
-      vpc_link           = "my-vpc"
-      integration_uri    = module.alb.http_tcp_listener_arns[0]
-      integration_type   = "HTTP_PROXY"
-      integration_method = "ANY"
-    }
-
-    "$default" = {
-      lambda_arn = module.lambda_function.lambda_function_arn
-    }
-  }
-
-  vpc_links = {
-    my-vpc = {
-      name               = local.name
-      security_group_ids = [module.api_gateway_security_group.security_group_id]
-      subnet_ids         = module.vpc.public_subnets
-    }
-  }
 
   tags = local.tags
 }

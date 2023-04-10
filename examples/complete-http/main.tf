@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 locals {
-  name   = "ex-${replace(basename(path.cwd), "_", "-")}"
+  name   = "ex-${basename(path.cwd)}"
   region = "eu-west-1"
 
   subdomain   = "complete-http"
@@ -11,168 +11,10 @@ locals {
   downloaded  = "downloaded_package_${md5(local.package_url)}.zip"
 
   tags = {
-    Name        = local.name
-    Environment = "dev"
+    Example    = local.name
+    GithubRepo = "terraform-aws-apigateway-v2"
+    GithubOrg  = "terraform-aws-modules"
   }
-}
-
-################################################################################
-# Supporting Resources
-################################################################################
-data "aws_route53_zone" "this" {
-  name = var.domain_name
-}
-
-module "acm" {
-  source  = "terraform-aws-modules/acm/aws"
-  version = "~> 3.0"
-
-  domain_name               = var.domain_name
-  zone_id                   = data.aws_route53_zone.this.id
-  subject_alternative_names = ["${local.subdomain}.${var.domain_name}"]
-
-  tags = local.tags
-}
-
-resource "aws_route53_record" "api" {
-  zone_id = data.aws_route53_zone.this.zone_id
-  name    = local.subdomain
-  type    = "A"
-
-  alias {
-    name                   = module.api_gateway.domain_name_configuration[0].target_domain_name
-    zone_id                = module.api_gateway.domain_name_configuration[0].hosted_zone_id
-    evaluate_target_health = false
-  }
-}
-
-resource "aws_apigatewayv2_authorizer" "some_authorizer" {
-  api_id           = module.api_gateway.api_id
-  authorizer_type  = "JWT"
-  identity_sources = ["$request.header.Authorization"]
-  name             = local.name
-
-  jwt_configuration {
-    audience = ["example"]
-    issuer   = "https://${aws_cognito_user_pool.this.endpoint}"
-  }
-}
-
-resource "aws_cognito_user_pool" "this" {
-  name = local.name
-
-  tags = local.tags
-}
-
-module "step_function" {
-  source  = "terraform-aws-modules/step-functions/aws"
-  version = "~> 2.0"
-
-  name      = local.name
-  role_name = "${local.name}-step-function"
-
-  definition = <<-EOT
-  {
-    "Comment": "A Hello World example of the Amazon States Language using Pass states",
-    "StartAt": "Hello",
-    "States": {
-      "Hello": {
-        "Type": "Pass",
-        "Result": "Hello",
-        "Next": "World"
-      },
-      "World": {
-        "Type": "Pass",
-        "Result": "World",
-        "End": true
-      }
-    }
-  }
-  EOT
-
-  tags = local.tags
-}
-
-resource "random_pet" "this" {
-  length = 2
-}
-
-resource "aws_cloudwatch_log_group" "logs" {
-  name = local.name
-
-  tags = local.tags
-}
-
-# Using packaged function from Lambda module
-resource "null_resource" "download_package" {
-  triggers = {
-    downloaded = local.downloaded
-  }
-
-  provisioner "local-exec" {
-    command = "curl -L -o ${local.downloaded} ${local.package_url}"
-  }
-}
-
-module "lambda_function" {
-  source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 2.0"
-
-  function_name = local.name
-  description   = "My awesome lambda function"
-  handler       = "index.lambda_handler"
-  runtime       = "python3.8"
-
-  publish = true
-
-  create_package         = false
-  local_existing_package = local.downloaded
-
-  allowed_triggers = {
-    AllowExecutionFromAPIGateway = {
-      service    = "apigateway"
-      source_arn = "${module.api_gateway.api_execution_arn}/*/*"
-    }
-  }
-
-  tags = local.tags
-}
-
-# S3 bucket and TLS certificate for truststore
-resource "aws_s3_bucket" "truststore" {
-  bucket = "${random_pet.this.id}-truststore"
-  acl    = "private"
-
-  tags = local.tags
-}
-
-resource "aws_s3_bucket_object" "truststore" {
-  bucket                 = aws_s3_bucket.truststore.bucket
-  key                    = "truststore.pem"
-  server_side_encryption = "AES256"
-  content                = tls_self_signed_cert.example.cert_pem
-}
-
-resource "tls_private_key" "private_key" {
-  algorithm = "RSA"
-}
-
-resource "tls_self_signed_cert" "example" {
-  key_algorithm     = tls_private_key.private_key.algorithm
-  is_ca_certificate = true
-  private_key_pem   = tls_private_key.private_key.private_key_pem
-
-  subject {
-    common_name  = "example.com"
-    organization = "ACME Examples, Inc"
-  }
-
-  validity_period_hours = 12
-
-  allowed_uses = [
-    "cert_signing",
-    "server_auth",
-  ]
 }
 
 ################################################################################
@@ -193,9 +35,8 @@ module "api_gateway" {
   }
 
   mutual_tls_authentication = {
-    truststore_uri     = "s3://${aws_s3_bucket.truststore.bucket}/${aws_s3_object.truststore.id}"
+    truststore_uri     = "s3://${module.s3_bucket.s3_bucket_id}/${aws_s3_object.truststore.id}"
     truststore_version = aws_s3_object.truststore.version_id
-    /* Start of quick create */
   }
 
   domain_name                 = var.domain_name
@@ -306,4 +147,179 @@ module "api_gateway" {
   })
 
   tags = local.tags
+}
+
+################################################################################
+# Supporting Resources
+################################################################################
+
+data "aws_route53_zone" "this" {
+  name = var.domain_name
+}
+
+module "acm" {
+  source  = "terraform-aws-modules/acm/aws"
+  version = "~> 3.0"
+
+  domain_name               = var.domain_name
+  zone_id                   = data.aws_route53_zone.this.id
+  subject_alternative_names = ["${local.subdomain}.${var.domain_name}"]
+
+  tags = local.tags
+}
+
+resource "aws_route53_record" "api" {
+  zone_id = data.aws_route53_zone.this.zone_id
+  name    = local.subdomain
+  type    = "A"
+
+  alias {
+    name                   = module.api_gateway.domain_name_configuration[0].target_domain_name
+    zone_id                = module.api_gateway.domain_name_configuration[0].hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_apigatewayv2_authorizer" "some_authorizer" {
+  api_id           = module.api_gateway.api_id
+  authorizer_type  = "JWT"
+  identity_sources = ["$request.header.Authorization"]
+  name             = local.name
+
+  jwt_configuration {
+    audience = ["example"]
+    issuer   = "https://${aws_cognito_user_pool.this.endpoint}"
+  }
+}
+
+resource "aws_cognito_user_pool" "this" {
+  name = local.name
+
+  tags = local.tags
+}
+
+module "step_function" {
+  source  = "terraform-aws-modules/step-functions/aws"
+  version = "~> 2.0"
+
+  name      = local.name
+  role_name = "${local.name}-step-function"
+
+  definition = <<-EOT
+  {
+    "Comment": "A Hello World example of the Amazon States Language using Pass states",
+    "StartAt": "Hello",
+    "States": {
+      "Hello": {
+        "Type": "Pass",
+        "Result": "Hello",
+        "Next": "World"
+      },
+      "World": {
+        "Type": "Pass",
+        "Result": "World",
+        "End": true
+      }
+    }
+  }
+  EOT
+
+  tags = local.tags
+}
+
+resource "aws_cloudwatch_log_group" "logs" {
+  name = local.name
+
+  tags = local.tags
+}
+
+# Using packaged function from Lambda module
+resource "null_resource" "download_package" {
+  triggers = {
+    downloaded = local.downloaded
+  }
+
+  provisioner "local-exec" {
+    command = "curl -L -o ${local.downloaded} ${local.package_url}"
+  }
+}
+
+module "lambda_function" {
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "~> 2.0"
+
+  function_name = local.name
+  description   = "My awesome lambda function"
+  handler       = "index.lambda_handler"
+  runtime       = "python3.8"
+
+  publish = true
+
+  create_package         = false
+  local_existing_package = local.downloaded
+
+  allowed_triggers = {
+    AllowExecutionFromAPIGateway = {
+      service    = "apigateway"
+      source_arn = "${module.api_gateway.api_execution_arn}/*/*"
+    }
+  }
+
+  tags = local.tags
+}
+
+module "s3_bucket" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "~> 3.0"
+
+  bucket_prefix = "${local.name}-"
+
+  # Allow deletion of non-empty bucket
+  # Example usage only - not recommended for production
+  force_destroy = true
+
+  attach_deny_insecure_transport_policy = true
+  attach_require_latest_tls_policy      = true
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
+
+  tags = local.tags
+}
+
+resource "aws_s3_object" "truststore" {
+  bucket  = module.s3_bucket.s3_bucket_id
+  key     = "truststore.pem"
+  content = tls_self_signed_cert.example.cert_pem
+}
+
+resource "tls_private_key" "private_key" {
+  algorithm = "RSA"
+}
+
+resource "tls_self_signed_cert" "example" {
+  is_ca_certificate = true
+  private_key_pem   = tls_private_key.private_key.private_key_pem
+
+  subject {
+    common_name  = "example.com"
+    organization = "ACME Examples, Inc"
+  }
+
+  validity_period_hours = 12
+
+  allowed_uses = [
+    "cert_signing",
+    "server_auth",
+  ]
 }
