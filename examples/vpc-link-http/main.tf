@@ -75,7 +75,7 @@ module "api_gateway" {
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~> 4.0"
+  version = "~> 5.0"
 
   name = local.name
   cidr = local.vpc_cidr
@@ -89,7 +89,7 @@ module "vpc" {
 
 module "api_gateway_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "~> 4.0"
+  version = "~> 5.0"
 
   name        = local.name
   description = "API Gateway group for example usage"
@@ -135,7 +135,7 @@ module "alb" {
 
 module "alb_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "~> 4.0"
+  version = "~> 5.0"
 
   name        = "${local.name}-alb"
   description = "ALB for example usage"
@@ -190,7 +190,7 @@ module "lambda_function" {
 
 module "lambda_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "~> 4.0"
+  version = "~> 5.0"
 
   name        = "${local.name}-lambda"
   description = "Lambda security group for example usage"
