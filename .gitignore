@@ -30,3 +30,4 @@ terraform.rc
 
 # Zip archive
 *.zip
+builds
