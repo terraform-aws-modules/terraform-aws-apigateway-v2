@@ -22,6 +22,28 @@ variable "create_default_stage_api_mapping" {
   default     = true
 }
 
+variable "additional_default_stage_api_mappings" {
+  description = "additional mapping for default stage"
+  type        = map(object({
+    domain_name = string
+    api_mapping_key = string
+  }))
+  default     = {}
+}
+
+
+variable "default_stage_description" {
+  description = "default stage description"
+  type        = string
+  default     = ""
+}
+
+variable "routes" {
+  description = "apigateway routes to create"
+  type        = map(any)
+  default     = {}
+}
+
 # variable "create_stage" {
 #   description = "Whether to create custom stage"
 #   type        = bool
@@ -196,7 +218,27 @@ variable "mutual_tls_authentication" {
 # routes and integrations
 variable "integrations" {
   description = "Map of API gateway routes with integrations"
-  type        = map(any)
+  type        = map(object({
+    description = optional(string, null)
+    integration_type = optional(string, "HTTP_PROXY")
+    integration_subtype = optional(string, null)
+    integration_method = optional(string, null)
+    integration_uri = optional(string, null)
+    lambda_arn      = optional(string, null)
+    connection_type = optional(string, "INTERNET")
+    connection_id = optional(string, null)
+    payload_format_version = optional(string, null)
+    timeout_milliseconds = optional(string, null)
+    passthrough_behavior = optional(string, null)
+    content_handling_strategy = optional(string, null)
+    credentials_arn = optional(string, null)
+    request_parameters = optional(map(string), {})
+    tls_config = optional(bool, false)
+    tls_config_server_name_to_verify = optional(string, null)
+    response_parameters = optional(bool, false)
+    response_parameters_status_code = optional(number,null)
+    response_parameters_mappings = optional(map(string), {})
+  }))
   default     = {}
 }
 

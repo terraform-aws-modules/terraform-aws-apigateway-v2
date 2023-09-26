@@ -66,7 +66,7 @@ resource "aws_apigatewayv2_stage" "default" {
   api_id      = aws_apigatewayv2_api.this[0].id
   name        = "$default"
   auto_deploy = true
-
+  description = var.default_stage_description
   dynamic "access_log_settings" {
     for_each = var.default_stage_access_log_destination_arn != null && var.default_stage_access_log_format != null ? [true] : []
 
@@ -111,6 +111,8 @@ resource "aws_apigatewayv2_stage" "default" {
   }
 }
 
+### Api mappings
+
 # Default API mapping
 resource "aws_apigatewayv2_api_mapping" "this" {
   count = var.create && var.create_api_domain_name && var.create_default_stage && var.create_default_stage_api_mapping ? 1 : 0
@@ -120,9 +122,20 @@ resource "aws_apigatewayv2_api_mapping" "this" {
   stage       = aws_apigatewayv2_stage.default[0].id
 }
 
+# Additional Api mappings
+resource "aws_apigatewayv2_api_mapping" "this_additional" {
+  for_each = var.additional_default_stage_api_mappings
+
+  api_id          = aws_apigatewayv2_api.this[0].id
+  domain_name     = each.value["domain_name"]
+  stage           = aws_apigatewayv2_stage.default[0].id
+  api_mapping_key = each.value["api_mapping_key"]
+}
+
+
 # Routes and integrations
 resource "aws_apigatewayv2_route" "this" {
-  for_each = var.create && var.create_routes_and_integrations ? var.integrations : {}
+  for_each = var.create && var.create_routes_and_integrations ? var.routes : {}
 
   api_id    = aws_apigatewayv2_api.this[0].id
   route_key = each.key
@@ -134,7 +147,7 @@ resource "aws_apigatewayv2_route" "this" {
   model_selection_expression          = try(each.value.model_selection_expression, null)
   operation_name                      = try(each.value.operation_name, null)
   route_response_selection_expression = try(each.value.route_response_selection_expression, null)
-  target                              = "integrations/${aws_apigatewayv2_integration.this[each.key].id}"
+  target                              = "integrations/${aws_apigatewayv2_integration.this[coalesce(each.value.integration_key, each.key)].id}"
 
   # Have been added to the docs. But is WEBSOCKET only(not yet supported)
   # request_models  = try(each.value.request_models, null)
@@ -144,37 +157,37 @@ resource "aws_apigatewayv2_integration" "this" {
   for_each = var.create && var.create_routes_and_integrations ? var.integrations : {}
 
   api_id      = aws_apigatewayv2_api.this[0].id
-  description = try(each.value.description, null)
+  description = each.value.description
 
-  integration_type    = try(each.value.integration_type, try(each.value.lambda_arn, "") != "" ? "AWS_PROXY" : "MOCK")
-  integration_subtype = try(each.value.integration_subtype, null)
-  integration_method  = try(each.value.integration_method, try(each.value.integration_subtype, null) == null ? "POST" : null)
-  integration_uri     = try(each.value.lambda_arn, try(each.value.integration_uri, null))
+  integration_type    = each.value.integration_type
+  integration_subtype = each.value.integration_subtype
+  integration_method  = each.value.integration_method
+  integration_uri     = coalesce(each.value.lambda_arn, each.value.integration_uri)
 
-  connection_type = try(each.value.connection_type, "INTERNET")
+  connection_type = each.value.connection_type
   connection_id   = try(aws_apigatewayv2_vpc_link.this[each.value["vpc_link"]].id, try(each.value.connection_id, null))
 
-  payload_format_version    = try(each.value.payload_format_version, null)
-  timeout_milliseconds      = try(each.value.timeout_milliseconds, null)
-  passthrough_behavior      = try(each.value.passthrough_behavior, null)
-  content_handling_strategy = try(each.value.content_handling_strategy, null)
-  credentials_arn           = try(each.value.credentials_arn, null)
+  payload_format_version    = each.value.payload_format_version
+  timeout_milliseconds      = each.value.timeout_milliseconds
+  passthrough_behavior      = each.value.passthrough_behavior
+  content_handling_strategy = each.value.content_handling_strategy
+  credentials_arn           = each.value.credentials_arn
   request_parameters        = try(jsondecode(each.value["request_parameters"]), each.value["request_parameters"], null)
 
   dynamic "tls_config" {
-    for_each = flatten([try(jsondecode(each.value["tls_config"]), each.value["tls_config"], [])])
+    for_each = each.value["tls_config"] ? [1] : []
 
     content {
-      server_name_to_verify = tls_config.value["server_name_to_verify"]
+      server_name_to_verify = each.value["tls_config_server_name_to_verify"]
     }
   }
 
   dynamic "response_parameters" {
-    for_each = flatten([try(jsondecode(each.value["response_parameters"]), each.value["response_parameters"], [])])
+    for_each = each.value["response_parameters"] ? [1] : []
 
     content {
-      status_code = response_parameters.value["status_code"]
-      mappings    = response_parameters.value["mappings"]
+      status_code = each.value["response_parameters_status_code"]
+      mappings    = each.value["response_parameters_mappings"]
     }
   }
 
