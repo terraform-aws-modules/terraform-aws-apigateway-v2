@@ -2,7 +2,6 @@ provider "aws" {
   region = "eu-west-1"
 
   # Make it faster by skipping something
-  skip_get_ec2_platforms      = true
   skip_metadata_api_check     = true
   skip_region_validation      = true
   skip_credentials_validation = true
@@ -26,6 +25,8 @@ module "api_gateway" {
   name          = "${random_pet.this.id}-http"
   description   = "My awesome HTTP API Gateway"
   protocol_type = "HTTP"
+
+  fail_on_warnings = false
 
   cors_configuration = {
     allow_headers = ["content-type", "x-amz-date", "authorization", "x-api-key", "x-amz-security-token", "x-amz-user-agent"]
