@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.0.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v2.2.2...v3.0.0) (2024-02-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* Added the fail_on_warnings variable, bumped Terraform version to 1.0+ (#96)
+
+### Features
+
+* Added the fail_on_warnings variable, bumped Terraform version to 1.0+ ([#96](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/96)) ([26859db](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/26859db0a5d651903469f6fabeda1e341867c45d))
+
 ### [2.2.2](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v2.2.1...v2.2.2) (2023-01-24)
 
 
