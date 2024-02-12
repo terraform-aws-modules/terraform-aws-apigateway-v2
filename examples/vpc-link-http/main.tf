@@ -14,29 +14,6 @@ provider "aws" {
   skip_requesting_account_id = false
 }
 
-################################
-# Supporting resources
-################################
-
-resource "random_pet" "this" {
-  length = 2
-}
-
-module "vpc" {
-  source  = "terraform-aws-modules/vpc/aws"
-  version = " ~> 3.0"
-
-  name = "vpc-link-http"
-  cidr = "10.0.0.0/16"
-
-  azs             = ["${local.region}a", "${local.region}b", "${local.region}c"]
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
-
-  enable_nat_gateway = false
-  single_nat_gateway = true
-}
-
 ###################
 # HTTP API Gateway
 ###################
@@ -66,7 +43,7 @@ module "api_gateway" {
     "GET /alb-internal-route" = {
       connection_type    = "VPC_LINK"
       vpc_link           = "my-vpc"
-      integration_uri    = module.alb.http_tcp_listener_arns[0]
+      integration_uri    = module.alb.listeners["default"].arn
       integration_type   = "HTTP_PROXY"
       integration_method = "ANY"
     }
@@ -89,9 +66,32 @@ module "api_gateway" {
   }
 }
 
+################################
+# Supporting resources
+################################
+
+resource "random_pet" "this" {
+  length = 2
+}
+
+module "vpc" {
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "~> 5.0"
+
+  name = "vpc-link-http"
+  cidr = "10.0.0.0/16"
+
+  azs             = ["${local.region}a", "${local.region}b", "${local.region}c"]
+  private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24", "10.0.103.0/24"]
+
+  enable_nat_gateway = false
+  single_nat_gateway = true
+}
+
 module "api_gateway_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "~> 4.0"
+  version = "~> 5.0"
 
   name        = "api-gateway-sg-${random_pet.this.id}"
   description = "API Gateway group for example usage"
@@ -110,43 +110,55 @@ module "api_gateway_security_group" {
 
 module "alb" {
   source  = "terraform-aws-modules/alb/aws"
-  version = "~> 6.0"
+  version = "~> 9.0"
 
   name = "alb-${random_pet.this.id}"
 
-  vpc_id          = module.vpc.vpc_id
-  security_groups = [module.alb_security_group.security_group_id]
-  subnets         = module.vpc.public_subnets
+  vpc_id  = module.vpc.vpc_id
+  subnets = module.vpc.public_subnets
 
-  http_tcp_listeners = [
-    {
-      port               = 80
-      protocol           = "HTTP"
-      target_group_index = 0
-      action_type        = "forward"
+  security_group_ingress_rules = {
+    all_http = {
+      from_port   = 80
+      to_port     = 80
+      ip_protocol = "tcp"
+      description = "HTTP web traffic"
+      cidr_ipv4   = "0.0.0.0/0"
     }
-  ]
-
-  target_groups = [
-    {
-      name_prefix = "l1-"
-      target_type = "lambda"
+    all_https = {
+      from_port   = 443
+      to_port     = 443
+      ip_protocol = "tcp"
+      description = "HTTPS web traffic"
+      cidr_ipv4   = "0.0.0.0/0"
     }
-  ]
-}
+  }
 
-module "alb_security_group" {
-  source  = "terraform-aws-modules/security-group/aws"
-  version = "~> 4.0"
+  security_group_egress_rules = {
+    all = {
+      ip_protocol = "-1"
+      cidr_ipv4   = module.vpc.vpc_cidr_block
+    }
+  }
 
-  name        = "alb-sg-${random_pet.this.id}"
-  description = "ALB for example usage"
-  vpc_id      = module.vpc.vpc_id
+  listeners = {
+    default = {
+      port     = 80
+      protocol = "HTTP"
+      forward = {
+        target_group_key = "lambda"
+      }
+    }
+  }
 
-  ingress_cidr_blocks = ["0.0.0.0/0"]
-  ingress_rules       = ["http-80-tcp"]
-
-  egress_rules = ["all-all"]
+  target_groups = {
+    lambda = {
+      name_prefix              = "l1-"
+      target_type              = "lambda"
+      target_id                = module.lambda_function.lambda_function_arn
+      attach_lambda_permission = true
+    }
+  }
 }
 
 
@@ -171,7 +183,7 @@ resource "null_resource" "download_package" {
 
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 2.0"
+  version = "~> 7.0"
 
   function_name = "${random_pet.this.id}-lambda"
   description   = "My awesome lambda function"
@@ -197,7 +209,7 @@ module "lambda_function" {
 
 module "lambda_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
-  version = "~> 4.0"
+  version = "~> 5.0"
 
   name        = "lambda-sg-${random_pet.this.id}"
   description = "Lambda security group for example usage"
