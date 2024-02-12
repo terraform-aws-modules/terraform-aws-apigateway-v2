@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.1.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v3.0.0...v3.1.0) (2024-02-12)
+
+
+### Features
+
+* Add variable create_route to control creation of route ([#98](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/98)) ([68ad2b1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/68ad2b183a4872e29890784290b5925beee1dd29))
+
 ## [3.0.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v2.2.2...v3.0.0) (2024-02-12)
 
 
