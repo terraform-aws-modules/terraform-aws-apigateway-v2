@@ -77,6 +77,12 @@ variable "disable_execute_api_endpoint" {
   default     = false
 }
 
+variable "fail_on_warnings" {
+  description = "Whether warnings should return an error while API Gateway is creating or updating the resource using an OpenAPI specification. Defaults to false. Applicable for HTTP APIs."
+  type        = bool
+  default     = false
+}
+
 variable "protocol_type" {
   description = "The API protocol. Valid values: HTTP, WEBSOCKET"
   type        = string

@@ -11,6 +11,7 @@ resource "aws_apigatewayv2_api" "this" {
   route_selection_expression   = var.route_selection_expression
   api_key_selection_expression = var.api_key_selection_expression
   disable_execute_api_endpoint = var.disable_execute_api_endpoint
+  fail_on_warnings             = var.fail_on_warnings
 
   /* Start of quick create */
   route_key       = var.route_key
