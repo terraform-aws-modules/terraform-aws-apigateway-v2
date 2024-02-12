@@ -90,7 +90,7 @@ resource "aws_apigatewayv2_stage" "default" {
   }
 
   dynamic "route_settings" {
-    for_each = { for k, v in var.integrations : k => v if var.create_routes_and_integrations && length(setintersection(["data_trace_enabled", "detailed_metrics_enabled", "logging_level", "throttling_burst_limit", "throttling_rate_limit"], keys(v))) > 0 }
+    for_each = { for k, v in var.integrations : k => v if var.create_routes_and_integrations && (!contains(keys(v), "create_route") || v.create_route == true) && length(setintersection(["data_trace_enabled", "detailed_metrics_enabled", "logging_level", "throttling_burst_limit", "throttling_rate_limit"], keys(v))) > 0 }
 
     content {
       route_key          = route_settings.key
