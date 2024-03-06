@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [3.1.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v3.1.0...v3.1.1) (2024-03-06)
+
+
+### Bug Fixes
+
+* Update CI workflow versions to remove deprecated runtime warnings ([#102](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/102)) ([c052dfe](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/c052dfe4c6cab30a638303f6abbd7861937adc60))
+
 ## [3.1.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v3.0.0...v3.1.0) (2024-02-12)
 
 
