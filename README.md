@@ -46,7 +46,7 @@ module "api_gateway" {
       payload_format_version = "2.0"
       timeout_milliseconds   = 12000
     }
-    
+
     "GET /some-route-with-authorizer" = {
       integration_type = "HTTP_PROXY"
       integration_uri  = "some url"
@@ -90,12 +90,12 @@ module "api_gateway" {
   create_default_stage_api_mapping = false  # to control creation of "$default" stage and API mapping
   create_routes_and_integrations   = false  # to control creation of routes and integrations
   create_vpc_link                  = false  # to control creation of VPC link
-  
+
   integrations= {
     "GET /" = {
       create_route = false # to control creation of route
     }
-  } 
+  }
 
   # ... omitted
 }
