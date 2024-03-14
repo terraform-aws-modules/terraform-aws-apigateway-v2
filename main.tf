@@ -60,6 +60,19 @@ resource "aws_apigatewayv2_domain_name" "this" {
   tags = merge(var.domain_name_tags, var.tags)
 }
 
+# Default stage log group
+resource "aws_cloudwatch_log_group" "this" {
+  count = var.create && var.create_default_stage && var.create_default_stage_access_log_group ? 1 : 0
+
+  name              = coalesce(var.default_stage_access_log_group_name, "${var.name}${var.default_stage_access_log_group_name_suffix}")
+  retention_in_days = var.default_stage_access_log_group_retention_in_days
+  kms_key_id        = var.default_stage_access_log_group_kms_key_id
+  skip_destroy      = var.default_stage_access_log_group_skip_destroy
+  log_group_class   = var.default_stage_access_log_group_class
+
+  tags = merge(var.tags, var.default_stage_access_log_group_tags)
+}
+
 # Default stage
 resource "aws_apigatewayv2_stage" "default" {
   count = var.create && var.create_default_stage ? 1 : 0
@@ -69,10 +82,10 @@ resource "aws_apigatewayv2_stage" "default" {
   auto_deploy = true
 
   dynamic "access_log_settings" {
-    for_each = var.default_stage_access_log_destination_arn != null && var.default_stage_access_log_format != null ? [true] : []
+    for_each = (var.default_stage_access_log_destination_arn != null || var.create_default_stage_access_log_group) && var.default_stage_access_log_format != null ? [true] : []
 
     content {
-      destination_arn = var.default_stage_access_log_destination_arn
+      destination_arn = try(aws_cloudwatch_log_group.this[0].arn, var.default_stage_access_log_destination_arn)
       format          = var.default_stage_access_log_format
     }
   }
@@ -110,6 +123,8 @@ resource "aws_apigatewayv2_stage" "default" {
   lifecycle {
     ignore_changes = [deployment_id]
   }
+
+  depends_on = [aws_apigatewayv2_integration.this]
 }
 
 # Default API mapping
@@ -123,7 +138,7 @@ resource "aws_apigatewayv2_api_mapping" "this" {
 
 # Routes and integrations
 resource "aws_apigatewayv2_route" "this" {
-  for_each = var.create && var.create_routes_and_integrations ? var.integrations : {}
+  for_each = { for k, v in var.integrations : k => v if var.create && var.create_routes_and_integrations }
 
   api_id    = aws_apigatewayv2_api.this[0].id
   route_key = each.key
@@ -142,7 +157,7 @@ resource "aws_apigatewayv2_route" "this" {
 }
 
 resource "aws_apigatewayv2_integration" "this" {
-  for_each = var.create && var.create_routes_and_integrations ? var.integrations : {}
+  for_each = { for k, v in var.integrations : k => v if var.create && var.create_routes_and_integrations }
 
   api_id      = aws_apigatewayv2_api.this[0].id
   description = try(each.value.description, null)
@@ -186,7 +201,7 @@ resource "aws_apigatewayv2_integration" "this" {
 
 # Authorizers
 resource "aws_apigatewayv2_authorizer" "this" {
-  for_each = var.create && var.create_routes_and_integrations ? var.authorizers : {}
+  for_each = { for k, v in var.authorizers : k => v if var.create && var.create_routes_and_integrations }
 
   api_id = aws_apigatewayv2_api.this[0].id
 
@@ -211,7 +226,7 @@ resource "aws_apigatewayv2_authorizer" "this" {
 
 # VPC Link (Private API)
 resource "aws_apigatewayv2_vpc_link" "this" {
-  for_each = var.create && var.create_vpc_link ? var.vpc_links : {}
+  for_each = { for k, v in var.vpc_links : k => v if var.create && var.create_vpc_link }
 
   name               = try(each.value.name, each.key)
   security_group_ids = each.value["security_group_ids"]

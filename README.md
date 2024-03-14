@@ -84,12 +84,13 @@ module "api_gateway" {
 
   create = false # to disable all resources
 
-  create_api_gateway               = false  # to control creation of API Gateway
-  create_api_domain_name           = false  # to control creation of API Gateway Domain Name
-  create_default_stage             = false  # to control creation of "$default" stage
-  create_default_stage_api_mapping = false  # to control creation of "$default" stage and API mapping
-  create_routes_and_integrations   = false  # to control creation of routes and integrations
-  create_vpc_link                  = false  # to control creation of VPC link
+  create_api_gateway                    = false  # to control creation of API Gateway
+  create_api_domain_name                = false  # to control creation of API Gateway Domain Name
+  create_default_stage                  = false  # to control creation of "$default" stage
+  create_default_stage_access_log_group = false  # to control creation of CloudWatch Access log group for "$default" stage
+  create_default_stage_api_mapping      = false  # to control creation of "$default" stage and API mapping
+  create_routes_and_integrations        = false  # to control creation of routes and integrations
+  create_vpc_link                       = false  # to control creation of VPC link
 
   integrations= {
     "GET /" = {
@@ -116,13 +117,13 @@ module "api_gateway" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.30 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.30 |
 
 ## Modules
 
@@ -140,6 +141,7 @@ No modules.
 | [aws_apigatewayv2_route.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_route) | resource |
 | [aws_apigatewayv2_stage.default](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_stage) | resource |
 | [aws_apigatewayv2_vpc_link.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_vpc_link) | resource |
+| [aws_cloudwatch_log_group.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
 
 ## Inputs
 
@@ -154,6 +156,7 @@ No modules.
 | <a name="input_create_api_domain_name"></a> [create\_api\_domain\_name](#input\_create\_api\_domain\_name) | Whether to create API domain name resource | `bool` | `true` | no |
 | <a name="input_create_api_gateway"></a> [create\_api\_gateway](#input\_create\_api\_gateway) | Whether to create API Gateway | `bool` | `true` | no |
 | <a name="input_create_default_stage"></a> [create\_default\_stage](#input\_create\_default\_stage) | Whether to create default stage | `bool` | `true` | no |
+| <a name="input_create_default_stage_access_log_group"></a> [create\_default\_stage\_access\_log\_group](#input\_create\_default\_stage\_access\_log\_group) | Whether to create CloudWatch log group for Access logs | `bool` | `false` | no |
 | <a name="input_create_default_stage_api_mapping"></a> [create\_default\_stage\_api\_mapping](#input\_create\_default\_stage\_api\_mapping) | Whether to create default stage API mapping | `bool` | `true` | no |
 | <a name="input_create_routes_and_integrations"></a> [create\_routes\_and\_integrations](#input\_create\_routes\_and\_integrations) | Whether to create routes and integrations resources | `bool` | `true` | no |
 | <a name="input_create_vpc_link"></a> [create\_vpc\_link](#input\_create\_vpc\_link) | Whether to create VPC links | `bool` | `true` | no |
@@ -161,6 +164,13 @@ No modules.
 | <a name="input_default_route_settings"></a> [default\_route\_settings](#input\_default\_route\_settings) | Settings for default route | `map(string)` | `{}` | no |
 | <a name="input_default_stage_access_log_destination_arn"></a> [default\_stage\_access\_log\_destination\_arn](#input\_default\_stage\_access\_log\_destination\_arn) | Default stage's ARN of the CloudWatch Logs log group to receive access logs. Any trailing :* is trimmed from the ARN. | `string` | `null` | no |
 | <a name="input_default_stage_access_log_format"></a> [default\_stage\_access\_log\_format](#input\_default\_stage\_access\_log\_format) | Default stage's single line format of the access logs of data, as specified by selected $context variables. | `string` | `null` | no |
+| <a name="input_default_stage_access_log_group_class"></a> [default\_stage\_access\_log\_group\_class](#input\_default\_stage\_access\_log\_group\_class) | Specified the log class of the Access log group. Possible values are: STANDARD or INFREQUENT\_ACCESS | `string` | `null` | no |
+| <a name="input_default_stage_access_log_group_kms_key_id"></a> [default\_stage\_access\_log\_group\_kms\_key\_id](#input\_default\_stage\_access\_log\_group\_kms\_key\_id) | The ARN of the KMS Key to use when encrypting log data for Access logs | `string` | `null` | no |
+| <a name="input_default_stage_access_log_group_name"></a> [default\_stage\_access\_log\_group\_name](#input\_default\_stage\_access\_log\_group\_name) | Specifies the name of CloudWatch Log Group for Access logs | `string` | `null` | no |
+| <a name="input_default_stage_access_log_group_name_suffix"></a> [default\_stage\_access\_log\_group\_name\_suffix](#input\_default\_stage\_access\_log\_group\_name\_suffix) | Specifies the name suffix of CloudWatch Log Group for Access logs | `string` | `""` | no |
+| <a name="input_default_stage_access_log_group_retention_in_days"></a> [default\_stage\_access\_log\_group\_retention\_in\_days](#input\_default\_stage\_access\_log\_group\_retention\_in\_days) | Specifies the number of days you want to retain log events in the specified log group for Access logs | `number` | `null` | no |
+| <a name="input_default_stage_access_log_group_skip_destroy"></a> [default\_stage\_access\_log\_group\_skip\_destroy](#input\_default\_stage\_access\_log\_group\_skip\_destroy) | Set to true if you do not wish the log group (and any logs it may contain) to be deleted at destroy time, and instead just remove the log group from the Terraform state | `bool` | `false` | no |
+| <a name="input_default_stage_access_log_group_tags"></a> [default\_stage\_access\_log\_group\_tags](#input\_default\_stage\_access\_log\_group\_tags) | Additional tags for the Access logs | `map(string)` | `{}` | no |
 | <a name="input_default_stage_tags"></a> [default\_stage\_tags](#input\_default\_stage\_tags) | A mapping of tags to assign to the default stage resource. | `map(string)` | `{}` | no |
 | <a name="input_description"></a> [description](#input\_description) | The description of the API. | `string` | `null` | no |
 | <a name="input_disable_execute_api_endpoint"></a> [disable\_execute\_api\_endpoint](#input\_disable\_execute\_api\_endpoint) | Whether clients can invoke the API by using the default execute-api endpoint. To require that clients use a custom domain name to invoke the API, disable the default endpoint | `string` | `false` | no |
