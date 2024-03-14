@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.0.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v3.1.1...v4.0.0) (2024-03-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* Added creation of CW Log Group. Bump AWS provider version. (#103)
+
+### Features
+
+* Added creation of CW Log Group. Bump AWS provider version. ([#103](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/103)) ([c123558](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/c12355835449be55218914677d5fb5d8f2c2f4b0))
+
 ## [3.1.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v3.1.0...v3.1.1) (2024-03-06)
 
 
