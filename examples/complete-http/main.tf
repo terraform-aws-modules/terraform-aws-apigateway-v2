@@ -26,6 +26,8 @@ module "api_gateway" {
   description   = "My awesome HTTP API Gateway"
   protocol_type = "HTTP"
 
+  create_default_stage_access_log_group = true
+
   fail_on_warnings = false
 
   cors_configuration = {
@@ -42,8 +44,7 @@ module "api_gateway" {
   domain_name                 = local.domain_name
   domain_name_certificate_arn = module.acm.acm_certificate_arn
 
-  default_stage_access_log_destination_arn = aws_cloudwatch_log_group.logs.arn
-  default_stage_access_log_format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
+  default_stage_access_log_format = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
 
   default_route_settings = {
     detailed_metrics_enabled = true
@@ -62,7 +63,6 @@ module "api_gateway" {
   }
 
   integrations = {
-
     "ANY /" = {
       lambda_arn             = module.lambda_function.lambda_function_arn
       payload_format_version = "2.0"
@@ -242,10 +242,6 @@ EOF
 
 resource "random_pet" "this" {
   length = 2
-}
-
-resource "aws_cloudwatch_log_group" "logs" {
-  name = random_pet.this.id
 }
 
 #############################################

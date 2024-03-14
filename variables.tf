@@ -22,17 +22,11 @@ variable "create_default_stage_api_mapping" {
   default     = true
 }
 
-# variable "create_stage" {
-#   description = "Whether to create custom stage"
-#   type        = bool
-#   default     = false
-# }
-#
-# variable "create_stage_api_mapping" {
-#   description = "Whether to create stage API mapping"
-#   type        = bool
-#   default     = false
-# }
+variable "create_default_stage_access_log_group" {
+  description = "Whether to create CloudWatch log group for Access logs"
+  type        = bool
+  default     = false
+}
 
 variable "create_api_domain_name" {
   description = "Whether to create API domain name resource"
@@ -159,6 +153,49 @@ variable "default_stage_access_log_format" {
 
 variable "default_stage_tags" {
   description = "A mapping of tags to assign to the default stage resource."
+  type        = map(string)
+  default     = {}
+}
+
+# Log group for default stage
+variable "default_stage_access_log_group_name" {
+  description = "Specifies the name of CloudWatch Log Group for Access logs"
+  type        = string
+  default     = null
+}
+
+variable "default_stage_access_log_group_name_suffix" {
+  description = "Specifies the name suffix of CloudWatch Log Group for Access logs"
+  type        = string
+  default     = ""
+}
+
+variable "default_stage_access_log_group_retention_in_days" {
+  description = "Specifies the number of days you want to retain log events in the specified log group for Access logs"
+  type        = number
+  default     = null
+}
+
+variable "default_stage_access_log_group_kms_key_id" {
+  description = "The ARN of the KMS Key to use when encrypting log data for Access logs"
+  type        = string
+  default     = null
+}
+
+variable "default_stage_access_log_group_skip_destroy" {
+  description = "Set to true if you do not wish the log group (and any logs it may contain) to be deleted at destroy time, and instead just remove the log group from the Terraform state"
+  type        = bool
+  default     = false
+}
+
+variable "default_stage_access_log_group_class" {
+  description = "Specified the log class of the Access log group. Possible values are: STANDARD or INFREQUENT_ACCESS"
+  type        = string
+  default     = null
+}
+
+variable "default_stage_access_log_group_tags" {
+  description = "Additional tags for the Access logs"
   type        = map(string)
   default     = {}
 }
