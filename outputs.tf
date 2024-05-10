@@ -66,6 +66,15 @@ output "domain_name_hosted_zone_id" {
 }
 
 ################################################################################
+# Domain - Certificate
+################################################################################
+
+output "acm_certificate_arn" {
+  description = "The ARN of the certificate"
+  value       = module.acm.acm_certificate_arn
+}
+
+################################################################################
 # Integration(s)
 ################################################################################
 
@@ -105,6 +114,20 @@ output "stage_execution_arn" {
 output "stage_invoke_url" {
   description = "The URL to invoke the API pointing to the stage"
   value       = try(aws_apigatewayv2_stage.this[0].invoke_url, null)
+}
+
+################################################################################
+# Stage Access Logs - Log Group
+################################################################################
+
+output "stage_access_logs_cloudwatch_log_group_name" {
+  description = "Name of cloudwatch log group created"
+  value       = try(aws_cloudwatch_log_group.this[0].name, null)
+}
+
+output "stage_access_logs_cloudwatch_log_group_arn" {
+  description = "Arn of cloudwatch log group created"
+  value       = try(aws_cloudwatch_log_group.this[0].arn, null)
 }
 
 ################################################################################

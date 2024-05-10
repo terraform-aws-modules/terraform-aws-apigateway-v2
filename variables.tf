@@ -143,6 +143,32 @@ variable "mutual_tls_authentication" {
 }
 
 ################################################################################
+# Domain - Route53 Record
+################################################################################
+
+variable "create_domain_records" {
+  description = "Whether to create Route53 records for the domain name"
+  type        = bool
+  default     = false
+}
+
+variable "subdomain" {
+  description = "An optional subdomain to use for API gateway (prepended to the `domain_name` when the records are created)"
+  type        = string
+  default     = null
+}
+
+################################################################################
+# Domain - Certificate
+################################################################################
+
+variable "create_certificate" {
+  description = "Whether to create a certificate for the domain"
+  type        = bool
+  default     = false
+}
+
+################################################################################
 # Integration(s)
 ################################################################################
 

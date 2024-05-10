@@ -6,10 +6,6 @@ locals {
   name   = "ex-${basename(path.cwd)}"
   region = "eu-west-1"
 
-  subdomain   = "complete-http"
-  package_url = "https://raw.githubusercontent.com/terraform-aws-modules/terraform-aws-lambda/master/examples/fixtures/python3.8-zip/existing_package.zip"
-  downloaded  = "downloaded_package_${md5(local.package_url)}.zip"
-
   tags = {
     Example    = local.name
     GithubRepo = "terraform-aws-apigateway-v2"
@@ -24,15 +20,10 @@ locals {
 module "api_gateway" {
   source = "../../"
 
-  name        = local.name
-  description = "My awesome HTTP API Gateway"
-
-  protocol_type      = "HTTP"
-  create_domain_name = true
-
-  # create_default_stage_access_log_group = true
-
-  fail_on_warnings = false
+  # API
+  body = templatefile("api.yaml", {
+    example_function_arn = module.lambda_function.lambda_function_arn
+  })
 
   cors_configuration = {
     allow_headers = ["content-type", "x-amz-date", "authorization", "x-api-key", "x-amz-security-token", "x-amz-user-agent"]
@@ -40,25 +31,12 @@ module "api_gateway" {
     allow_origins = ["*"]
   }
 
-  mutual_tls_authentication = {
-    truststore_uri     = "s3://${module.s3_bucket.s3_bucket_id}/${aws_s3_object.truststore.id}"
-    truststore_version = aws_s3_object.truststore.version_id
-  }
+  description      = "My awesome HTTP API Gateway"
+  fail_on_warnings = false
+  name             = local.name
+  protocol_type    = "HTTP"
 
-  domain_name                 = var.domain_name
-  domain_name_certificate_arn = module.acm.acm_certificate_arn
-
-  stage_access_log_settings = {
-    destination_arn = aws_cloudwatch_log_group.logs.arn
-    format          = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
-  }
-
-  stage_default_route_settings = {
-    detailed_metrics_enabled = true
-    throttling_burst_limit   = 100
-    throttling_rate_limit    = 100
-  }
-
+  # Authorizer(s)
   authorizers = {
     "cognito" = {
       authorizer_type  = "JWT"
@@ -71,6 +49,19 @@ module "api_gateway" {
     }
   }
 
+  # Domain Name
+  create_domain_name    = true
+  domain_name           = var.domain_name
+  create_domain_records = true
+  create_certificate    = true
+  subdomain             = "example"
+
+  mutual_tls_authentication = {
+    truststore_uri     = "s3://${module.s3_bucket.s3_bucket_id}/${aws_s3_object.truststore.id}"
+    truststore_version = aws_s3_object.truststore.version_id
+  }
+
+  # Routes & Integration(s)
   integrations = {
     "ANY /" = {
       lambda_arn             = module.lambda_function.lambda_function_arn
@@ -146,12 +137,20 @@ module "api_gateway" {
         }
       ])
     }
-
   }
 
-  body = templatefile("api.yaml", {
-    example_function_arn = module.lambda_function.lambda_function_arn
-  })
+  # Stage
+  stage_access_log_settings = {
+    create_log_group            = true
+    log_group_retention_in_days = 7
+    format                      = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
+  }
+
+  stage_default_route_settings = {
+    detailed_metrics_enabled = true
+    throttling_burst_limit   = 100
+    throttling_rate_limit    = 100
+  }
 
   tags = local.tags
 }
@@ -159,33 +158,6 @@ module "api_gateway" {
 ################################################################################
 # Supporting Resources
 ################################################################################
-
-data "aws_route53_zone" "this" {
-  name = var.domain_name
-}
-
-module "acm" {
-  source  = "terraform-aws-modules/acm/aws"
-  version = "~> 3.0"
-
-  domain_name               = var.domain_name
-  zone_id                   = data.aws_route53_zone.this.id
-  subject_alternative_names = ["${local.subdomain}.${var.domain_name}"]
-
-  tags = local.tags
-}
-
-resource "aws_route53_record" "api" {
-  zone_id = data.aws_route53_zone.this.zone_id
-  name    = local.subdomain
-  type    = "A"
-
-  alias {
-    name                   = module.api_gateway.domain_name_configuration[0].target_domain_name
-    zone_id                = module.api_gateway.domain_name_configuration[0].hosted_zone_id
-    evaluate_target_health = false
-  }
-}
 
 resource "aws_cognito_user_pool" "this" {
   name = local.name
@@ -195,7 +167,7 @@ resource "aws_cognito_user_pool" "this" {
 
 module "step_function" {
   source  = "terraform-aws-modules/step-functions/aws"
-  version = "~> 2.0"
+  version = "~> 4.0"
 
   name      = local.name
   role_name = "${local.name}-step-function"
@@ -222,36 +194,17 @@ module "step_function" {
   tags = local.tags
 }
 
-resource "aws_cloudwatch_log_group" "logs" {
-  name = local.name
-
-  tags = local.tags
-}
-
-# Using packaged function from Lambda module
-resource "null_resource" "download_package" {
-  triggers = {
-    downloaded = local.downloaded
-  }
-
-  provisioner "local-exec" {
-    command = "curl -L -o ${local.downloaded} ${local.package_url}"
-  }
-}
-
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 4.0"
+  version = "~> 7.0"
 
   function_name = local.name
   description   = "My awesome lambda function"
-  handler       = "index.lambda_handler"
-  runtime       = "python3.8"
+  handler       = "lambda.handler"
+  runtime       = "python3.12"
 
-  publish = true
-
-  create_package         = false
-  local_existing_package = local.downloaded
+  publish     = true
+  source_path = "lambda.py"
 
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {
@@ -265,7 +218,7 @@ module "lambda_function" {
 
 module "s3_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "~> 3.0"
+  version = "~> 4.0"
 
   bucket_prefix = "${local.name}-"
 
@@ -275,11 +228,6 @@ module "s3_bucket" {
 
   attach_deny_insecure_transport_policy = true
   attach_require_latest_tls_policy      = true
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
 
   server_side_encryption_configuration = {
     rule = {

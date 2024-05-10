@@ -1,6 +1,8 @@
 locals {
   is_http      = var.protocol_type == "HTTP"
   is_websocket = var.protocol_type == "WEBSOCKET"
+
+  create_routes_and_integrations = var.create && var.create_routes_and_integrations
 }
 
 ################################################################################
@@ -11,6 +13,7 @@ resource "aws_apigatewayv2_api" "this" {
   count = var.create ? 1 : 0
 
   api_key_selection_expression = local.is_websocket ? var.api_key_selection_expression : null
+  body                         = local.is_http ? var.body : null
 
   dynamic "cors_configuration" {
     for_each = local.is_http && length(var.cors_configuration) > 0 ? [var.cors_configuration] : []
@@ -30,7 +33,6 @@ resource "aws_apigatewayv2_api" "this" {
   disable_execute_api_endpoint = var.disable_execute_api_endpoint
   fail_on_warnings             = local.is_http ? var.fail_on_warnings : null
   name                         = var.name
-  body                         = local.is_http ? var.body : null
   protocol_type                = var.protocol_type
   route_key                    = local.is_http ? var.route_key : null
   route_selection_expression   = var.route_selection_expression
@@ -40,21 +42,12 @@ resource "aws_apigatewayv2_api" "this" {
   tags = var.tags
 }
 
-resource "aws_apigatewayv2_api_mapping" "this" {
-  count = var.create && var.create_domain_name && var.create_stage && var.api_mapping_key != null ? 1 : 0
-
-  api_id          = aws_apigatewayv2_api.this[0].id
-  api_mapping_key = var.api_mapping_key
-  domain_name     = aws_apigatewayv2_domain_name.this[0].id
-  stage           = aws_apigatewayv2_stage.this[0].id
-}
-
 ################################################################################
 # Authorizer(s)
 ################################################################################
 
 resource "aws_apigatewayv2_authorizer" "this" {
-  for_each = { for k, v in var.authorizers : k => v if var.create && var.create_routes_and_integrations }
+  for_each = { for k, v in var.authorizers : k => v if local.create_routes_and_integrations }
 
   api_id = aws_apigatewayv2_api.this[0].id
 
@@ -82,13 +75,17 @@ resource "aws_apigatewayv2_authorizer" "this" {
 # Domain Name
 ################################################################################
 
+locals {
+  create_domain_name = var.create && var.create_domain_name
+}
+
 resource "aws_apigatewayv2_domain_name" "this" {
-  count = var.create && var.create_domain_name ? 1 : 0
+  count = local.create_domain_name ? 1 : 0
 
   domain_name = var.domain_name
 
   domain_name_configuration {
-    certificate_arn                        = var.domain_name_certificate_arn
+    certificate_arn                        = local.create_certificate ? module.acm.acm_certificate_arn : var.domain_name_certificate_arn
     endpoint_type                          = "REGIONAL"
     security_policy                        = "TLS_1_2"
     ownership_verification_certificate_arn = var.domain_name_ownership_verification_certificate_arn
@@ -106,12 +103,68 @@ resource "aws_apigatewayv2_domain_name" "this" {
   tags = var.tags
 }
 
+resource "aws_apigatewayv2_api_mapping" "this" {
+  count = local.create_domain_name && local.create_stage && var.api_mapping_key != null ? 1 : 0
+
+  api_id          = aws_apigatewayv2_api.this[0].id
+  api_mapping_key = var.api_mapping_key
+  domain_name     = aws_apigatewayv2_domain_name.this[0].id
+  stage           = aws_apigatewayv2_stage.this[0].id
+}
+
+################################################################################
+# Domain - Route53 Record
+################################################################################
+
+data "aws_route53_zone" "this" {
+  count = local.create_domain_name && var.create_domain_records ? 1 : 0
+
+  name = var.domain_name
+}
+
+resource "aws_route53_record" "api" {
+  for_each = { for k, v in toset(["A", "AAAA"]) : k => v if local.create_domain_name && var.create_domain_records }
+
+  zone_id = data.aws_route53_zone.this[0].zone_id
+  name    = var.subdomain != null ? "${var.subdomain}.${aws_apigatewayv2_domain_name.this[0].id}" : aws_apigatewayv2_domain_name.this[0].id
+  type    = each.value
+
+  alias {
+    name                   = aws_apigatewayv2_domain_name.this[0].domain_name_configuration[0].target_domain_name
+    zone_id                = aws_apigatewayv2_domain_name.this[0].domain_name_configuration[0].hosted_zone_id
+    evaluate_target_health = false
+  }
+}
+
+################################################################################
+# Domain - Certificate
+################################################################################
+
+locals {
+  create_certificate = local.create_domain_name && var.create_certificate
+}
+
+module "acm" {
+  source  = "terraform-aws-modules/acm/aws"
+  version = "5.0.1"
+
+  create_certificate = local.create_certificate
+
+  domain_name               = var.domain_name
+  zone_id                   = data.aws_route53_zone.this[0].id
+  subject_alternative_names = var.subdomain != null ? ["${var.subdomain}.${var.domain_name}"] : []
+
+  validation_method = "DNS"
+
+  tags = var.tags
+}
+
 ################################################################################
 # Integration(s)
 ################################################################################
 
 resource "aws_apigatewayv2_integration" "this" {
-  for_each = { for k, v in var.integrations : k => v if var.create && var.create_routes_and_integrations }
+  for_each = { for k, v in var.integrations : k => v if local.create_routes_and_integrations }
 
   api_id = aws_apigatewayv2_api.this[0].id
 
@@ -159,7 +212,7 @@ resource "aws_apigatewayv2_integration" "this" {
 ################################################################################
 
 resource "aws_apigatewayv2_integration_response" "this" {
-  for_each = { for k, v in var.integrations : k => v if var.create && var.create_routes_and_integrations && try(v.integration_response_key, null) != null }
+  for_each = { for k, v in var.integrations : k => v if local.create_routes_and_integrations && try(v.integration_response_key, null) != null }
 
   api_id         = aws_apigatewayv2_api.this[0].id
   integration_id = aws_apigatewayv2_integration.this[each.key].id
@@ -175,7 +228,7 @@ resource "aws_apigatewayv2_integration_response" "this" {
 ################################################################################
 
 resource "aws_apigatewayv2_route" "this" {
-  for_each = { for k, v in var.integrations : k => v if var.create && var.create_routes_and_integrations }
+  for_each = { for k, v in var.integrations : k => v if local.create_routes_and_integrations }
 
   api_id = aws_apigatewayv2_api.this[0].id
 
@@ -205,8 +258,12 @@ resource "aws_apigatewayv2_route" "this" {
 # Stage
 ################################################################################
 
+locals {
+  create_stage = var.create && var.create_stage
+}
+
 resource "aws_apigatewayv2_stage" "this" {
-  count = var.create && var.create_stage ? 1 : 0
+  count = local.create_stage ? 1 : 0
 
   api_id = aws_apigatewayv2_api.this[0].id
 
@@ -214,7 +271,7 @@ resource "aws_apigatewayv2_stage" "this" {
     for_each = length(var.stage_access_log_settings) > 0 ? [var.stage_access_log_settings] : []
 
     content {
-      destination_arn = access_log_settings.value.destination_arn
+      destination_arn = try(access_log_settings.value.create_log_group, true) ? aws_cloudwatch_log_group.this["default"].arn : access_log_settings.value.destination_arn
       format          = access_log_settings.value.format
     }
   }
@@ -257,6 +314,22 @@ resource "aws_apigatewayv2_stage" "this" {
   depends_on = [
     aws_apigatewayv2_route.this
   ]
+}
+
+################################################################################
+# Stage Access Logs - Log Group
+################################################################################
+
+resource "aws_cloudwatch_log_group" "this" {
+  for_each = { for k, v in { "default" = var.stage_access_log_settings } : k => v if local.create_stage && try(v.create_log_group, true) }
+
+  name              = try(each.value.log_group_name, "/aws/api-gateway/${var.name}/${replace(var.stage_name, "$", "")}")
+  retention_in_days = try(each.value.log_group_retention_in_days, 30)
+  kms_key_id        = try(each.value.log_group_kms_key_id, null)
+  skip_destroy      = try(each.value.log_group_skip_destroy, null)
+  log_group_class   = try(each.value.log_group_class, null)
+
+  tags = merge(var.tags, try(each.value.tags, {}))
 }
 
 ################################################################################
