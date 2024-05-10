@@ -30,6 +30,10 @@ module "api_gateway" {
   protocol_type      = "HTTP"
   create_domain_name = true
 
+  # create_default_stage_access_log_group = true
+
+  fail_on_warnings = false
+
   cors_configuration = {
     allow_headers = ["content-type", "x-amz-date", "authorization", "x-api-key", "x-amz-security-token", "x-amz-user-agent"]
     allow_methods = ["*"]
@@ -68,7 +72,6 @@ module "api_gateway" {
   }
 
   integrations = {
-
     "ANY /" = {
       lambda_arn             = module.lambda_function.lambda_function_arn
       payload_format_version = "2.0"

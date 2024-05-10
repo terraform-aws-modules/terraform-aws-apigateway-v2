@@ -2,6 +2,42 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.0.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v3.1.1...v4.0.0) (2024-03-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* Added creation of CW Log Group. Bump AWS provider version. (#103)
+
+### Features
+
+* Added creation of CW Log Group. Bump AWS provider version. ([#103](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/103)) ([c123558](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/c12355835449be55218914677d5fb5d8f2c2f4b0))
+
+## [3.1.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v3.1.0...v3.1.1) (2024-03-06)
+
+
+### Bug Fixes
+
+* Update CI workflow versions to remove deprecated runtime warnings ([#102](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/102)) ([c052dfe](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/c052dfe4c6cab30a638303f6abbd7861937adc60))
+
+## [3.1.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v3.0.0...v3.1.0) (2024-02-12)
+
+
+### Features
+
+* Add variable create_route to control creation of route ([#98](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/98)) ([68ad2b1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/68ad2b183a4872e29890784290b5925beee1dd29))
+
+## [3.0.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v2.2.2...v3.0.0) (2024-02-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* Added the fail_on_warnings variable, bumped Terraform version to 1.0+ (#96)
+
+### Features
+
+* Added the fail_on_warnings variable, bumped Terraform version to 1.0+ ([#96](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/96)) ([26859db](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/26859db0a5d651903469f6fabeda1e341867c45d))
+
 ### [2.2.2](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v2.2.1...v2.2.2) (2023-01-24)
 
 

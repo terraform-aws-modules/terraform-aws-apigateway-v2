@@ -48,7 +48,7 @@ module "api_gateway" {
     "GET /alb-internal-route" = {
       connection_type    = "VPC_LINK"
       vpc_link           = "my-vpc"
-      integration_uri    = module.alb.http_tcp_listener_arns[0]
+      integration_uri    = module.alb.listeners["default"].arn
       integration_type   = "HTTP_PROXY"
       integration_method = "ANY"
     }
@@ -87,6 +87,14 @@ module "vpc" {
   tags = local.tags
 }
 
+################################
+# Supporting resources
+################################
+
+resource "random_pet" "this" {
+  length = 2
+}
+
 module "api_gateway_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "~> 5.0"
@@ -106,29 +114,31 @@ module "api_gateway_security_group" {
 
 module "alb" {
   source  = "terraform-aws-modules/alb/aws"
-  version = "~> 6.0"
+  version = "~> 9.0"
 
   name = local.name
 
-  vpc_id          = module.vpc.vpc_id
-  security_groups = [module.alb_security_group.security_group_id]
-  subnets         = module.vpc.public_subnets
+  vpc_id  = module.vpc.vpc_id
+  subnets = module.vpc.public_subnets
 
-  http_tcp_listeners = [
-    {
-      port               = 80
-      protocol           = "HTTP"
-      target_group_index = 0
-      action_type        = "forward"
-    }
-  ]
+  enable_deletion_protection = false
 
-  target_groups = [
-    {
-      name_prefix = "l1-"
-      target_type = "lambda"
+  security_group_ingress_rules = {
+    all_http = {
+      from_port   = 80
+      to_port     = 80
+      ip_protocol = "tcp"
+      description = "HTTP web traffic"
+      cidr_ipv4   = "0.0.0.0/0"
     }
-  ]
+    all_https = {
+      from_port   = 443
+      to_port     = 443
+      ip_protocol = "tcp"
+      description = "HTTPS web traffic"
+      cidr_ipv4   = "0.0.0.0/0"
+    }
+  }
 
   tags = local.tags
 }
