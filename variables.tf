@@ -152,10 +152,10 @@ variable "create_domain_records" {
   default     = false
 }
 
-variable "subdomain" {
-  description = "An optional subdomain to use for API gateway (prepended to the `domain_name` when the records are created)"
-  type        = string
-  default     = null
+variable "subdomains" {
+  description = "An optional list of subdomains to use for API gateway"
+  type        = list(string)
+  default     = []
 }
 
 ################################################################################

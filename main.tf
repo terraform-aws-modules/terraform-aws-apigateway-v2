@@ -28,9 +28,10 @@ resource "aws_apigatewayv2_api" "this" {
     }
   }
 
-  credentials_arn              = local.is_http ? var.credentials_arn : null
-  description                  = var.description
-  disable_execute_api_endpoint = var.disable_execute_api_endpoint
+  credentials_arn = local.is_http ? var.credentials_arn : null
+  description     = var.description
+  # https://docs.aws.amazon.com/apigateway/latest/developerguide/rest-api-disable-default-endpoint.html
+  disable_execute_api_endpoint = local.is_http && local.create_domain_name ? true : var.disable_execute_api_endpoint
   fail_on_warnings             = local.is_http ? var.fail_on_warnings : null
   name                         = var.name
   protocol_type                = var.protocol_type
@@ -104,7 +105,7 @@ resource "aws_apigatewayv2_domain_name" "this" {
 }
 
 resource "aws_apigatewayv2_api_mapping" "this" {
-  count = local.create_domain_name && local.create_stage && var.api_mapping_key != null ? 1 : 0
+  count = local.create_domain_name && local.create_stage ? 1 : 0
 
   api_id          = aws_apigatewayv2_api.this[0].id
   api_mapping_key = var.api_mapping_key
@@ -116,18 +117,23 @@ resource "aws_apigatewayv2_api_mapping" "this" {
 # Domain - Route53 Record
 ################################################################################
 
+locals {
+  # https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-custom-domains.html
+  stripped_domain_name = replace(var.domain_name, "*.", "")
+}
+
 data "aws_route53_zone" "this" {
   count = local.create_domain_name && var.create_domain_records ? 1 : 0
 
-  name = var.domain_name
+  name = local.stripped_domain_name
 }
 
-resource "aws_route53_record" "api" {
-  for_each = { for k, v in toset(["A", "AAAA"]) : k => v if local.create_domain_name && var.create_domain_records }
+resource "aws_route53_record" "alias_ipv4" {
+  for_each = { for k, v in toset(var.subdomains) : k => v if local.create_domain_name && var.create_domain_records }
 
   zone_id = data.aws_route53_zone.this[0].zone_id
-  name    = var.subdomain != null ? "${var.subdomain}.${aws_apigatewayv2_domain_name.this[0].id}" : aws_apigatewayv2_domain_name.this[0].id
-  type    = each.value
+  name    = each.value
+  type    = "A"
 
   alias {
     name                   = aws_apigatewayv2_domain_name.this[0].domain_name_configuration[0].target_domain_name
@@ -142,6 +148,8 @@ resource "aws_route53_record" "api" {
 
 locals {
   create_certificate = local.create_domain_name && var.create_certificate
+
+  is_wildcard = startswith(var.domain_name, "*.")
 }
 
 module "acm" {
@@ -150,9 +158,9 @@ module "acm" {
 
   create_certificate = local.create_certificate
 
-  domain_name               = var.domain_name
+  domain_name               = local.stripped_domain_name
   zone_id                   = data.aws_route53_zone.this[0].id
-  subject_alternative_names = var.subdomain != null ? ["${var.subdomain}.${var.domain_name}"] : []
+  subject_alternative_names = local.is_wildcard ? [var.domain_name] : [for sub in var.subdomains : "${sub}.${local.stripped_domain_name}"]
 
   validation_method = "DNS"
 
@@ -179,11 +187,11 @@ resource "aws_apigatewayv2_integration" "this" {
   integration_uri           = try(each.value.lambda_arn, try(each.value.integration_uri, null))
   passthrough_behavior      = try(each.value.passthrough_behavior, null)
   payload_format_version    = try(each.value.payload_format_version, null)
-  request_parameters        = try(jsondecode(each.value.request_parameters), each.value.request_parameters, null)
-  request_templates         = try(jsondecode(each.value.request_templates), each.value.request_templates, null)
+  request_parameters        = try(each.value.request_parameters, null)
+  request_templates         = try(each.value.request_templates, null)
 
   dynamic "response_parameters" {
-    for_each = flatten([try(jsondecode(each.value.response_parameters), each.value.response_parameters, [])])
+    for_each = try(each.value.response_parameters, [])
 
     content {
       mappings    = response_parameters.value.mappings
@@ -195,10 +203,10 @@ resource "aws_apigatewayv2_integration" "this" {
   timeout_milliseconds          = try(each.value.timeout_milliseconds, null)
 
   dynamic "tls_config" {
-    for_each = flatten([try(jsondecode(each.value.tls_config), each.value.tls_config, [])])
+    for_each = try([each.value.tls_config], [])
 
     content {
-      server_name_to_verify = tls_config.value.server_name_to_verify
+      server_name_to_verify = replace(tls_config.value.server_name_to_verify, "*.", "")
     }
   }
 
@@ -219,7 +227,7 @@ resource "aws_apigatewayv2_integration_response" "this" {
 
   content_handling_strategy     = try(each.value.content_handling_strategy, null)
   integration_response_key      = each.value.integration_response_key
-  response_templates            = try(jsondecode(each.value.response_templates), each.value.response_templates, null)
+  response_templates            = try(each.value.response_templates, null)
   template_selection_expression = try(each.value.template_selection_expression, null)
 }
 

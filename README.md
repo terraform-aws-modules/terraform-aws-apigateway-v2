@@ -132,7 +132,7 @@ module "api_gateway" {
 | [aws_apigatewayv2_stage.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_stage) | resource |
 | [aws_apigatewayv2_vpc_link.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_vpc_link) | resource |
 | [aws_cloudwatch_log_group.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/cloudwatch_log_group) | resource |
-| [aws_route53_record.api](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
+| [aws_route53_record.alias_ipv4](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/route53_record) | resource |
 | [aws_route53_zone.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/route53_zone) | data source |
 
 ## Inputs
@@ -171,7 +171,7 @@ module "api_gateway" {
 | <a name="input_stage_name"></a> [stage\_name](#input\_stage\_name) | The name of the stage. Must be between 1 and 128 characters in length | `string` | `"$default"` | no |
 | <a name="input_stage_tags"></a> [stage\_tags](#input\_stage\_tags) | A mapping of tags to assign to the stage resource | `map(string)` | `{}` | no |
 | <a name="input_stage_variables"></a> [stage\_variables](#input\_stage\_variables) | A map that defines the stage variables for the stage | `map(string)` | `{}` | no |
-| <a name="input_subdomain"></a> [subdomain](#input\_subdomain) | An optional subdomain to use for API gateway (prepended to the `domain_name` when the records are created) | `string` | `null` | no |
+| <a name="input_subdomains"></a> [subdomains](#input\_subdomains) | An optional list of subdomains to use for API gateway | `list(string)` | `[]` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A mapping of tags to assign to API gateway resources | `map(string)` | `{}` | no |
 | <a name="input_target"></a> [target](#input\_target) | Part of quick create. Quick create produces an API with an integration, a default catch-all route, and a default stage which is configured to automatically deploy changes. For HTTP integrations, specify a fully qualified URL. For Lambda integrations, specify a function ARN. The type of the integration will be HTTP\_PROXY or AWS\_PROXY, respectively. Applicable for HTTP APIs | `string` | `null` | no |
 | <a name="input_vpc_link_tags"></a> [vpc\_link\_tags](#input\_vpc\_link\_tags) | A map of tags to add to the VPC Links created | `map(string)` | `{}` | no |

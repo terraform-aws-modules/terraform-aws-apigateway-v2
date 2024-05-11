@@ -52,14 +52,9 @@ module "api_gateway" {
   # Domain Name
   create_domain_name    = true
   domain_name           = var.domain_name
+  subdomains            = ["customer1", "customer2"]
   create_domain_records = true
   create_certificate    = true
-  subdomain             = "example"
-
-  mutual_tls_authentication = {
-    truststore_uri     = "s3://${module.s3_bucket.s3_bucket_id}/${aws_s3_object.truststore.id}"
-    truststore_version = aws_s3_object.truststore.version_id
-  }
 
   # Routes & Integration(s)
   integrations = {
@@ -93,27 +88,19 @@ module "api_gateway" {
       authorization_scopes   = ["user.id", "user.email"]
     }
 
-    "GET /some-route-with-authorizer-and-different-scope" = {
-      lambda_arn             = module.lambda_function.lambda_function_arn
-      payload_format_version = "2.0"
-      authorization_type     = "JWT"
-      authorizer_key         = "cognito"
-      authorization_scopes   = ["user.id", "user.email"]
-    }
-
     "POST /start-step-function" = {
       integration_type    = "AWS_PROXY"
       integration_subtype = "StepFunctions-StartExecution"
       credentials_arn     = module.step_function.role_arn
 
       # Note: jsonencode is used to pass argument as a string
-      request_parameters = jsonencode({
+      request_parameters = {
         StateMachineArn = module.step_function.state_machine_arn
         Input = jsonencode({
           "key1" : "value1",
           "key2" : "value2"
         })
-      })
+      }
 
       payload_format_version = "1.0"
       timeout_milliseconds   = 12000
@@ -121,11 +108,11 @@ module "api_gateway" {
 
     "$default" = {
       lambda_arn = module.lambda_function.lambda_function_arn
-      tls_config = jsonencode({
+      tls_config = {
         server_name_to_verify = var.domain_name
-      })
+      }
 
-      response_parameters = jsonencode([
+      response_parameters = [
         {
           status_code = 500
           mappings = {
@@ -139,7 +126,7 @@ module "api_gateway" {
             "append:header.error" = "$stageVariables.environmentId"
           }
         }
-      ])
+      ]
     }
   }
 
@@ -247,55 +234,4 @@ module "lambda_function" {
   }
 
   tags = local.tags
-}
-
-module "s3_bucket" {
-  source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "~> 4.0"
-
-  bucket_prefix = "${local.name}-"
-
-  # Allow deletion of non-empty bucket
-  # Example usage only - not recommended for production
-  force_destroy = true
-
-  attach_deny_insecure_transport_policy = true
-  attach_require_latest_tls_policy      = true
-
-  server_side_encryption_configuration = {
-    rule = {
-      apply_server_side_encryption_by_default = {
-        sse_algorithm = "AES256"
-      }
-    }
-  }
-
-  tags = local.tags
-}
-
-resource "aws_s3_object" "truststore" {
-  bucket  = module.s3_bucket.s3_bucket_id
-  key     = "truststore.pem"
-  content = tls_self_signed_cert.example.cert_pem
-}
-
-resource "tls_private_key" "private_key" {
-  algorithm = "RSA"
-}
-
-resource "tls_self_signed_cert" "example" {
-  is_ca_certificate = true
-  private_key_pem   = tls_private_key.private_key.private_key_pem
-
-  subject {
-    common_name  = "example.com"
-    organization = "ACME Examples, Inc"
-  }
-
-  validity_period_hours = 12
-
-  allowed_uses = [
-    "cert_signing",
-    "server_auth",
-  ]
 }
