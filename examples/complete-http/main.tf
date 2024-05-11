@@ -109,6 +109,10 @@ module "api_gateway" {
       # Note: jsonencode is used to pass argument as a string
       request_parameters = jsonencode({
         StateMachineArn = module.step_function.state_machine_arn
+        Input = jsonencode({
+          "key1" : "value1",
+          "key2" : "value2"
+        })
       })
 
       payload_format_version = "1.0"
@@ -143,7 +147,23 @@ module "api_gateway" {
   stage_access_log_settings = {
     create_log_group            = true
     log_group_retention_in_days = 7
-    format                      = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
+    format = jsonencode({
+      "requestId" : "$context.requestId",
+      "extendedRequestId" : "$context.extendedRequestId",
+      "ip" : "$context.identity.sourceIp",
+      "caller" : "$context.identity.caller",
+      "user" : "$context.identity.user",
+      "requestTime" : "$context.requestTime",
+      "httpMethod" : "$context.httpMethod",
+      "resourcePath" : "$context.resourcePath",
+      "status" : "$context.status",
+      "protocol" : "$context.protocol",
+      "responseLength" : "$context.responseLength",
+      "domainName" : "$context.domainName",
+      "errorMessage" : "$context.error.message",
+      "errorResponseType" : "$context.error.responseType",
+      "integrationErrorMessage" : "$context.integrationErrorMessage",
+    })
   }
 
   stage_default_route_settings = {
@@ -171,24 +191,35 @@ module "step_function" {
 
   name      = local.name
   role_name = "${local.name}-step-function"
+  trusted_entities = [
+    "apigateway.amazonaws.com",
+    "lambda.amazonaws.com",
+  ]
 
-  definition = <<-EOT
-  {
-    "Comment": "A Hello World example of the Amazon States Language using Pass states",
-    "StartAt": "Hello",
-    "States": {
-      "Hello": {
-        "Type": "Pass",
-        "Result": "Hello",
-        "Next": "World"
-      },
-      "World": {
-        "Type": "Pass",
-        "Result": "World",
-        "End": true
-      }
+  attach_policies_for_integrations = true
+  service_integrations = {
+    stepfunction = {
+      stepfunction = ["*"]
     }
   }
+
+  definition = <<-EOT
+    {
+      "Comment": "A Hello World example of the Amazon States Language using Pass states",
+      "StartAt": "Hello",
+      "States": {
+        "Hello": {
+          "Type": "Pass",
+          "Result": "Hello",
+          "Next": "World"
+        },
+        "World": {
+          "Type": "Pass",
+          "Result": "World",
+          "End": true
+        }
+      }
+    }
   EOT
 
   tags = local.tags
@@ -205,6 +236,8 @@ module "lambda_function" {
 
   publish     = true
   source_path = "lambda.py"
+
+  cloudwatch_logs_retention_in_days = 7
 
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {

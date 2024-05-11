@@ -31,3 +31,5 @@ terraform.rc
 # Zip archive
 *.zip
 builds
+
+.DS_Store

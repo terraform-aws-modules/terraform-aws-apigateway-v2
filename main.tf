@@ -286,8 +286,8 @@ resource "aws_apigatewayv2_stage" "this" {
       data_trace_enabled       = local.is_websocket ? try(default_route_settings.value.data_trace_enabled, false) : null
       detailed_metrics_enabled = try(default_route_settings.value.detailed_metrics_enabled, false)
       logging_level            = local.is_websocket ? try(default_route_settings.value.logging_level, null) : null
-      throttling_burst_limit   = try(default_route_settings.value.throttling_burst_limit, null)
-      throttling_rate_limit    = try(default_route_settings.value.throttling_rate_limit, null)
+      throttling_burst_limit   = try(default_route_settings.value.throttling_burst_limit, 500)
+      throttling_rate_limit    = try(default_route_settings.value.throttling_rate_limit, 1000)
     }
   }
 
@@ -302,8 +302,8 @@ resource "aws_apigatewayv2_stage" "this" {
       detailed_metrics_enabled = try(route_settings.value.detailed_metrics_enabled, false)
       logging_level            = local.is_websocket ? try(route_settings.value.logging_level, null) : null
       route_key                = route_settings.key
-      throttling_burst_limit   = try(route_settings.value.throttling_burst_limit, null)
-      throttling_rate_limit    = try(route_settings.value.throttling_rate_limit, null)
+      throttling_burst_limit   = try(route_settings.value.throttling_burst_limit, 500)
+      throttling_rate_limit    = try(route_settings.value.throttling_rate_limit, 1000)
     }
   }
 

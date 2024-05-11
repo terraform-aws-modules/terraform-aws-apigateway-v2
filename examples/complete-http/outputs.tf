@@ -78,19 +78,19 @@ output "acm_certificate_arn" {
 # Integration(s)
 ################################################################################
 
-output "integrations" {
-  description = "Map of the integrations created and their attributes"
-  value       = module.api_gateway.integrations
-}
+# output "integrations" {
+#   description = "Map of the integrations created and their attributes"
+#   value       = module.api_gateway.integrations
+# }
 
 ################################################################################
 # Route(s)
 ################################################################################
 
-output "routes" {
-  description = "Map of the routes created and their attributes"
-  value       = module.api_gateway.routes
-}
+# output "routes" {
+#   description = "Map of the routes created and their attributes"
+#   value       = module.api_gateway.routes
+# }
 
 ################################################################################
 # Stage

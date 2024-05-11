@@ -38,6 +38,6 @@ module "wrapper" {
   subdomain                                          = try(each.value.subdomain, var.defaults.subdomain, null)
   tags                                               = try(each.value.tags, var.defaults.tags, {})
   target                                             = try(each.value.target, var.defaults.target, null)
-  vpc_links                                          = try(each.value.vpc_links, var.defaults.vpc_links, {})
   vpc_link_tags                                      = try(each.value.vpc_link_tags, var.defaults.vpc_link_tags, {})
+  vpc_links                                          = try(each.value.vpc_links, var.defaults.vpc_links, {})
 }
