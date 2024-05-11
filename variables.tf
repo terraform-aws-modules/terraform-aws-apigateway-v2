@@ -241,7 +241,7 @@ variable "stage_tags" {
 ################################################################################
 
 variable "deploy_stage" {
-  description = "Whether to deploy the stage"
+  description = "Whether to deploy the stage. `HTTP` APIs are auto-deployed by default"
   type        = bool
   default     = true
 }

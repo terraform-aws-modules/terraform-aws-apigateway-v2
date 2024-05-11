@@ -153,7 +153,7 @@ module "api_gateway" {
 | <a name="input_create_routes_and_integrations"></a> [create\_routes\_and\_integrations](#input\_create\_routes\_and\_integrations) | Whether to create routes and integrations resources | `bool` | `true` | no |
 | <a name="input_create_stage"></a> [create\_stage](#input\_create\_stage) | Whether to create default stage | `bool` | `true` | no |
 | <a name="input_credentials_arn"></a> [credentials\_arn](#input\_credentials\_arn) | Part of quick create. Specifies any credentials required for the integration. Applicable for HTTP APIs | `string` | `null` | no |
-| <a name="input_deploy_stage"></a> [deploy\_stage](#input\_deploy\_stage) | Whether to deploy the stage | `bool` | `true` | no |
+| <a name="input_deploy_stage"></a> [deploy\_stage](#input\_deploy\_stage) | Whether to deploy the stage. `HTTP` APIs are auto-deployed by default | `bool` | `true` | no |
 | <a name="input_description"></a> [description](#input\_description) | The description of the API. Must be less than or equal to 1024 characters in length | `string` | `null` | no |
 | <a name="input_disable_execute_api_endpoint"></a> [disable\_execute\_api\_endpoint](#input\_disable\_execute\_api\_endpoint) | Whether clients can invoke the API by using the default execute-api endpoint. By default, clients can invoke the API with the default `{api_id}.execute-api.{region}.amazonaws.com endpoint`. To require that clients use a custom domain name to invoke the API, disable the default endpoint | `bool` | `null` | no |
 | <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | The domain name to use for API gateway | `string` | `""` | no |

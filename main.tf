@@ -329,7 +329,7 @@ resource "aws_apigatewayv2_stage" "this" {
 ################################################################################
 
 resource "aws_apigatewayv2_deployment" "this" {
-  count = local.create_stage && var.deploy_stage && var.stage_name != "$default" ? 1 : 0
+  count = local.create_stage && var.deploy_stage && !local.is_http ? 1 : 0
 
   api_id      = aws_apigatewayv2_api.this[0].id
   description = var.description
