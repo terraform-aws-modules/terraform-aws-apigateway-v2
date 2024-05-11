@@ -156,10 +156,10 @@ module "acm" {
   source  = "terraform-aws-modules/acm/aws"
   version = "5.0.1"
 
-  create_certificate = local.create_certificate
+  create_certificate = local.create_domain_name && var.create_domain_records && local.create_certificate
 
   domain_name               = local.stripped_domain_name
-  zone_id                   = data.aws_route53_zone.this[0].id
+  zone_id                   = try(data.aws_route53_zone.this[0].id, "")
   subject_alternative_names = local.is_wildcard ? [var.domain_name] : [for sub in var.subdomains : "${sub}.${local.stripped_domain_name}"]
 
   validation_method = "DNS"
@@ -322,6 +322,28 @@ resource "aws_apigatewayv2_stage" "this" {
   depends_on = [
     aws_apigatewayv2_route.this
   ]
+}
+
+################################################################################
+# Deployment
+################################################################################
+
+resource "aws_apigatewayv2_deployment" "this" {
+  count = local.create_stage && var.deploy_stage && var.stage_name != "$default" ? 1 : 0
+
+  api_id      = aws_apigatewayv2_api.this[0].id
+  description = var.description
+
+  triggers = {
+    redeployment = sha1(join(",", tolist([
+      jsonencode(aws_apigatewayv2_integration.this),
+      jsonencode(aws_apigatewayv2_route.this),
+    ])))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 ################################################################################

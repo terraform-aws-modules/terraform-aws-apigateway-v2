@@ -41,23 +41,50 @@ locals {
 module "api_gateway" {
   source = "../../"
 
-  name                       = local.name
-  description                = "My awesome AWS Websocket API Gateway"
+  # API
+  description = "My awesome AWS Websocket API Gateway"
+  name        = local.name
+
+  # Websocket
   protocol_type              = "WEBSOCKET"
   route_selection_expression = "$request.body.action"
 
+  # Routes & Integration(s)
+  integrations = {
+    "$connect" = {
+      operation_name   = "ConnectRoute"
+      integration_type = "AWS_PROXY"
+      route_key        = "$connect"
+      lambda_arn       = module.connect_lambda_function.lambda_function_invoke_arn
+    },
+    "$disconnect" = {
+      operation_name   = "DisconnectRoute"
+      integration_type = "AWS_PROXY"
+      route_key        = "$disconnect"
+      lambda_arn       = module.disconnect_lambda_function.lambda_function_invoke_arn
+    },
+    "sendmessage" = {
+      operation_name   = "SendRoute"
+      integration_type = "AWS_PROXY"
+      route_key        = "sendmessage"
+      lambda_arn       = module.send_message_lambda_function.lambda_function_invoke_arn
+    },
+  }
+
+  # Stage
   stage_name = "prod"
 
   stage_default_route_settings = {
     data_trace_enabled       = true
     detailed_metrics_enabled = true
     logging_level            = "INFO"
-    throttling_burst_limit   = 50
+    throttling_burst_limit   = 100
     throttling_rate_limit    = 100
   }
 
   stage_access_log_settings = {
-    destination_arn = aws_cloudwatch_log_group.logs.arn
+    create_log_group            = true
+    log_group_retention_in_days = 7
     format = jsonencode({
       context = {
         domainName              = "$context.domainName"
@@ -70,9 +97,8 @@ module "api_gateway" {
         stage                   = "$context.stage"
         status                  = "$context.status"
         error = {
-          message       = "$context.error.message"
-          messageString = "$context.error.messageString"
-          responseType  = "$context.error.responseType"
+          message      = "$context.error.message"
+          responseType = "$context.error.responseType"
         }
         identity = {
           sourceIP = "$context.identity.sourceIp"
@@ -85,43 +111,12 @@ module "api_gateway" {
     })
   }
 
-  integrations = {
-    "$connect" = {
-      operation_name         = "ConnectRoute"
-      integration_type       = "AWS_PROXY"
-      route_key              = "$connect"
-      lambda_arn             = module.connect_lambda_function.lambda_function_invoke_arn
-      throttling_burst_limit = 50
-      throttling_rate_limit  = 100
-    },
-    "$disconnect" = {
-      operation_name         = "DisconnectRoute"
-      integration_type       = "AWS_PROXY"
-      route_key              = "$disconnect"
-      lambda_arn             = module.disconnect_lambda_function.lambda_function_invoke_arn
-      throttling_burst_limit = 50
-      throttling_rate_limit  = 100
-    },
-    "sendmessage" = {
-      operation_name         = "SendRoute"
-      integration_type       = "AWS_PROXY"
-      route_key              = "sendmessage"
-      lambda_arn             = module.send_message_lambda_function.lambda_function_invoke_arn
-      throttling_burst_limit = 50
-      throttling_rate_limit  = 100
-    },
-  }
-
   tags = local.tags
 }
 
 ################################################################################
 # Supporting Resources
 ################################################################################
-
-resource "aws_cloudwatch_log_group" "logs" {
-  name = "/stage/${local.name}"
-}
 
 module "connect_lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
@@ -131,7 +126,8 @@ module "connect_lambda_function" {
   description   = "Websocket onConnect handler"
   source_path   = ["function/onConnect.js"]
   handler       = "onConnect.handler"
-  runtime       = "nodejs18.x"
+  runtime       = "nodejs20.x"
+  architectures = ["arm64"]
   memory_size   = 256
   publish       = true
 
@@ -141,8 +137,8 @@ module "connect_lambda_function" {
 
   allowed_triggers = {
     apigateway = {
-      principal  = "apigateway.amazonaws.com"
-      source_arn = "${module.api_gateway.api_execution_arn}/*"
+      service    = "apigateway"
+      source_arn = "${module.api_gateway.api_execution_arn}/*/*"
     }
   }
 
@@ -162,7 +158,8 @@ module "disconnect_lambda_function" {
   description   = "Websocket onDisconnect handler"
   source_path   = ["function/onDisconnect.js"]
   handler       = "onDisconnect.handler"
-  runtime       = "nodejs18.x"
+  runtime       = "nodejs20.x"
+  architectures = ["arm64"]
   memory_size   = 256
   publish       = true
 
@@ -172,8 +169,8 @@ module "disconnect_lambda_function" {
 
   allowed_triggers = {
     apigateway = {
-      principal  = "apigateway.amazonaws.com"
-      source_arn = "${module.api_gateway.api_execution_arn}/*"
+      service    = "apigateway"
+      source_arn = "${module.api_gateway.api_execution_arn}/*/*"
     }
   }
 
@@ -193,7 +190,8 @@ module "send_message_lambda_function" {
   description   = "Websocket sendMessage handler"
   source_path   = ["function/sendMessage.js"]
   handler       = "sendMessage.handler"
-  runtime       = "nodejs16.x"
+  runtime       = "nodejs20.x"
+  architectures = ["arm64"]
   memory_size   = 256
   publish       = true
 
@@ -203,8 +201,8 @@ module "send_message_lambda_function" {
 
   allowed_triggers = {
     apigateway = {
-      principal  = "apigateway.amazonaws.com"
-      source_arn = "${module.api_gateway.api_execution_arn}/*"
+      service    = "apigateway"
+      source_arn = "${module.api_gateway.api_execution_arn}/*/*"
     }
   }
 
@@ -236,4 +234,49 @@ module "dynamodb_table" {
   ]
 
   tags = local.tags
+}
+
+resource "aws_api_gateway_account" "demo" {
+  cloudwatch_role_arn = aws_iam_role.cloudwatch.arn
+}
+
+data "aws_iam_policy_document" "assume_role" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["apigateway.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
+resource "aws_iam_role" "cloudwatch" {
+  name               = "api_gateway_cloudwatch_global"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+data "aws_iam_policy_document" "cloudwatch" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:DescribeLogGroups",
+      "logs:DescribeLogStreams",
+      "logs:PutLogEvents",
+      "logs:GetLogEvents",
+      "logs:FilterLogEvents",
+    ]
+
+    resources = ["*"]
+  }
+}
+resource "aws_iam_role_policy" "cloudwatch" {
+  name   = "default"
+  role   = aws_iam_role.cloudwatch.id
+  policy = data.aws_iam_policy_document.cloudwatch.json
 }

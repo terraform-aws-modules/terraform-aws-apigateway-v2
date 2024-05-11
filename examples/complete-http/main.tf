@@ -34,7 +34,6 @@ module "api_gateway" {
   description      = "My awesome HTTP API Gateway"
   fail_on_warnings = false
   name             = local.name
-  protocol_type    = "HTTP"
 
   # Authorizer(s)
   authorizers = {
@@ -135,21 +134,28 @@ module "api_gateway" {
     create_log_group            = true
     log_group_retention_in_days = 7
     format = jsonencode({
-      "requestId" : "$context.requestId",
-      "extendedRequestId" : "$context.extendedRequestId",
-      "ip" : "$context.identity.sourceIp",
-      "caller" : "$context.identity.caller",
-      "user" : "$context.identity.user",
-      "requestTime" : "$context.requestTime",
-      "httpMethod" : "$context.httpMethod",
-      "resourcePath" : "$context.resourcePath",
-      "status" : "$context.status",
-      "protocol" : "$context.protocol",
-      "responseLength" : "$context.responseLength",
-      "domainName" : "$context.domainName",
-      "errorMessage" : "$context.error.message",
-      "errorResponseType" : "$context.error.responseType",
-      "integrationErrorMessage" : "$context.integrationErrorMessage",
+      context = {
+        domainName              = "$context.domainName"
+        integrationErrorMessage = "$context.integrationErrorMessage"
+        protocol                = "$context.protocol"
+        requestId               = "$context.requestId"
+        requestTime             = "$context.requestTime"
+        responseLength          = "$context.responseLength"
+        routeKey                = "$context.routeKey"
+        stage                   = "$context.stage"
+        status                  = "$context.status"
+        error = {
+          message      = "$context.error.message"
+          responseType = "$context.error.responseType"
+        }
+        identity = {
+          sourceIP = "$context.identity.sourceIp"
+        }
+        integration = {
+          error             = "$context.integration.error"
+          integrationStatus = "$context.integration.integrationStatus"
+        }
+      }
     })
   }
 
@@ -180,7 +186,6 @@ module "step_function" {
   role_name = "${local.name}-step-function"
   trusted_entities = [
     "apigateway.amazonaws.com",
-    "lambda.amazonaws.com",
   ]
 
   attach_policies_for_integrations = true
@@ -220,9 +225,9 @@ module "lambda_function" {
   description   = "My awesome lambda function"
   handler       = "lambda.handler"
   runtime       = "python3.12"
-
-  publish     = true
-  source_path = "lambda.py"
+  architectures = ["arm64"]
+  publish       = true
+  source_path   = "lambda.py"
 
   cloudwatch_logs_retention_in_days = 7
 

@@ -121,7 +121,7 @@ variable "create_domain_name" {
 variable "domain_name" {
   description = "The domain name to use for API gateway"
   type        = string
-  default     = null
+  default     = ""
 }
 
 variable "domain_name_certificate_arn" {
@@ -234,6 +234,16 @@ variable "stage_tags" {
   description = "A mapping of tags to assign to the stage resource"
   type        = map(string)
   default     = {}
+}
+
+################################################################################
+# Deployment
+################################################################################
+
+variable "deploy_stage" {
+  description = "Whether to deploy the stage"
+  type        = bool
+  default     = true
 }
 
 ################################################################################

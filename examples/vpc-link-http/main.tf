@@ -11,9 +11,6 @@ locals {
   vpc_cidr = "10.0.0.0/16"
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
 
-  package_url = "https://raw.githubusercontent.com/terraform-aws-modules/terraform-aws-lambda/master/examples/fixtures/python3.8-zip/existing_package.zip"
-  downloaded  = "downloaded_package_${md5(local.package_url)}.zip"
-
   tags = {
     Example    = local.name
     GithubRepo = "terraform-aws-apigateway-v2"
@@ -28,16 +25,17 @@ locals {
 module "api_gateway" {
   source = "../../"
 
-  name          = local.name
-  description   = "HTTP API Gateway with VPC links"
-  protocol_type = "HTTP"
-
+  # API
   cors_configuration = {
     allow_headers = ["content-type", "x-amz-date", "authorization", "x-api-key", "x-amz-security-token", "x-amz-user-agent"]
     allow_methods = ["*"]
     allow_origins = ["*"]
   }
 
+  description = "HTTP API Gateway with VPC links"
+  name        = local.name
+
+  # Routes & Integration(s)
   integrations = {
     "ANY /" = {
       lambda_arn             = module.lambda_function.lambda_function_arn
@@ -58,6 +56,7 @@ module "api_gateway" {
     }
   }
 
+  # VPC Link
   vpc_links = {
     my-vpc = {
       name               = local.name
@@ -84,15 +83,10 @@ module "vpc" {
   private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 4, k)]
   public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 48)]
 
+  enable_nat_gateway = true
+  single_nat_gateway = true
+
   tags = local.tags
-}
-
-################################
-# Supporting resources
-################################
-
-resource "random_pet" "this" {
-  length = 2
 }
 
 module "api_gateway_security_group" {
@@ -111,7 +105,6 @@ module "api_gateway_security_group" {
   tags = local.tags
 }
 
-
 module "alb" {
   source  = "terraform-aws-modules/alb/aws"
   version = "~> 9.0"
@@ -121,6 +114,7 @@ module "alb" {
   vpc_id  = module.vpc.vpc_id
   subnets = module.vpc.public_subnets
 
+  # Disable for example
   enable_deletion_protection = false
 
   security_group_ingress_rules = {
@@ -140,49 +134,34 @@ module "alb" {
     }
   }
 
-  tags = local.tags
-}
-
-module "alb_security_group" {
-  source  = "terraform-aws-modules/security-group/aws"
-  version = "~> 5.0"
-
-  name        = "${local.name}-alb"
-  description = "ALB for example usage"
-  vpc_id      = module.vpc.vpc_id
-
-  ingress_cidr_blocks = ["0.0.0.0/0"]
-  ingress_rules       = ["http-80-tcp"]
-
-  egress_rules = ["all-all"]
-
-  tags = local.tags
-}
-
-
-resource "null_resource" "download_package" {
-  triggers = {
-    downloaded = local.downloaded
+  listeners = {
+    default = {
+      port     = 80
+      protocol = "HTTP"
+      fixed_response = {
+        content_type = "text/plain"
+        message_body = "Hello, World!"
+        status_code  = "200"
+      }
+    }
   }
 
-  provisioner "local-exec" {
-    command = "curl -L -o ${local.downloaded} ${local.package_url}"
-  }
+  tags = local.tags
 }
 
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 4.0"
+  version = "~> 7.0"
 
   function_name = local.name
   description   = "My awesome lambda function"
-  handler       = "index.lambda_handler"
-  runtime       = "python3.8"
+  handler       = "lambda.handler"
+  runtime       = "python3.12"
+  architectures = ["arm64"]
+  publish       = true
+  source_path   = "lambda.py"
 
-  publish = true
-
-  create_package         = false
-  local_existing_package = local.downloaded
+  cloudwatch_logs_retention_in_days = 7
 
   attach_network_policy  = true
   vpc_subnet_ids         = module.vpc.private_subnets
@@ -191,7 +170,7 @@ module "lambda_function" {
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {
       service    = "apigateway"
-      source_arn = "${module.api_gateway.api_execution_arn}/*/*/*"
+      source_arn = "${module.api_gateway.api_execution_arn}/*/*"
     }
   }
 
