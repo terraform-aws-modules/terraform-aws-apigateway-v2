@@ -19,12 +19,12 @@ resource "aws_apigatewayv2_api" "this" {
     for_each = local.is_http && length(var.cors_configuration) > 0 ? [var.cors_configuration] : []
 
     content {
-      allow_credentials = try(cors_configuration.value.allow_credentials, null)
-      allow_headers     = try(cors_configuration.value.allow_headers, null)
-      allow_methods     = try(cors_configuration.value.allow_methods, null)
-      allow_origins     = try(cors_configuration.value.allow_origins, null)
-      expose_headers    = try(cors_configuration.value.expose_headers, null)
-      max_age           = try(cors_configuration.value.max_age, null)
+      allow_credentials = cors_configuration.value.allow_credentials
+      allow_headers     = cors_configuration.value.allow_headers
+      allow_methods     = cors_configuration.value.allow_methods
+      allow_origins     = cors_configuration.value.allow_origins
+      expose_headers    = cors_configuration.value.expose_headers
+      max_age           = cors_configuration.value.max_age
     }
   }
 
@@ -48,28 +48,28 @@ resource "aws_apigatewayv2_api" "this" {
 ################################################################################
 
 resource "aws_apigatewayv2_authorizer" "this" {
-  for_each = { for k, v in var.authorizers : k => v if local.create_routes_and_integrations }
+  for_each = { for k, v in var.authorizers : k => v if var.create }
 
   api_id = aws_apigatewayv2_api.this[0].id
 
-  authorizer_credentials_arn        = try(each.value.authorizer_credentials_arn, null)
-  authorizer_payload_format_version = try(each.value.authorizer_payload_format_version, null)
-  authorizer_result_ttl_in_seconds  = try(each.value.authorizer_result_ttl_in_seconds, null)
-  authorizer_type                   = try(each.value.authorizer_type, null)
-  authorizer_uri                    = try(each.value.authorizer_uri, null)
-  enable_simple_responses           = try(each.value.enable_simple_responses, null)
-  identity_sources                  = try(flatten([each.value.identity_sources]), null)
+  authorizer_credentials_arn        = each.value.authorizer_credentials_arn
+  authorizer_payload_format_version = each.value.authorizer_payload_format_version
+  authorizer_result_ttl_in_seconds  = each.value.authorizer_result_ttl_in_seconds
+  authorizer_type                   = each.value.authorizer_type
+  authorizer_uri                    = each.value.authorizer_uri
+  enable_simple_responses           = each.value.enable_simple_responses
+  identity_sources                  = each.value.identity_sources
 
   dynamic "jwt_configuration" {
-    for_each = try([each.value.jwt_configuration], [])
+    for_each = length(each.value.jwt_configuration) > 0 ? [each.value.jwt_configuration] : []
 
     content {
-      audience = try(jwt_configuration.value.audience, null)
-      issuer   = try(jwt_configuration.value.issuer, null)
+      audience = jwt_configuration.value.audience
+      issuer   = jwt_configuration.value.issuer
     }
   }
 
-  name = try(each.value.name, each.key)
+  name = coalesce(each.value.name, each.key)
 }
 
 ################################################################################
@@ -168,30 +168,75 @@ module "acm" {
 }
 
 ################################################################################
+# Route(s)
+################################################################################
+
+resource "aws_apigatewayv2_route" "this" {
+  for_each = { for k, v in var.routes : k => v if local.create_routes_and_integrations }
+
+  api_id = aws_apigatewayv2_api.this[0].id
+
+  api_key_required           = local.is_websocket ? each.value.api_key_required : null
+  authorization_scopes       = each.value.authorization_scopes
+  authorization_type         = each.value.authorization_type
+  authorizer_id              = try(aws_apigatewayv2_authorizer.this[each.value.authorizer_key].id, each.value.authorizer_id)
+  model_selection_expression = local.is_websocket ? each.value.model_selection_expression : null
+  operation_name             = each.value.operation_name
+  request_models             = local.is_websocket ? each.value.request_models : null
+
+  dynamic "request_parameter" {
+    for_each = { for k, v in each.value.request_parameter : k => v if try(v.request_parameter_key, null) != null && local.is_websocket }
+
+    content {
+      request_parameter_key = request_parameter.value.request_parameter_key
+      required              = request_parameter.value.required
+    }
+  }
+
+  route_key                           = each.key
+  route_response_selection_expression = local.is_websocket ? each.value.route_response_selection_expression : null
+  target                              = "integrations/${aws_apigatewayv2_integration.this[each.key].id}"
+}
+
+################################################################################
+# Route Response(s)
+################################################################################
+
+resource "aws_apigatewayv2_route_response" "this" {
+  for_each = { for k, v in var.routes : k => v if local.create_routes_and_integrations && coalesce(v.route_response.create, false) }
+
+  api_id                     = aws_apigatewayv2_api.this[0].id
+  model_selection_expression = each.value.route_response.model_selection_expression
+  response_models            = each.value.route_response.response_models
+  route_id                   = aws_apigatewayv2_route.this[each.key].id
+  route_response_key         = each.value.route_response.route_response_key
+}
+
+################################################################################
 # Integration(s)
 ################################################################################
 
 resource "aws_apigatewayv2_integration" "this" {
-  for_each = { for k, v in var.integrations : k => v if local.create_routes_and_integrations }
+  for_each = { for k, v in var.routes : k => v.integration if local.create_routes_and_integrations }
 
   api_id = aws_apigatewayv2_api.this[0].id
 
-  connection_id             = try(aws_apigatewayv2_vpc_link.this[each.value.vpc_link].id, lookup(each.value, "connection_id", null))
-  connection_type           = try(each.value.connection_type, null)
-  content_handling_strategy = try(each.value.content_handling_strategy, null)
-  credentials_arn           = try(each.value.credentials_arn, null)
-  description               = try(each.value.description, null)
-  integration_method        = try(each.value.integration_method, try(each.value.integration_subtype, null) == null ? "POST" : null)
-  integration_subtype       = try(each.value.integration_subtype, null)
-  integration_type          = try(each.value.integration_type, try(each.value.lambda_arn, "") != "" ? "AWS_PROXY" : "MOCK")
-  integration_uri           = try(each.value.lambda_arn, try(each.value.integration_uri, null))
-  passthrough_behavior      = try(each.value.passthrough_behavior, null)
-  payload_format_version    = try(each.value.payload_format_version, null)
-  request_parameters        = try(each.value.request_parameters, null)
-  request_templates         = try(each.value.request_templates, null)
+  connection_id             = try(aws_apigatewayv2_vpc_link.this[each.value.vpc_link_key].id, each.value.connection_id)
+  connection_type           = each.value.connection_type
+  content_handling_strategy = each.value.content_handling_strategy
+  credentials_arn           = each.value.credentials_arn
+  description               = each.value.description
+  integration_method        = each.value.method
+  integration_subtype       = each.value.subtype
+  integration_type          = each.value.type
+  integration_uri           = each.value.uri
+  passthrough_behavior      = each.value.passthrough_behavior
+  payload_format_version    = each.value.payload_format_version
+  request_parameters        = each.value.request_parameters
+  request_templates         = each.value.request_templates
 
   dynamic "response_parameters" {
-    for_each = try(each.value.response_parameters, [])
+    for_each = coalesce(each.value.response_parameters, [])
 
     content {
       mappings    = response_parameters.value.mappings
@@ -199,11 +244,12 @@ resource "aws_apigatewayv2_integration" "this" {
     }
   }
 
-  template_selection_expression = try(each.value.template_selection_expression, null)
-  timeout_milliseconds          = try(each.value.timeout_milliseconds, null)
+  template_selection_expression = each.value.template_selection_expression
+  timeout_milliseconds          = each.value.timeout_milliseconds
 
   dynamic "tls_config" {
-    for_each = try([each.value.tls_config], [])
+    # For some reason the default is not using an empty obect and causing an interation to occur
+    for_each = length({ for k, v in each.value.tls_config : k => v if v != null }) > 0 ? [each.value.tls_config] : []
 
     content {
       server_name_to_verify = replace(tls_config.value.server_name_to_verify, "*.", "")
@@ -220,46 +266,15 @@ resource "aws_apigatewayv2_integration" "this" {
 ################################################################################
 
 resource "aws_apigatewayv2_integration_response" "this" {
-  for_each = { for k, v in var.integrations : k => v if local.create_routes_and_integrations && try(v.integration_response_key, null) != null }
+  for_each = { for k, v in var.routes : k => v.integration if local.create_routes_and_integrations && v.integration.response.integration_response_key != null }
 
   api_id         = aws_apigatewayv2_api.this[0].id
   integration_id = aws_apigatewayv2_integration.this[each.key].id
 
-  content_handling_strategy     = try(each.value.content_handling_strategy, null)
-  integration_response_key      = each.value.integration_response_key
-  response_templates            = try(each.value.response_templates, null)
-  template_selection_expression = try(each.value.template_selection_expression, null)
-}
-
-################################################################################
-# Route(s)
-################################################################################
-
-resource "aws_apigatewayv2_route" "this" {
-  for_each = { for k, v in var.integrations : k => v if local.create_routes_and_integrations }
-
-  api_id = aws_apigatewayv2_api.this[0].id
-
-  api_key_required           = local.is_websocket ? try(each.value.api_key_required, null) : null
-  authorization_scopes       = try(each.value.authorization_scopes, null)
-  authorization_type         = try(each.value.authorization_type, null)
-  authorizer_id              = try(aws_apigatewayv2_authorizer.this[each.value.authorizer_key].id, each.value.authorizer_id, null)
-  model_selection_expression = local.is_websocket ? try(each.value.model_selection_expression, null) : null
-  operation_name             = try(each.value.operation_name, null)
-  request_models             = local.is_websocket ? try(each.value.request_models, {}) : null
-
-  dynamic "request_parameter" {
-    for_each = local.is_websocket ? try(each.value.request_parameter, []) : []
-
-    content {
-      request_parameter_key = request_parameter.value.request_parameter_key
-      required              = request_parameter.value.required
-    }
-  }
-
-  route_key                           = each.key
-  route_response_selection_expression = local.is_websocket ? try(each.value.route_response_selection_expression, null) : null
-  target                              = "integrations/${aws_apigatewayv2_integration.this[each.key].id}"
+  content_handling_strategy     = each.value.response.content_handling_strategy
+  integration_response_key      = each.value.response.integration_response_key
+  response_templates            = each.value.response.response_templates
+  template_selection_expression = each.value.response.template_selection_expression
 }
 
 ################################################################################
@@ -268,6 +283,31 @@ resource "aws_apigatewayv2_route" "this" {
 
 locals {
   create_stage = var.create && var.create_stage
+
+  default_log_format = jsonencode({
+    context = {
+      domainName              = "$context.domainName"
+      integrationErrorMessage = "$context.integrationErrorMessage"
+      protocol                = "$context.protocol"
+      requestId               = "$context.requestId"
+      requestTime             = "$context.requestTime"
+      responseLength          = "$context.responseLength"
+      routeKey                = "$context.routeKey"
+      stage                   = "$context.stage"
+      status                  = "$context.status"
+      error = {
+        message      = "$context.error.message"
+        responseType = "$context.error.responseType"
+      }
+      identity = {
+        sourceIP = "$context.identity.sourceIp"
+      }
+      integration = {
+        error             = "$context.integration.error"
+        integrationStatus = "$context.integration.integrationStatus"
+      }
+    }
+  })
 }
 
 resource "aws_apigatewayv2_stage" "this" {
@@ -279,8 +319,8 @@ resource "aws_apigatewayv2_stage" "this" {
     for_each = length(var.stage_access_log_settings) > 0 ? [var.stage_access_log_settings] : []
 
     content {
-      destination_arn = try(access_log_settings.value.create_log_group, true) ? aws_cloudwatch_log_group.this["default"].arn : access_log_settings.value.destination_arn
-      format          = access_log_settings.value.format
+      destination_arn = access_log_settings.value.create_log_group ? aws_cloudwatch_log_group.this["this"].arn : access_log_settings.value.destination_arn
+      format          = coalesce(access_log_settings.value.format, local.default_log_format)
     }
   }
 
@@ -291,27 +331,28 @@ resource "aws_apigatewayv2_stage" "this" {
     for_each = length(var.stage_default_route_settings) > 0 ? [var.stage_default_route_settings] : []
 
     content {
-      data_trace_enabled       = local.is_websocket ? try(default_route_settings.value.data_trace_enabled, false) : null
-      detailed_metrics_enabled = try(default_route_settings.value.detailed_metrics_enabled, false)
-      logging_level            = local.is_websocket ? try(default_route_settings.value.logging_level, null) : null
-      throttling_burst_limit   = try(default_route_settings.value.throttling_burst_limit, 500)
-      throttling_rate_limit    = try(default_route_settings.value.throttling_rate_limit, 1000)
+      data_trace_enabled       = local.is_websocket ? default_route_settings.value.data_trace_enabled : null
+      detailed_metrics_enabled = default_route_settings.value.detailed_metrics_enabled
+      logging_level            = local.is_websocket ? default_route_settings.value.logging_level : null
+      throttling_burst_limit   = default_route_settings.value.throttling_burst_limit
+      throttling_rate_limit    = default_route_settings.value.throttling_rate_limit
     }
   }
 
-  description = var.stage_description
-  name        = var.stage_name
+  deployment_id = local.is_http ? null : try(aws_apigatewayv2_deployment.this[0].id, null)
+  description   = var.stage_description
+  name          = var.stage_name
 
   dynamic "route_settings" {
-    for_each = { for k, v in var.integrations : k => v if var.create_routes_and_integrations }
+    for_each = { for k, v in var.routes : k => v if var.create_routes_and_integrations }
 
     content {
-      data_trace_enabled       = local.is_websocket ? try(route_settings.value.data_trace_enabled, false) : null
-      detailed_metrics_enabled = try(route_settings.value.detailed_metrics_enabled, false)
-      logging_level            = local.is_websocket ? try(route_settings.value.logging_level, null) : null
+      data_trace_enabled       = local.is_websocket ? route_settings.value.data_trace_enabled : null
+      detailed_metrics_enabled = route_settings.value.detailed_metrics_enabled
+      logging_level            = local.is_websocket ? route_settings.value.logging_level : null
       route_key                = route_settings.key
-      throttling_burst_limit   = try(route_settings.value.throttling_burst_limit, 500)
-      throttling_rate_limit    = try(route_settings.value.throttling_rate_limit, 1000)
+      throttling_burst_limit   = route_settings.value.throttling_burst_limit
+      throttling_rate_limit    = route_settings.value.throttling_rate_limit
     }
   }
 
@@ -338,8 +379,15 @@ resource "aws_apigatewayv2_deployment" "this" {
     redeployment = sha1(join(",", tolist([
       jsonencode(aws_apigatewayv2_integration.this),
       jsonencode(aws_apigatewayv2_route.this),
+      jsonencode(aws_apigatewayv2_route_response.this),
     ])))
   }
+
+  depends_on = [
+    aws_apigatewayv2_api.this,
+    aws_apigatewayv2_route.this,
+    aws_apigatewayv2_integration.this,
+  ]
 
   lifecycle {
     create_before_destroy = true
@@ -351,15 +399,15 @@ resource "aws_apigatewayv2_deployment" "this" {
 ################################################################################
 
 resource "aws_cloudwatch_log_group" "this" {
-  for_each = { for k, v in { "default" = var.stage_access_log_settings } : k => v if local.create_stage && try(v.create_log_group, true) }
+  for_each = { for k, v in { "this" = var.stage_access_log_settings } : k => v if local.create_stage && try(v.create_log_group, true) }
 
-  name              = try(each.value.log_group_name, "/aws/api-gateway/${var.name}/${replace(var.stage_name, "$", "")}")
-  retention_in_days = try(each.value.log_group_retention_in_days, 30)
-  kms_key_id        = try(each.value.log_group_kms_key_id, null)
-  skip_destroy      = try(each.value.log_group_skip_destroy, null)
-  log_group_class   = try(each.value.log_group_class, null)
+  name              = coalesce(each.value.log_group_name, "/aws/apigateway/${var.name}/${replace(var.stage_name, "$", "")}")
+  retention_in_days = each.value.log_group_retention_in_days
+  kms_key_id        = each.value.log_group_kms_key_id
+  skip_destroy      = each.value.log_group_skip_destroy
+  log_group_class   = each.value.log_group_class
 
-  tags = merge(var.tags, try(each.value.tags, {}))
+  tags = merge(var.tags, each.value.log_group_tags)
 }
 
 ################################################################################
@@ -369,9 +417,9 @@ resource "aws_cloudwatch_log_group" "this" {
 resource "aws_apigatewayv2_vpc_link" "this" {
   for_each = { for k, v in var.vpc_links : k => v if var.create }
 
-  name               = try(each.value.name, each.key)
+  name               = coalesce(each.value.name, each.key)
   security_group_ids = each.value.security_group_ids
   subnet_ids         = each.value.subnet_ids
 
-  tags = merge(var.tags, var.vpc_link_tags, try(each.value.tags, {}))
+  tags = merge(var.tags, var.vpc_link_tags, each.value.tags)
 }

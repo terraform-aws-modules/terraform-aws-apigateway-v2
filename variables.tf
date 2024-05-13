@@ -22,8 +22,15 @@ variable "api_key_selection_expression" {
 
 variable "cors_configuration" {
   description = "The cross-origin resource sharing (CORS) configuration. Applicable for HTTP APIs"
-  type        = any
-  default     = {}
+  type = object({
+    allow_credentials = optional(bool)
+    allow_headers     = optional(list(string))
+    allow_methods     = optional(list(string))
+    allow_origins     = optional(list(string))
+    expose_headers    = optional(list(string), [])
+    max_age           = optional(number)
+  })
+  default = {}
 }
 
 variable "credentials_arn" {
@@ -104,8 +111,21 @@ variable "api_mapping_key" {
 
 variable "authorizers" {
   description = "Map of API gateway authorizers to create"
-  type        = any
-  default     = {}
+  type = map(object({
+    authorizer_credentials_arn        = optional(string)
+    authorizer_payload_format_version = optional(string)
+    authorizer_result_ttl_in_seconds  = optional(number)
+    authorizer_type                   = optional(string, "REQUEST")
+    authorizer_uri                    = optional(string)
+    enable_simple_responses           = optional(bool)
+    identity_sources                  = optional(list(string))
+    jwt_configuration = optional(object({
+      audience = optional(list(string))
+      issuer   = optional(string)
+    }), {})
+    name = optional(string)
+  }))
+  default = {}
 }
 
 ################################################################################
@@ -115,7 +135,7 @@ variable "authorizers" {
 variable "create_domain_name" {
   description = "Whether to create API domain name resource"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "domain_name" {
@@ -149,7 +169,7 @@ variable "mutual_tls_authentication" {
 variable "create_domain_records" {
   description = "Whether to create Route53 records for the domain name"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "subdomains" {
@@ -165,7 +185,7 @@ variable "subdomains" {
 variable "create_certificate" {
   description = "Whether to create a certificate for the domain"
   type        = bool
-  default     = false
+  default     = true
 }
 
 ################################################################################
@@ -178,10 +198,75 @@ variable "create_routes_and_integrations" {
   default     = true
 }
 
-variable "integrations" {
+variable "routes" {
   description = "Map of API gateway routes with integrations"
-  type        = any
-  default     = {}
+  type = map(object({
+    # Route
+    authorizer_key             = optional(string)
+    api_key_required           = optional(bool)
+    authorization_scopes       = optional(list(string), [])
+    authorization_type         = optional(string)
+    authorizer_id              = optional(string)
+    model_selection_expression = optional(string)
+    operation_name             = optional(string)
+    request_models             = optional(map(string), {})
+    request_parameter = optional(object({
+      request_parameter_key = optional(string)
+      required              = optional(bool, false)
+    }), {})
+    route_response_selection_expression = optional(string)
+
+    # Route settings
+    data_trace_enabled       = optional(bool, false)
+    detailed_metrics_enabled = optional(bool, false)
+    logging_level            = optional(string)
+    throttling_burst_limit   = optional(number, 500)
+    throttling_rate_limit    = optional(number, 1000)
+
+    # Stage - Route response
+    route_response = optional(object({
+      create                     = optional(bool, false)
+      model_selection_expression = optional(string)
+      response_models            = optional(map(string))
+      route_response_key         = optional(string, "$default")
+    }), {})
+
+    # Integration
+    integration = object({
+      connection_id             = optional(string)
+      vpc_link_key              = optional(string)
+      connection_type           = optional(string)
+      content_handling_strategy = optional(string)
+      credentials_arn           = optional(string)
+      description               = optional(string)
+      method                    = optional(string)
+      subtype                   = optional(string)
+      type                      = optional(string, "AWS_PROXY")
+      uri                       = optional(string)
+      passthrough_behavior      = optional(string)
+      payload_format_version    = optional(string)
+      request_parameters        = optional(map(string), {})
+      request_templates         = optional(map(string), {})
+      response_parameters = optional(list(object({
+        mappings    = map(string)
+        status_code = string
+      })))
+      template_selection_expression = optional(string)
+      timeout_milliseconds          = optional(number)
+      tls_config = optional(object({
+        server_name_to_verify = optional(string)
+      }), {})
+
+      # Integration Response
+      response = optional(object({
+        content_handling_strategy     = optional(string)
+        integration_response_key      = optional(string)
+        response_templates            = optional(map(string))
+        template_selection_expression = optional(string)
+      }), {})
+    })
+  }))
+  default = {}
 }
 
 ################################################################################
@@ -196,8 +281,18 @@ variable "create_stage" {
 
 variable "stage_access_log_settings" {
   description = "Settings for logging access in this stage. Use the aws_api_gateway_account resource to configure [permissions for CloudWatch Logging](https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html#set-up-access-logging-permissions)"
-  type        = map(string)
-  default     = {}
+  type = object({
+    create_log_group            = optional(bool, true)
+    destination_arn             = optional(string)
+    format                      = optional(string)
+    log_group_name              = optional(string)
+    log_group_retention_in_days = optional(number, 30)
+    log_group_kms_key_id        = optional(string)
+    log_group_skip_destroy      = optional(bool)
+    log_group_class             = optional(string)
+    log_group_tags              = optional(map(string), {})
+  })
+  default = {}
 }
 
 variable "stage_client_certificate_id" {
@@ -208,8 +303,14 @@ variable "stage_client_certificate_id" {
 
 variable "stage_default_route_settings" {
   description = "The default route settings for the stage"
-  type        = map(string)
-  default     = {}
+  type = object({
+    data_trace_enabled       = optional(bool, false)
+    detailed_metrics_enabled = optional(bool, false)
+    logging_level            = optional(string)
+    throttling_burst_limit   = optional(number, 500)
+    throttling_rate_limit    = optional(number, 1000)
+  })
+  default = {}
 }
 
 variable "stage_description" {
@@ -252,8 +353,13 @@ variable "deploy_stage" {
 
 variable "vpc_links" {
   description = "Map of VPC Link definitions to create"
-  type        = any
-  default     = {}
+  type = map(object({
+    name               = optional(string)
+    security_group_ids = optional(list(string))
+    subnet_ids         = optional(list(string))
+    tags               = optional(map(string), {})
+  }))
+  default = {}
 }
 
 variable "vpc_link_tags" {

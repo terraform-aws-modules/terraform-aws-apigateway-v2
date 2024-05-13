@@ -45,29 +45,35 @@ module "api_gateway" {
   description = "My awesome AWS Websocket API Gateway"
   name        = local.name
 
+  # Custom Domain
+  create_domain_name = false
+
   # Websocket
   protocol_type              = "WEBSOCKET"
   route_selection_expression = "$request.body.action"
 
   # Routes & Integration(s)
-  integrations = {
+  routes = {
     "$connect" = {
-      operation_name   = "ConnectRoute"
-      integration_type = "AWS_PROXY"
-      route_key        = "$connect"
-      lambda_arn       = module.connect_lambda_function.lambda_function_invoke_arn
+      operation_name = "ConnectRoute"
+
+      integration = {
+        uri = module.connect_lambda_function.lambda_function_invoke_arn
+      }
     },
     "$disconnect" = {
-      operation_name   = "DisconnectRoute"
-      integration_type = "AWS_PROXY"
-      route_key        = "$disconnect"
-      lambda_arn       = module.disconnect_lambda_function.lambda_function_invoke_arn
+      operation_name = "DisconnectRoute"
+
+      integration = {
+        uri = module.disconnect_lambda_function.lambda_function_invoke_arn
+      }
     },
     "sendmessage" = {
-      operation_name   = "SendRoute"
-      integration_type = "AWS_PROXY"
-      route_key        = "sendmessage"
-      lambda_arn       = module.send_message_lambda_function.lambda_function_invoke_arn
+      operation_name = "SendRoute"
+
+      integration = {
+        uri = module.send_message_lambda_function.lambda_function_invoke_arn
+      }
     },
   }
 
@@ -234,49 +240,4 @@ module "dynamodb_table" {
   ]
 
   tags = local.tags
-}
-
-resource "aws_api_gateway_account" "demo" {
-  cloudwatch_role_arn = aws_iam_role.cloudwatch.arn
-}
-
-data "aws_iam_policy_document" "assume_role" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "Service"
-      identifiers = ["apigateway.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRole"]
-  }
-}
-
-resource "aws_iam_role" "cloudwatch" {
-  name               = "api_gateway_cloudwatch_global"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
-}
-
-data "aws_iam_policy_document" "cloudwatch" {
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:DescribeLogGroups",
-      "logs:DescribeLogStreams",
-      "logs:PutLogEvents",
-      "logs:GetLogEvents",
-      "logs:FilterLogEvents",
-    ]
-
-    resources = ["*"]
-  }
-}
-resource "aws_iam_role_policy" "cloudwatch" {
-  name   = "default"
-  role   = aws_iam_role.cloudwatch.id
-  policy = data.aws_iam_policy_document.cloudwatch.json
 }

@@ -35,24 +35,33 @@ module "api_gateway" {
   description = "HTTP API Gateway with VPC links"
   name        = local.name
 
+  # Custom Domain
+  create_domain_name = false
+
   # Routes & Integration(s)
-  integrations = {
+  routes = {
     "ANY /" = {
-      lambda_arn             = module.lambda_function.lambda_function_arn
-      payload_format_version = "2.0"
-      timeout_milliseconds   = 12000
+      integration = {
+        uri                    = module.lambda_function.lambda_function_arn
+        payload_format_version = "2.0"
+        timeout_milliseconds   = 12000
+      }
     }
 
     "GET /alb-internal-route" = {
-      connection_type    = "VPC_LINK"
-      vpc_link           = "my-vpc"
-      integration_uri    = module.alb.listeners["default"].arn
-      integration_type   = "HTTP_PROXY"
-      integration_method = "ANY"
+      integration = {
+        connection_type = "VPC_LINK"
+        uri             = module.alb.listeners["default"].arn
+        type            = "HTTP_PROXY"
+        method          = "ANY"
+        vpc_link_key    = "my-vpc"
+      }
     }
 
     "$default" = {
-      lambda_arn = module.lambda_function.lambda_function_arn
+      integration = {
+        uri = module.lambda_function.lambda_function_arn
+      }
     }
   }
 

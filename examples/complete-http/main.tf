@@ -39,7 +39,7 @@ module "api_gateway" {
   authorizers = {
     "cognito" = {
       authorizer_type  = "JWT"
-      identity_sources = "$request.header.Authorization"
+      identity_sources = ["$request.header.Authorization"]
       name             = "cognito"
       jwt_configuration = {
         audience = ["d6a38afd-45d6-4874-d1aa-3c5c558aqcc2"]
@@ -49,83 +49,97 @@ module "api_gateway" {
   }
 
   # Domain Name
-  create_domain_name    = true
   domain_name           = var.domain_name
   subdomains            = ["customer1", "customer2"]
   create_domain_records = true
   create_certificate    = true
 
   # Routes & Integration(s)
-  integrations = {
+  routes = {
     "ANY /" = {
-      lambda_arn             = module.lambda_function.lambda_function_arn
-      payload_format_version = "2.0"
-      timeout_milliseconds   = 12000
+      integration = {
+        uri                    = module.lambda_function.lambda_function_arn
+        payload_format_version = "2.0"
+        timeout_milliseconds   = 12000
+      }
     }
 
     "GET /some-route" = {
-      lambda_arn               = module.lambda_function.lambda_function_arn
-      payload_format_version   = "2.0"
       authorization_type       = "JWT"
       authorizer_key           = "cognito"
       throttling_rate_limit    = 80
       throttling_burst_limit   = 40
       detailed_metrics_enabled = true
+
+      integration = {
+        uri                    = module.lambda_function.lambda_function_arn
+        payload_format_version = "2.0"
+      }
     }
 
     "GET /some-route-with-authorizer" = {
-      lambda_arn             = module.lambda_function.lambda_function_arn
-      payload_format_version = "2.0"
-      authorizer_key         = "cognito"
+      authorizer_key = "cognito"
+
+      integration = {
+        uri                    = module.lambda_function.lambda_function_arn
+        payload_format_version = "2.0"
+      }
     }
 
     "GET /some-route-with-authorizer-and-scope" = {
-      lambda_arn             = module.lambda_function.lambda_function_arn
-      payload_format_version = "2.0"
-      authorization_type     = "JWT"
-      authorizer_key         = "cognito"
-      authorization_scopes   = ["user.id", "user.email"]
+      authorization_type   = "JWT"
+      authorizer_key       = "cognito"
+      authorization_scopes = ["user.id", "user.email"]
+
+      integration = {
+        uri                    = module.lambda_function.lambda_function_arn
+        payload_format_version = "2.0"
+      }
     }
 
     "POST /start-step-function" = {
-      integration_type    = "AWS_PROXY"
-      integration_subtype = "StepFunctions-StartExecution"
-      credentials_arn     = module.step_function.role_arn
+      integration = {
+        type            = "AWS_PROXY"
+        subtype         = "StepFunctions-StartExecution"
+        credentials_arn = module.step_function.role_arn
 
-      # Note: jsonencode is used to pass argument as a string
-      request_parameters = {
-        StateMachineArn = module.step_function.state_machine_arn
-        Input = jsonencode({
-          "key1" : "value1",
-          "key2" : "value2"
-        })
+        # Note: jsonencode is used to pass argument as a string
+        request_parameters = {
+          StateMachineArn = module.step_function.state_machine_arn
+          Input = jsonencode({
+            "key1" : "value1",
+            "key2" : "value2"
+          })
+        }
+
+        payload_format_version = "1.0"
+        timeout_milliseconds   = 12000
       }
-
-      payload_format_version = "1.0"
-      timeout_milliseconds   = 12000
     }
 
     "$default" = {
-      lambda_arn = module.lambda_function.lambda_function_arn
-      tls_config = {
-        server_name_to_verify = var.domain_name
-      }
-
-      response_parameters = [
-        {
-          status_code = 500
-          mappings = {
-            "append:header.header1" = "$context.requestId"
-            "overwrite:statuscode"  = "403"
-          }
-        },
-        {
-          status_code = 404
-          mappings = {
-            "append:header.error" = "$stageVariables.environmentId"
-          }
+      integration = {
+        uri = module.lambda_function.lambda_function_arn
+        tls_config = {
+          server_name_to_verify = var.domain_name
         }
-      ]
+
+        response_parameters = [
+          {
+            status_code = 500
+            mappings = {
+              "append:header.header1" = "$context.requestId"
+              "overwrite:statuscode"  = "403"
+            }
+          },
+          {
+            status_code = 404
+            mappings = {
+              "append:header.error" = "$stageVariables.environmentId"
+            }
+          }
+        ]
+      }
     }
   }
 
@@ -166,6 +180,12 @@ module "api_gateway" {
   }
 
   tags = local.tags
+}
+
+module "api_gateway_disabled" {
+  source = "../../"
+
+  create = false
 }
 
 ################################################################################

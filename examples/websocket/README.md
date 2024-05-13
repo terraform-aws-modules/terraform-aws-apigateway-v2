@@ -28,6 +28,10 @@ $ npm install -g wscat
 
 3. On the console, connect to your published API endpoint by executing the following command:
 
+> [!NOTE]
+> It will take a few seconds on a new API for the endpoint to respond.
+> If you see a 403 error, give it a few seconds and try again - only one new APIs that were just created.
+
 ```bash
 $ wscat -c wss://{YOUR-API-ID}.execute-api.{YOUR-REGION}.amazonaws.com/{STAGE}
 ```
@@ -51,9 +55,7 @@ connected (press CTRL+C to quit)
 
 ## Providers
 
-| Name | Version |
-|------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.37 |
+No providers.
 
 ## Modules
 
@@ -67,13 +69,7 @@ connected (press CTRL+C to quit)
 
 ## Resources
 
-| Name | Type |
-|------|------|
-| [aws_api_gateway_account.demo](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/api_gateway_account) | resource |
-| [aws_iam_role.cloudwatch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
-| [aws_iam_role_policy.cloudwatch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
-| [aws_iam_policy_document.assume_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.cloudwatch](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+No resources.
 
 ## Inputs
 

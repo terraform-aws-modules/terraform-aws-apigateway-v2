@@ -33,6 +33,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | Name | Source | Version |
 |------|--------|---------|
 | <a name="module_api_gateway"></a> [api\_gateway](#module\_api\_gateway) | ../../ | n/a |
+| <a name="module_api_gateway_disabled"></a> [api\_gateway\_disabled](#module\_api\_gateway\_disabled) | ../../ | n/a |
 | <a name="module_lambda_function"></a> [lambda\_function](#module\_lambda\_function) | terraform-aws-modules/lambda/aws | ~> 7.0 |
 | <a name="module_step_function"></a> [step\_function](#module\_step\_function) | terraform-aws-modules/step-functions/aws | ~> 4.0 |
 
@@ -46,7 +47,7 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | Custom domain name to use on API Gateway endpoint | `string` | `"*.sharedservices.clowd.haus"` | no |
+| <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | Custom domain name to use on API Gateway endpoint | `string` | `"terraform-aws-modules.modules.tf"` | no |
 
 ## Outputs
 
