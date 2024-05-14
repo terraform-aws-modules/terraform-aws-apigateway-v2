@@ -189,7 +189,7 @@ variable "create_certificate" {
 }
 
 ################################################################################
-# Integration(s)
+# Route(s) & Integration(s)
 ################################################################################
 
 variable "create_routes_and_integrations" {
