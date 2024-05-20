@@ -158,17 +158,35 @@ module "alb" {
   tags = local.tags
 }
 
+
+locals {
+  package_url = "https://raw.githubusercontent.com/terraform-aws-modules/terraform-aws-lambda/master/examples/fixtures/python-function.zip"
+  downloaded  = "downloaded_package_${md5(local.package_url)}.zip"
+}
+
+resource "null_resource" "download_package" {
+  triggers = {
+    downloaded = local.downloaded
+  }
+
+  provisioner "local-exec" {
+    command = "curl -L -o ${local.downloaded} ${local.package_url}"
+  }
+}
+
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "~> 7.0"
 
   function_name = local.name
   description   = "My awesome lambda function"
-  handler       = "lambda.handler"
+  handler       = "index.lambda_handler"
   runtime       = "python3.12"
   architectures = ["arm64"]
   publish       = true
-  source_path   = "lambda.py"
+
+  create_package         = false
+  local_existing_package = local.downloaded
 
   cloudwatch_logs_retention_in_days = 7
 

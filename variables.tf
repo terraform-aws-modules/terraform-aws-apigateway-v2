@@ -178,6 +178,12 @@ variable "subdomains" {
   default     = []
 }
 
+variable "subdomain_record_types" {
+  description = "A list of record types to create for the subdomain(s)"
+  type        = list(string)
+  default     = ["A", "AAAA"]
+}
+
 ################################################################################
 # Domain - Certificate
 ################################################################################

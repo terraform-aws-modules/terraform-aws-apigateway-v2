@@ -54,6 +54,11 @@ module "api_gateway" {
   create_domain_records = true
   create_certificate    = true
 
+  mutual_tls_authentication = {
+    truststore_uri     = "s3://${module.s3_bucket.s3_bucket_id}/${aws_s3_object.this.id}"
+    truststore_version = aws_s3_object.this.version_id
+  }
+
   # Routes & Integration(s)
   routes = {
     "ANY /" = {
@@ -66,7 +71,7 @@ module "api_gateway" {
 
     "GET /some-route" = {
       authorization_type       = "JWT"
-      authorizer_key           = "cognito"
+      authorizer_id            = aws_apigatewayv2_authorizer.external.id
       throttling_rate_limit    = 80
       throttling_burst_limit   = 40
       detailed_metrics_enabled = true
@@ -192,6 +197,18 @@ module "api_gateway_disabled" {
 # Supporting Resources
 ################################################################################
 
+resource "aws_apigatewayv2_authorizer" "external" {
+  api_id           = module.api_gateway.api_id
+  authorizer_type  = "JWT"
+  identity_sources = ["$request.header.Authorization"]
+  name             = local.name
+
+  jwt_configuration {
+    audience = ["example"]
+    issuer   = "https://${aws_cognito_user_pool.this.endpoint}"
+  }
+}
+
 resource "aws_cognito_user_pool" "this" {
   name = local.name
 
@@ -237,17 +254,34 @@ module "step_function" {
   tags = local.tags
 }
 
+locals {
+  package_url = "https://raw.githubusercontent.com/terraform-aws-modules/terraform-aws-lambda/master/examples/fixtures/python-function.zip"
+  downloaded  = "downloaded_package_${md5(local.package_url)}.zip"
+}
+
+resource "null_resource" "download_package" {
+  triggers = {
+    downloaded = local.downloaded
+  }
+
+  provisioner "local-exec" {
+    command = "curl -L -o ${local.downloaded} ${local.package_url}"
+  }
+}
+
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "~> 7.0"
 
   function_name = local.name
   description   = "My awesome lambda function"
-  handler       = "lambda.handler"
+  handler       = "index.lambda_handler"
   runtime       = "python3.12"
   architectures = ["arm64"]
   publish       = true
-  source_path   = "lambda.py"
+
+  create_package         = false
+  local_existing_package = local.downloaded
 
   cloudwatch_logs_retention_in_days = 7
 
@@ -259,4 +293,56 @@ module "lambda_function" {
   }
 
   tags = local.tags
+}
+
+################################################################################
+# mTLS Supporting Resources
+################################################################################
+
+module "s3_bucket" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "~> 3.0"
+
+  bucket_prefix = "${local.name}-"
+
+  # NOTE: This is enabled for example usage only, you should not enable this for production workloads
+  force_destroy = true
+
+  tags = local.tags
+}
+resource "aws_s3_object" "this" {
+  bucket                 = module.s3_bucket.s3_bucket_id
+  key                    = "truststore.pem"
+  server_side_encryption = "AES256"
+  content                = tls_self_signed_cert.this.cert_pem
+}
+
+resource "tls_private_key" "this" {
+  algorithm = "RSA"
+}
+
+resource "tls_self_signed_cert" "this" {
+  is_ca_certificate = true
+  private_key_pem   = tls_private_key.this.private_key_pem
+
+  subject {
+    common_name = "example.com"
+  }
+
+  validity_period_hours = 12
+
+  allowed_uses = [
+    "cert_signing",
+    "server_auth",
+  ]
+}
+
+resource "local_file" "key" {
+  content  = tls_private_key.this.private_key_pem
+  filename = "my-key.key"
+}
+
+resource "local_file" "pem" {
+  content  = tls_self_signed_cert.this.cert_pem
+  filename = "my-cert.pem"
 }

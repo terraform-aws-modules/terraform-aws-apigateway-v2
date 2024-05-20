@@ -123,6 +123,11 @@ resource "aws_apigatewayv2_api_mapping" "this" {
 locals {
   # https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-custom-domains.html
   stripped_domain_name = replace(var.domain_name, "*.", "")
+
+  record_set = { for prd in setproduct(var.subdomains, var.subdomain_record_types) : "${prd[0]}-${prd[1]}" => {
+    name = prd[0]
+    type = prd[1]
+  } }
 }
 
 data "aws_route53_zone" "this" {
@@ -131,12 +136,12 @@ data "aws_route53_zone" "this" {
   name = local.stripped_domain_name
 }
 
-resource "aws_route53_record" "alias_ipv4" {
-  for_each = { for k, v in toset(var.subdomains) : k => v if local.create_domain_name && var.create_domain_records }
+resource "aws_route53_record" "this" {
+  for_each = { for k, v in local.record_set : k => v if local.create_domain_name && var.create_domain_records }
 
   zone_id = data.aws_route53_zone.this[0].zone_id
-  name    = each.value
-  type    = "A"
+  name    = each.value.name
+  type    = each.value.type
 
   alias {
     name                   = aws_apigatewayv2_domain_name.this[0].domain_name_configuration[0].target_domain_name
@@ -424,5 +429,5 @@ resource "aws_apigatewayv2_vpc_link" "this" {
   security_group_ids = each.value.security_group_ids
   subnet_ids         = each.value.subnet_ids
 
-  tags = merge(var.tags, var.vpc_link_tags, each.value.tags)
+  tags = merge(var.tags, var.vpc_link_tags, try(each.value.tags, {}))
 }

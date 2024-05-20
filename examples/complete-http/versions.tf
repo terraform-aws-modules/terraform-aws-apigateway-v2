@@ -6,5 +6,17 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 5.37"
     }
+    local = {
+      source  = "hashicorp/local"
+      version = ">= 2.5"
+    }
+    null = {
+      source  = "hashicorp/null"
+      version = ">= 2.0"
+    }
+    tls = {
+      source  = "hashicorp/tls"
+      version = ">= 3.1"
+    }
   }
 }

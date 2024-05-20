@@ -1,3 +1,8 @@
+output "test_curl_command" {
+  description = "Curl command to test API endpoint using mTLS"
+  value       = "curl --key ./my-key.key --cert ./my-cert.pem https://customer1.${replace(var.domain_name, "*.", "")} | jq"
+}
+
 ################################################################################
 # API Gateway
 ################################################################################

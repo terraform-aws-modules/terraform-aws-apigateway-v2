@@ -36,6 +36,7 @@ module "wrapper" {
   stage_name                                         = try(each.value.stage_name, var.defaults.stage_name, "$default")
   stage_tags                                         = try(each.value.stage_tags, var.defaults.stage_tags, {})
   stage_variables                                    = try(each.value.stage_variables, var.defaults.stage_variables, {})
+  subdomain_record_types                             = try(each.value.subdomain_record_types, var.defaults.subdomain_record_types, ["A", "AAAA"])
   subdomains                                         = try(each.value.subdomains, var.defaults.subdomains, [])
   tags                                               = try(each.value.tags, var.defaults.tags, {})
   target                                             = try(each.value.target, var.defaults.target, null)
