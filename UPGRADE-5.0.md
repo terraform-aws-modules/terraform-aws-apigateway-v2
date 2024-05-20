@@ -154,7 +154,6 @@ Please consult the `examples` directory for reference example configurations. If
 -     authorization_type     = "JWT"
 -     authorizer_key         = "cognito"
 -     authorization_scopes   = "tf/something.relevant.read,tf/something.relevant.write"
--     cognito user pool
 
 +     authorization_type   = "JWT"
 +     authorizer_key       = "cognito"
