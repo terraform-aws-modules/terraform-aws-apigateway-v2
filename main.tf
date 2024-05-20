@@ -251,7 +251,7 @@ resource "aws_apigatewayv2_integration" "this" {
   timeout_milliseconds          = each.value.timeout_milliseconds
 
   dynamic "tls_config" {
-    # For some reason the default is not using an empty obect and causing an interation to occur
+    # For some reason the default is not using an empty object and causing an integration to occur
     for_each = length({ for k, v in each.value.tls_config : k => v if v != null }) > 0 ? [each.value.tls_config] : []
 
     content {
