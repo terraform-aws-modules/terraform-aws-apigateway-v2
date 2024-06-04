@@ -1,34 +1,29 @@
 provider "aws" {
-  region = "eu-west-1"
-
-  # Make it faster by skipping something
-  skip_metadata_api_check     = true
-  skip_region_validation      = true
-  skip_credentials_validation = true
-
-  # skip_requesting_account_id should be disabled to generate valid ARN in apigatewayv2_api_execution_arn
-  skip_requesting_account_id = false
+  region = local.region
 }
 
 locals {
-  domain_name = "terraform-aws-modules.modules.tf" # trimsuffix(data.aws_route53_zone.this.name, ".")
-  subdomain   = "complete-http"
+  name   = "ex-${basename(path.cwd)}"
+  region = "eu-west-1"
+
+  tags = {
+    Example    = local.name
+    GithubRepo = "terraform-aws-apigateway-v2"
+    GithubOrg  = "terraform-aws-modules"
+  }
 }
 
-###################
-# HTTP API Gateway
-###################
+################################################################################
+# API Gateway Module
+################################################################################
 
 module "api_gateway" {
   source = "../../"
 
-  name          = "${random_pet.this.id}-http"
-  description   = "My awesome HTTP API Gateway"
-  protocol_type = "HTTP"
-
-  create_default_stage_access_log_group = true
-
-  fail_on_warnings = false
+  # API
+  body = templatefile("api.yaml", {
+    example_function_arn = module.lambda_function.lambda_function_arn
+  })
 
   cors_configuration = {
     allow_headers = ["content-type", "x-amz-date", "authorization", "x-api-key", "x-amz-security-token", "x-amz-user-agent"]
@@ -36,161 +31,179 @@ module "api_gateway" {
     allow_origins = ["*"]
   }
 
-  mutual_tls_authentication = {
-    truststore_uri     = "s3://${aws_s3_bucket.truststore.bucket}/${aws_s3_object.truststore.id}"
-    truststore_version = aws_s3_object.truststore.version_id
+  description      = "My awesome HTTP API Gateway"
+  fail_on_warnings = false
+  name             = local.name
+
+  # Authorizer(s)
+  authorizers = {
+    cognito = {
+      authorizer_type  = "JWT"
+      identity_sources = ["$request.header.Authorization"]
+      name             = "cognito"
+      jwt_configuration = {
+        audience = ["d6a38afd-45d6-4874-d1aa-3c5c558aqcc2"]
+        issuer   = "https://${aws_cognito_user_pool.this.endpoint}"
+      }
+    }
   }
 
-  domain_name                 = local.domain_name
-  domain_name_certificate_arn = module.acm.acm_certificate_arn
+  # Domain Name
+  domain_name           = var.domain_name
+  create_domain_records = true
+  create_certificate    = true
 
-  default_stage_access_log_format = "$context.identity.sourceIp - - [$context.requestTime] \"$context.httpMethod $context.routeKey $context.protocol\" $context.status $context.responseLength $context.requestId $context.integrationErrorMessage"
+  mutual_tls_authentication = {
+    truststore_uri     = "s3://${module.s3_bucket.s3_bucket_id}/${aws_s3_object.this.id}"
+    truststore_version = aws_s3_object.this.version_id
+  }
 
-  default_route_settings = {
+  # Routes & Integration(s)
+  routes = {
+    "ANY /" = {
+      detailed_metrics_enabled = false
+
+      integration = {
+        uri                    = module.lambda_function.lambda_function_arn
+        payload_format_version = "2.0"
+        timeout_milliseconds   = 12000
+      }
+    }
+
+    "GET /some-route" = {
+      authorization_type       = "JWT"
+      authorizer_id            = aws_apigatewayv2_authorizer.external.id
+      throttling_rate_limit    = 80
+      throttling_burst_limit   = 40
+      detailed_metrics_enabled = true
+
+      integration = {
+        uri                    = module.lambda_function.lambda_function_arn
+        payload_format_version = "2.0"
+      }
+    }
+
+    "GET /some-route-with-authorizer" = {
+      authorization_type = "JWT"
+      authorizer_key     = "cognito"
+
+      integration = {
+        uri                    = module.lambda_function.lambda_function_arn
+        payload_format_version = "2.0"
+      }
+    }
+
+    "GET /some-route-with-authorizer-and-scope" = {
+      authorization_type   = "JWT"
+      authorizer_key       = "cognito"
+      authorization_scopes = ["user.id", "user.email"]
+
+      integration = {
+        uri                    = module.lambda_function.lambda_function_arn
+        payload_format_version = "2.0"
+      }
+    }
+
+    "POST /start-step-function" = {
+      integration = {
+        type            = "AWS_PROXY"
+        subtype         = "StepFunctions-StartExecution"
+        credentials_arn = module.step_function.role_arn
+
+        # Note: jsonencode is used to pass argument as a string
+        request_parameters = {
+          StateMachineArn = module.step_function.state_machine_arn
+          Input = jsonencode({
+            "key1" : "value1",
+            "key2" : "value2"
+          })
+        }
+
+        payload_format_version = "1.0"
+        timeout_milliseconds   = 12000
+      }
+    }
+
+    "$default" = {
+      integration = {
+        uri = module.lambda_function.lambda_function_arn
+        tls_config = {
+          server_name_to_verify = var.domain_name
+        }
+
+        response_parameters = [
+          {
+            status_code = 500
+            mappings = {
+              "append:header.header1" = "$context.requestId"
+              "overwrite:statuscode"  = "403"
+            }
+          },
+          {
+            status_code = 404
+            mappings = {
+              "append:header.error" = "$stageVariables.environmentId"
+            }
+          }
+        ]
+      }
+    }
+  }
+
+  # Stage
+  stage_access_log_settings = {
+    create_log_group            = true
+    log_group_retention_in_days = 7
+    format = jsonencode({
+      context = {
+        domainName              = "$context.domainName"
+        integrationErrorMessage = "$context.integrationErrorMessage"
+        protocol                = "$context.protocol"
+        requestId               = "$context.requestId"
+        requestTime             = "$context.requestTime"
+        responseLength          = "$context.responseLength"
+        routeKey                = "$context.routeKey"
+        stage                   = "$context.stage"
+        status                  = "$context.status"
+        error = {
+          message      = "$context.error.message"
+          responseType = "$context.error.responseType"
+        }
+        identity = {
+          sourceIP = "$context.identity.sourceIp"
+        }
+        integration = {
+          error             = "$context.integration.error"
+          integrationStatus = "$context.integration.integrationStatus"
+        }
+      }
+    })
+  }
+
+  stage_default_route_settings = {
     detailed_metrics_enabled = true
     throttling_burst_limit   = 100
     throttling_rate_limit    = 100
   }
 
-  authorizers = {
-    "cognito" = {
-      authorizer_type  = "JWT"
-      identity_sources = "$request.header.Authorization"
-      name             = "cognito"
-      audience         = ["d6a38afd-45d6-4874-d1aa-3c5c558aqcc2"]
-      issuer           = "https://${aws_cognito_user_pool.this.endpoint}"
-    }
-  }
-
-  integrations = {
-    "ANY /" = {
-      lambda_arn             = module.lambda_function.lambda_function_arn
-      payload_format_version = "2.0"
-      timeout_milliseconds   = 12000
-    }
-
-    "GET /some-route" = {
-      lambda_arn               = module.lambda_function.lambda_function_arn
-      payload_format_version   = "2.0"
-      authorization_type       = "JWT"
-      authorizer_id            = aws_apigatewayv2_authorizer.some_authorizer.id
-      throttling_rate_limit    = 80
-      throttling_burst_limit   = 40
-      detailed_metrics_enabled = true
-    }
-
-    "GET /some-route-with-authorizer" = {
-      lambda_arn             = module.lambda_function.lambda_function_arn
-      payload_format_version = "2.0"
-      authorizer_key         = "cognito"
-    }
-
-    "GET /some-route-with-authorizer-and-scope" = {
-      lambda_arn             = module.lambda_function.lambda_function_arn
-      payload_format_version = "2.0"
-      authorization_type     = "JWT"
-      authorizer_key         = "cognito"
-      authorization_scopes   = "tf/something.relevant.read,tf/something.relevant.write" # Should comply with the resource server configuration part of the cognito user pool
-    }
-
-    "GET /some-route-with-authorizer-and-different-scope" = {
-      lambda_arn             = module.lambda_function.lambda_function_arn
-      payload_format_version = "2.0"
-      authorization_type     = "JWT"
-      authorizer_key         = "cognito"
-      authorization_scopes   = "tf/something.relevant.write" # Should comply with the resource server configuration part of the cognito user pool
-    }
-
-    "POST /start-step-function" = {
-      integration_type    = "AWS_PROXY"
-      integration_subtype = "StepFunctions-StartExecution"
-      credentials_arn     = module.step_function.role_arn
-
-      # Note: jsonencode is used to pass argument as a string
-      request_parameters = jsonencode({
-        StateMachineArn = module.step_function.state_machine_arn
-      })
-
-      payload_format_version = "1.0"
-      timeout_milliseconds   = 12000
-    }
-
-    "$default" = {
-      lambda_arn = module.lambda_function.lambda_function_arn
-      tls_config = jsonencode({
-        server_name_to_verify = local.domain_name
-      })
-
-      response_parameters = jsonencode([
-        {
-          status_code = 500
-          mappings = {
-            "append:header.header1" = "$context.requestId"
-            "overwrite:statuscode"  = "403"
-          }
-        },
-        {
-          status_code = 404
-          mappings = {
-            "append:header.error" = "$stageVariables.environmentId"
-          }
-        }
-      ])
-    }
-
-  }
-
-  body = templatefile("api.yaml", {
-    example_function_arn = module.lambda_function.lambda_function_arn
-  })
-
-  tags = {
-    Name = "dev-api-new"
-  }
+  tags = local.tags
 }
 
-######
-# ACM
-######
+module "api_gateway_disabled" {
+  source = "../../"
 
-data "aws_route53_zone" "this" {
-  name = local.domain_name
+  create = false
 }
 
-module "acm" {
-  source  = "terraform-aws-modules/acm/aws"
-  version = "~> 3.0"
+################################################################################
+# Supporting Resources
+################################################################################
 
-  domain_name               = local.domain_name
-  zone_id                   = data.aws_route53_zone.this.id
-  subject_alternative_names = ["${local.subdomain}.${local.domain_name}"]
-}
-
-##########
-# Route53
-##########
-
-resource "aws_route53_record" "api" {
-  zone_id = data.aws_route53_zone.this.zone_id
-  name    = local.subdomain
-  type    = "A"
-
-  alias {
-    name                   = module.api_gateway.apigatewayv2_domain_name_configuration[0].target_domain_name
-    zone_id                = module.api_gateway.apigatewayv2_domain_name_configuration[0].hosted_zone_id
-    evaluate_target_health = false
-  }
-}
-
-#############################
-# AWS API Gateway Authorizer
-#############################
-
-resource "aws_apigatewayv2_authorizer" "some_authorizer" {
-  api_id           = module.api_gateway.apigatewayv2_api_id
+resource "aws_apigatewayv2_authorizer" "external" {
+  api_id           = module.api_gateway.api_id
   authorizer_type  = "JWT"
   identity_sources = ["$request.header.Authorization"]
-  name             = random_pet.this.id
+  name             = local.name
 
   jwt_configuration {
     audience = ["example"]
@@ -198,58 +211,53 @@ resource "aws_apigatewayv2_authorizer" "some_authorizer" {
   }
 }
 
-########################
-# AWS Cognito User Pool
-########################
-
 resource "aws_cognito_user_pool" "this" {
-  name = "user-pool-${random_pet.this.id}"
-}
+  name = local.name
 
-####################
-# AWS Step Function
-####################
+  tags = local.tags
+}
 
 module "step_function" {
   source  = "terraform-aws-modules/step-functions/aws"
-  version = "~> 2.0"
+  version = "~> 4.0"
 
-  name = random_pet.this.id
+  name      = local.name
+  role_name = "${local.name}-step-function"
+  trusted_entities = [
+    "apigateway.amazonaws.com",
+  ]
 
-  definition = <<EOF
-{
-  "Comment": "A Hello World example of the Amazon States Language using Pass states",
-  "StartAt": "Hello",
-  "States": {
-    "Hello": {
-      "Type": "Pass",
-      "Result": "Hello",
-      "Next": "World"
-    },
-    "World": {
-      "Type": "Pass",
-      "Result": "World",
-      "End": true
+  attach_policies_for_integrations = true
+  service_integrations = {
+    stepfunction = {
+      stepfunction = ["*"]
     }
   }
-}
-EOF
-}
 
-##################
-# Extra resources
-##################
+  definition = <<-EOT
+    {
+      "Comment": "A Hello World example of the Amazon States Language using Pass states",
+      "StartAt": "Hello",
+      "States": {
+        "Hello": {
+          "Type": "Pass",
+          "Result": "Hello",
+          "Next": "World"
+        },
+        "World": {
+          "Type": "Pass",
+          "Result": "World",
+          "End": true
+        }
+      }
+    }
+  EOT
 
-resource "random_pet" "this" {
-  length = 2
+  tags = local.tags
 }
-
-#############################################
-# Using packaged function from Lambda module
-#############################################
 
 locals {
-  package_url = "https://raw.githubusercontent.com/terraform-aws-modules/terraform-aws-lambda/master/examples/fixtures/python3.8-zip/existing_package.zip"
+  package_url = "https://raw.githubusercontent.com/terraform-aws-modules/terraform-aws-lambda/master/examples/fixtures/python-function.zip"
   downloaded  = "downloaded_package_${md5(local.package_url)}.zip"
 }
 
@@ -265,53 +273,63 @@ resource "null_resource" "download_package" {
 
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 3.0"
+  version = "~> 7.0"
 
-  function_name = "${random_pet.this.id}-lambda"
+  function_name = local.name
   description   = "My awesome lambda function"
   handler       = "index.lambda_handler"
-  runtime       = "python3.8"
-
-  publish = true
+  runtime       = "python3.12"
+  architectures = ["arm64"]
+  publish       = true
 
   create_package         = false
   local_existing_package = local.downloaded
 
+  cloudwatch_logs_retention_in_days = 7
+
   allowed_triggers = {
     AllowExecutionFromAPIGateway = {
       service    = "apigateway"
-      source_arn = "${module.api_gateway.apigatewayv2_api_execution_arn}/*/*"
+      source_arn = "${module.api_gateway.api_execution_arn}/*/*"
     }
   }
+
+  tags = local.tags
 }
 
-###############################################
-# S3 bucket and TLS certificate for truststore
-###############################################
+################################################################################
+# mTLS Supporting Resources
+################################################################################
 
-resource "aws_s3_bucket" "truststore" {
-  bucket = "${random_pet.this.id}-truststore"
-  #  acl    = "private"
+module "s3_bucket" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "~> 3.0"
+
+  bucket_prefix = "${local.name}-"
+
+  # NOTE: This is enabled for example usage only, you should not enable this for production workloads
+  force_destroy = true
+
+  tags = local.tags
 }
 
-resource "aws_s3_object" "truststore" {
-  bucket                 = aws_s3_bucket.truststore.bucket
+resource "aws_s3_object" "this" {
+  bucket                 = module.s3_bucket.s3_bucket_id
   key                    = "truststore.pem"
   server_side_encryption = "AES256"
-  content                = tls_self_signed_cert.example.cert_pem
+  content                = tls_self_signed_cert.this.cert_pem
 }
 
-resource "tls_private_key" "private_key" {
+resource "tls_private_key" "this" {
   algorithm = "RSA"
 }
 
-resource "tls_self_signed_cert" "example" {
+resource "tls_self_signed_cert" "this" {
   is_ca_certificate = true
-  private_key_pem   = tls_private_key.private_key.private_key_pem
+  private_key_pem   = tls_private_key.this.private_key_pem
 
   subject {
-    common_name  = "example.com"
-    organization = "ACME Examples, Inc"
+    common_name = "example.com"
   }
 
   validity_period_hours = 12
@@ -320,4 +338,14 @@ resource "tls_self_signed_cert" "example" {
     "cert_signing",
     "server_auth",
   ]
+}
+
+resource "local_file" "key" {
+  content  = tls_private_key.this.private_key_pem
+  filename = "my-key.key"
+}
+
+resource "local_file" "pem" {
+  content  = tls_self_signed_cert.this.cert_pem
+  filename = "my-cert.pem"
 }

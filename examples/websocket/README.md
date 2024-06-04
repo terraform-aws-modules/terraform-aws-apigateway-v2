@@ -1,6 +1,7 @@
-# AWS API Gateway w/ VPC Links example
+# AWS Websocket API example
 
-Configuration in this directory creates a private AWS API Gateway with VPC link and integrates it with a VPC bound resources (Lambda function and ALB).
+Configuration in this directory creates an AWS Websocket API.
+This example is based off of https://github.com/aws-samples/simple-websockets-chat-app
 
 ## Usage
 
@@ -14,6 +15,36 @@ $ terraform apply
 
 Note that this example may create resources which cost money. Run `terraform destroy` when you don't need these resources.
 
+## Testing the chat API
+
+To test the WebSocket API, you can use [wscat](https://github.com/websockets/wscat), an open-source command line tool.
+
+1. [Install NPM](https://www.npmjs.com/get-npm).
+2. Install wscat:
+
+```bash
+$ npm install -g wscat
+```
+
+3. On the console, connect to your published API endpoint by executing the following command:
+
+> [!NOTE]
+> It will take a few seconds on a new API for the endpoint to respond.
+> If you see a 403 error, give it a few seconds and try again - only one new APIs that were just created.
+
+```bash
+$ wscat -c wss://{YOUR-API-ID}.execute-api.{YOUR-REGION}.amazonaws.com/{STAGE}
+```
+
+4. To test the sendMessage function, send a JSON message like the following example. The Lambda function sends it back using the callback URL:
+
+```bash
+$ wscat -c wss://{YOUR-API-ID}.execute-api.{YOUR-REGION}.amazonaws.com/{STAGE}
+connected (press CTRL+C to quit)
+> {"action":"sendmessage", "data":"hello world"}
+< hello world
+```
+
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
@@ -21,32 +52,24 @@ Note that this example may create resources which cost money. Run `terraform des
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.37 |
-| <a name="requirement_null"></a> [null](#requirement\_null) | >= 2.0 |
 
 ## Providers
 
-| Name | Version |
-|------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.37 |
-| <a name="provider_null"></a> [null](#provider\_null) | >= 2.0 |
+No providers.
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_alb"></a> [alb](#module\_alb) | terraform-aws-modules/alb/aws | ~> 9.0 |
 | <a name="module_api_gateway"></a> [api\_gateway](#module\_api\_gateway) | ../../ | n/a |
-| <a name="module_api_gateway_security_group"></a> [api\_gateway\_security\_group](#module\_api\_gateway\_security\_group) | terraform-aws-modules/security-group/aws | ~> 5.0 |
-| <a name="module_lambda_function"></a> [lambda\_function](#module\_lambda\_function) | terraform-aws-modules/lambda/aws | ~> 7.0 |
-| <a name="module_lambda_security_group"></a> [lambda\_security\_group](#module\_lambda\_security\_group) | terraform-aws-modules/security-group/aws | ~> 5.0 |
-| <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | ~> 5.0 |
+| <a name="module_connect_lambda_function"></a> [connect\_lambda\_function](#module\_connect\_lambda\_function) | terraform-aws-modules/lambda/aws | ~> 4.0 |
+| <a name="module_disconnect_lambda_function"></a> [disconnect\_lambda\_function](#module\_disconnect\_lambda\_function) | terraform-aws-modules/lambda/aws | ~> 4.0 |
+| <a name="module_dynamodb_table"></a> [dynamodb\_table](#module\_dynamodb\_table) | terraform-aws-modules/dynamodb-table/aws | ~> 3.0 |
+| <a name="module_send_message_lambda_function"></a> [send\_message\_lambda\_function](#module\_send\_message\_lambda\_function) | terraform-aws-modules/lambda/aws | ~> 4.0 |
 
 ## Resources
 
-| Name | Type |
-|------|------|
-| [null_resource.download_package](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
-| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
+No resources.
 
 ## Inputs
 
