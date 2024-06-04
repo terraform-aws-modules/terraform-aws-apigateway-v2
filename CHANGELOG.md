@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.0.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v4.0.0...v5.0.0) (2024-06-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* Updates to support websocket API Gateway (#54)
+
+### Features
+
+* Updates to support websocket API Gateway ([#54](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/54)) ([30c9db0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/30c9db028fe68c29f5db782c3d7bfb4f424d9ee3))
+
 ## [4.0.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v3.1.1...v4.0.0) (2024-03-14)
 
 
