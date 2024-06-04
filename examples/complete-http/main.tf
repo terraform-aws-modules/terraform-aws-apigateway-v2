@@ -37,7 +37,7 @@ module "api_gateway" {
 
   # Authorizer(s)
   authorizers = {
-    "cognito" = {
+    cognito = {
       authorizer_type  = "JWT"
       identity_sources = ["$request.header.Authorization"]
       name             = "cognito"
@@ -50,7 +50,6 @@ module "api_gateway" {
 
   # Domain Name
   domain_name           = var.domain_name
-  subdomains            = ["customer1", "customer2"]
   create_domain_records = true
   create_certificate    = true
 
@@ -62,6 +61,8 @@ module "api_gateway" {
   # Routes & Integration(s)
   routes = {
     "ANY /" = {
+      detailed_metrics_enabled = false
+
       integration = {
         uri                    = module.lambda_function.lambda_function_arn
         payload_format_version = "2.0"
@@ -83,7 +84,8 @@ module "api_gateway" {
     }
 
     "GET /some-route-with-authorizer" = {
-      authorizer_key = "cognito"
+      authorization_type = "JWT"
+      authorizer_key     = "cognito"
 
       integration = {
         uri                    = module.lambda_function.lambda_function_arn
@@ -310,6 +312,7 @@ module "s3_bucket" {
 
   tags = local.tags
 }
+
 resource "aws_s3_object" "this" {
   bucket                 = module.s3_bucket.s3_bucket_id
   key                    = "truststore.pem"

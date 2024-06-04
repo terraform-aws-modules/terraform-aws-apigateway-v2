@@ -101,6 +101,11 @@ output "stage_id" {
   value       = try(aws_apigatewayv2_stage.this[0].id, null)
 }
 
+output "stage_domain_name" {
+  description = "Domain name of the stage (useful for CloudFront distribution)"
+  value       = replace(try(aws_apigatewayv2_stage.this[0].invoke_url, ""), "/^https?://([^/]*).*/", "$1")
+}
+
 output "stage_arn" {
   description = "The stage ARN"
   value       = try(aws_apigatewayv2_stage.this[0].arn, null)

@@ -61,7 +61,7 @@ Note that this example may create resources which cost money. Run `terraform des
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | Custom domain name to use on API Gateway endpoint | `string` | `"*.terraform-aws-modules.modules.tf"` | no |
+| <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | Custom domain name to use on API Gateway endpoint | `string` | `"terraform-aws-modules.modules.tf"` | no |
 
 ## Outputs
 
@@ -84,6 +84,7 @@ Note that this example may create resources which cost money. Run `terraform des
 | <a name="output_stage_access_logs_cloudwatch_log_group_arn"></a> [stage\_access\_logs\_cloudwatch\_log\_group\_arn](#output\_stage\_access\_logs\_cloudwatch\_log\_group\_arn) | Arn of cloudwatch log group created |
 | <a name="output_stage_access_logs_cloudwatch_log_group_name"></a> [stage\_access\_logs\_cloudwatch\_log\_group\_name](#output\_stage\_access\_logs\_cloudwatch\_log\_group\_name) | Name of cloudwatch log group created |
 | <a name="output_stage_arn"></a> [stage\_arn](#output\_stage\_arn) | The stage ARN |
+| <a name="output_stage_domain_name"></a> [stage\_domain\_name](#output\_stage\_domain\_name) | Domain name of the stage (useful for CloudFront distribution) |
 | <a name="output_stage_execution_arn"></a> [stage\_execution\_arn](#output\_stage\_execution\_arn) | The ARN prefix to be used in an aws\_lambda\_permission's source\_arn attribute or in an aws\_iam\_policy to authorize access to the @connections API |
 | <a name="output_stage_id"></a> [stage\_id](#output\_stage\_id) | The stage identifier |
 | <a name="output_stage_invoke_url"></a> [stage\_invoke\_url](#output\_stage\_invoke\_url) | The URL to invoke the API pointing to the stage |

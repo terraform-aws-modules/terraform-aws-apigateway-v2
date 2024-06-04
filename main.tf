@@ -64,7 +64,7 @@ resource "aws_apigatewayv2_authorizer" "this" {
   identity_sources                  = each.value.identity_sources
 
   dynamic "jwt_configuration" {
-    for_each = length(each.value.jwt_configuration) > 0 ? [each.value.jwt_configuration] : []
+    for_each = each.value.jwt_configuration != null ? [each.value.jwt_configuration] : []
 
     content {
       audience = jwt_configuration.value.audience
@@ -124,7 +124,8 @@ locals {
   # https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-custom-domains.html
   stripped_domain_name = replace(var.domain_name, "*.", "")
 
-  record_set = { for prd in setproduct(var.subdomains, var.subdomain_record_types) : "${prd[0]}-${prd[1]}" => {
+  record_names = coalescelist(var.subdomains, [local.stripped_domain_name])
+  record_set = { for prd in setproduct(local.record_names, var.subdomain_record_types) : "${prd[0]}-${prd[1]}" => {
     name = prd[0]
     type = prd[1]
   } }
@@ -256,11 +257,10 @@ resource "aws_apigatewayv2_integration" "this" {
   timeout_milliseconds          = each.value.timeout_milliseconds
 
   dynamic "tls_config" {
-    # For some reason the default is not using an empty object and causing an integration to occur
-    for_each = length({ for k, v in each.value.tls_config : k => v if v != null }) > 0 ? [each.value.tls_config] : []
+    for_each = each.value.tls_config != null && !local.is_websocket ? [each.value.tls_config] : []
 
     content {
-      server_name_to_verify = replace(tls_config.value.server_name_to_verify, "*.", "")
+      server_name_to_verify = try(tls_config.value.server_name_to_verify, null)
     }
   }
 
@@ -355,12 +355,12 @@ resource "aws_apigatewayv2_stage" "this" {
     for_each = { for k, v in var.routes : k => v if var.create_routes_and_integrations }
 
     content {
-      data_trace_enabled       = local.is_websocket ? route_settings.value.data_trace_enabled : null
-      detailed_metrics_enabled = route_settings.value.detailed_metrics_enabled
-      logging_level            = local.is_websocket ? route_settings.value.logging_level : null
+      data_trace_enabled       = local.is_websocket ? coalesce(route_settings.value.data_trace_enabled, var.stage_default_route_settings.data_trace_enabled) : null
+      detailed_metrics_enabled = coalesce(route_settings.value.detailed_metrics_enabled, var.stage_default_route_settings.detailed_metrics_enabled)
+      logging_level            = local.is_websocket ? coalesce(route_settings.value.logging_level, var.stage_default_route_settings.logging_level) : null
       route_key                = route_settings.key
-      throttling_burst_limit   = route_settings.value.throttling_burst_limit
-      throttling_rate_limit    = route_settings.value.throttling_rate_limit
+      throttling_burst_limit   = coalesce(route_settings.value.throttling_burst_limit, var.stage_default_route_settings.throttling_burst_limit)
+      throttling_rate_limit    = coalesce(route_settings.value.throttling_rate_limit, var.stage_default_route_settings.throttling_rate_limit)
     }
   }
 

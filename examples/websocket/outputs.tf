@@ -40,6 +40,11 @@ output "domain_name_id" {
   value       = module.api_gateway.domain_name_id
 }
 
+output "stage_domain_name" {
+  description = "Domain name of the stage (useful for CloudFront distribution)"
+  value       = module.api_gateway.stage_domain_name
+}
+
 output "domain_name_arn" {
   description = "The ARN of the domain name"
   value       = module.api_gateway.domain_name_arn

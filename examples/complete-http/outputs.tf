@@ -1,6 +1,6 @@
 output "test_curl_command" {
   description = "Curl command to test API endpoint using mTLS"
-  value       = "curl --key ./my-key.key --cert ./my-cert.pem https://customer1.${replace(var.domain_name, "*.", "")} | jq"
+  value       = "curl --key ./my-key.key --cert ./my-cert.pem https://${var.domain_name} | jq"
 }
 
 ################################################################################
@@ -104,6 +104,11 @@ output "routes" {
 output "stage_id" {
   description = "The stage identifier"
   value       = module.api_gateway.stage_id
+}
+
+output "stage_domain_name" {
+  description = "Domain name of the stage (useful for CloudFront distribution)"
+  value       = module.api_gateway.stage_domain_name
 }
 
 output "stage_arn" {

@@ -122,7 +122,7 @@ variable "authorizers" {
     jwt_configuration = optional(object({
       audience = optional(list(string))
       issuer   = optional(string)
-    }), {})
+    }))
     name = optional(string)
   }))
   default = {}
@@ -223,11 +223,11 @@ variable "routes" {
     route_response_selection_expression = optional(string)
 
     # Route settings
-    data_trace_enabled       = optional(bool, false)
-    detailed_metrics_enabled = optional(bool, false)
+    data_trace_enabled       = optional(bool)
+    detailed_metrics_enabled = optional(bool)
     logging_level            = optional(string)
-    throttling_burst_limit   = optional(number, 500)
-    throttling_rate_limit    = optional(number, 1000)
+    throttling_burst_limit   = optional(number)
+    throttling_rate_limit    = optional(number)
 
     # Stage - Route response
     route_response = optional(object({
@@ -261,7 +261,7 @@ variable "routes" {
       timeout_milliseconds          = optional(number)
       tls_config = optional(object({
         server_name_to_verify = optional(string)
-      }), {})
+      }))
 
       # Integration Response
       response = optional(object({
@@ -310,8 +310,8 @@ variable "stage_client_certificate_id" {
 variable "stage_default_route_settings" {
   description = "The default route settings for the stage"
   type = object({
-    data_trace_enabled       = optional(bool, false)
-    detailed_metrics_enabled = optional(bool, false)
+    data_trace_enabled       = optional(bool, true)
+    detailed_metrics_enabled = optional(bool, true)
     logging_level            = optional(string)
     throttling_burst_limit   = optional(number, 500)
     throttling_rate_limit    = optional(number, 1000)
