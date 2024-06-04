@@ -27,8 +27,8 @@ module "wrapper" {
   name                                               = try(each.value.name, var.defaults.name, "")
   protocol_type                                      = try(each.value.protocol_type, var.defaults.protocol_type, "HTTP")
   route_key                                          = try(each.value.route_key, var.defaults.route_key, null)
-  routes                                             = try(each.value.routes, var.defaults.routes, {})
   route_selection_expression                         = try(each.value.route_selection_expression, var.defaults.route_selection_expression, null)
+  routes                                             = try(each.value.routes, var.defaults.routes, {})
   stage_access_log_settings                          = try(each.value.stage_access_log_settings, var.defaults.stage_access_log_settings, {})
   stage_client_certificate_id                        = try(each.value.stage_client_certificate_id, var.defaults.stage_client_certificate_id, null)
   stage_default_route_settings                       = try(each.value.stage_default_route_settings, var.defaults.stage_default_route_settings, {})
@@ -40,6 +40,6 @@ module "wrapper" {
   subdomains                                         = try(each.value.subdomains, var.defaults.subdomains, [])
   tags                                               = try(each.value.tags, var.defaults.tags, {})
   target                                             = try(each.value.target, var.defaults.target, null)
-  vpc_links                                          = try(each.value.vpc_links, var.defaults.vpc_links, {})
   vpc_link_tags                                      = try(each.value.vpc_link_tags, var.defaults.vpc_link_tags, {})
+  vpc_links                                          = try(each.value.vpc_links, var.defaults.vpc_links, {})
 }
