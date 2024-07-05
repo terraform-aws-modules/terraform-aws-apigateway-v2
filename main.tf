@@ -388,6 +388,7 @@ resource "aws_apigatewayv2_deployment" "this" {
       jsonencode(aws_apigatewayv2_integration.this),
       jsonencode(aws_apigatewayv2_route.this),
       jsonencode(aws_apigatewayv2_route_response.this),
+      jsonencode(aws_apigatewayv2_api.this[0].body),
     ])))
   }
 
