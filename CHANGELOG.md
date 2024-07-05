@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.1.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.0.0...v5.1.0) (2024-07-05)
+
+
+### Features
+
+* Trigger re-deployment when API body changes ([#110](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/110)) ([909bc14](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/909bc14b4b55c0a387638d7d0a608a912f40888b))
+
 ## [5.0.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v4.0.0...v5.0.0) (2024-06-04)
 
 
