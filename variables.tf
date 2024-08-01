@@ -27,7 +27,7 @@ variable "cors_configuration" {
     allow_headers     = optional(list(string))
     allow_methods     = optional(list(string))
     allow_origins     = optional(list(string))
-    expose_headers    = optional(list(string), [])
+    expose_headers    = optional(list(string))
     max_age           = optional(number)
   })
   default = {}

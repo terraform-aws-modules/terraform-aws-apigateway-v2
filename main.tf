@@ -16,7 +16,7 @@ resource "aws_apigatewayv2_api" "this" {
   body                         = local.is_http ? var.body : null
 
   dynamic "cors_configuration" {
-    for_each = local.is_http && length(var.cors_configuration) > 0 ? [var.cors_configuration] : []
+    for_each = local.is_http && length({ for k, v in var.cors_configuration : k => v if v != null}) > 0 ? [var.cors_configuration] : []
 
     content {
       allow_credentials = cors_configuration.value.allow_credentials
