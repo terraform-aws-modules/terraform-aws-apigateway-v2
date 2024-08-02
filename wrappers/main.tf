@@ -8,7 +8,7 @@ module "wrapper" {
   api_version                                        = try(each.value.api_version, var.defaults.api_version, null)
   authorizers                                        = try(each.value.authorizers, var.defaults.authorizers, {})
   body                                               = try(each.value.body, var.defaults.body, null)
-  cors_configuration                                 = try(each.value.cors_configuration, var.defaults.cors_configuration, {})
+  cors_configuration                                 = try(each.value.cors_configuration, var.defaults.cors_configuration, null)
   create                                             = try(each.value.create, var.defaults.create, true)
   create_certificate                                 = try(each.value.create_certificate, var.defaults.create_certificate, true)
   create_domain_name                                 = try(each.value.create_domain_name, var.defaults.create_domain_name, true)

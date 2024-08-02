@@ -30,7 +30,7 @@ variable "cors_configuration" {
     expose_headers    = optional(list(string), [])
     max_age           = optional(number)
   })
-  default = {}
+  default = null
 }
 
 variable "credentials_arn" {
