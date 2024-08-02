@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.1.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.1.0...v5.1.1) (2024-08-02)
+
+
+### Bug Fixes
+
+* Do not create cors_configuration when variable not provided ([#114](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/114)) ([0ed8ffe](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/0ed8ffe304c4759bfca80189be85eb506ffcdcc4))
+
 ## [5.1.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.0.0...v5.1.0) (2024-07-05)
 
 
