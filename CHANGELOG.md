@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.1.2](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.1.1...v5.1.2) (2024-08-08)
+
+
+### Bug Fixes
+
+* Correct default value check on optional maps ([#116](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/116)) ([b43e2ea](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/b43e2eabfe9b1f0b9a14383ed48bc3a04f3c3d25))
+
 ## [5.1.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.1.0...v5.1.1) (2024-08-02)
 
 
