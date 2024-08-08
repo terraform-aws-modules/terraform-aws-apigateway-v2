@@ -324,7 +324,7 @@ resource "aws_apigatewayv2_stage" "this" {
   api_id = aws_apigatewayv2_api.this[0].id
 
   dynamic "access_log_settings" {
-    for_each = length(var.stage_access_log_settings) > 0 ? [var.stage_access_log_settings] : []
+    for_each = var.stage_access_log_settings != null ? [var.stage_access_log_settings] : []
 
     content {
       destination_arn = access_log_settings.value.create_log_group ? aws_cloudwatch_log_group.this["this"].arn : access_log_settings.value.destination_arn
@@ -336,7 +336,7 @@ resource "aws_apigatewayv2_stage" "this" {
   client_certificate_id = local.is_websocket ? var.stage_client_certificate_id : null
 
   dynamic "default_route_settings" {
-    for_each = length(var.stage_default_route_settings) > 0 ? [var.stage_default_route_settings] : []
+    for_each = var.stage_default_route_settings != null ? [var.stage_default_route_settings] : []
 
     content {
       data_trace_enabled       = local.is_websocket ? default_route_settings.value.data_trace_enabled : null
