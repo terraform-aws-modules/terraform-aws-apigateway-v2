@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.1.3](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.1.2...v5.1.3) (2024-08-12)
+
+
+### Bug Fixes
+
+* Remove websocket prefix from domain name output ([#118](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/118)) ([c6c0b01](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/c6c0b0161052fdcacd93aab576d5ff8495bad848))
+
 ## [5.1.2](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.1.1...v5.1.2) (2024-08-08)
 
 
