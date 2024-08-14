@@ -49,7 +49,9 @@ module "api_gateway" {
   }
 
   # Domain Name
-  domain_name           = var.domain_name
+  domain_name = var.domain_name
+  # Not strictly required, but handy if you want to create the domain within a specific zone
+  domain_name_zone_name = var.domain_name
   create_domain_records = true
   create_certificate    = true
 

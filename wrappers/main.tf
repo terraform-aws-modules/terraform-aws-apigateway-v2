@@ -22,6 +22,7 @@ module "wrapper" {
   domain_name                                        = try(each.value.domain_name, var.defaults.domain_name, "")
   domain_name_certificate_arn                        = try(each.value.domain_name_certificate_arn, var.defaults.domain_name_certificate_arn, null)
   domain_name_ownership_verification_certificate_arn = try(each.value.domain_name_ownership_verification_certificate_arn, var.defaults.domain_name_ownership_verification_certificate_arn, null)
+  domain_name_zone_name                              = try(each.value.domain_name_zone_name, var.defaults.domain_name_zone_name, null)
   fail_on_warnings                                   = try(each.value.fail_on_warnings, var.defaults.fail_on_warnings, null)
   mutual_tls_authentication                          = try(each.value.mutual_tls_authentication, var.defaults.mutual_tls_authentication, {})
   name                                               = try(each.value.name, var.defaults.name, "")

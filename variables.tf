@@ -144,6 +144,12 @@ variable "domain_name" {
   default     = ""
 }
 
+variable "domain_name_zone_name" {
+  description = "The Hosted Zone name the domain should be created in. If not passed this falls back to `domain_name`"
+  type        = string
+  default     = null
+}
+
 variable "domain_name_certificate_arn" {
   description = "The ARN of an AWS-managed certificate that will be used by the endpoint for the domain name. AWS Certificate Manager is the only supported source"
   type        = string

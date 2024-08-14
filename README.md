@@ -120,6 +120,21 @@ This will create records that allow users to access the API Gateway using the fo
 - `customer1.mydomain.com`
 - `customer2.mydomain.com`
 
+## Specific Hosted Zone
+
+If you want to create the domain name in a specific hosted zone, you can use the `domain_name_zone_name` input parameter:
+
+```hcl
+module "api_gateway" {
+  source = "terraform-aws-modules/apigateway-v2/aws"
+
+  ...
+  domain_name_zone_name = "api.mydomain.com"
+  domain_name           = "prod.api.mydomain.com"
+  ...
+}
+```
+
 ## Conditional Creation
 
 The following values are provided to toggle on/off creation of the associated resources as desired:
@@ -218,6 +233,7 @@ module "api_gateway" {
 | <a name="input_domain_name"></a> [domain\_name](#input\_domain\_name) | The domain name to use for API gateway | `string` | `""` | no |
 | <a name="input_domain_name_certificate_arn"></a> [domain\_name\_certificate\_arn](#input\_domain\_name\_certificate\_arn) | The ARN of an AWS-managed certificate that will be used by the endpoint for the domain name. AWS Certificate Manager is the only supported source | `string` | `null` | no |
 | <a name="input_domain_name_ownership_verification_certificate_arn"></a> [domain\_name\_ownership\_verification\_certificate\_arn](#input\_domain\_name\_ownership\_verification\_certificate\_arn) | ARN of the AWS-issued certificate used to validate custom domain ownership (when certificate\_arn is issued via an ACM Private CA or mutual\_tls\_authentication is configured with an ACM-imported certificate.) | `string` | `null` | no |
+| <a name="input_domain_name_zone_name"></a> [domain\_name\_zone\_name](#input\_domain\_name\_zone\_name) | The Hosted Zone name the domain should be created in. If not passed this falls back to `domain_name` | `string` | `null` | no |
 | <a name="input_fail_on_warnings"></a> [fail\_on\_warnings](#input\_fail\_on\_warnings) | Whether warnings should return an error while API Gateway is creating or updating the resource using an OpenAPI specification. Defaults to `false`. Applicable for HTTP APIs | `bool` | `null` | no |
 | <a name="input_mutual_tls_authentication"></a> [mutual\_tls\_authentication](#input\_mutual\_tls\_authentication) | The mutual TLS authentication configuration for the domain name | `map(string)` | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the API. Must be less than or equal to 128 characters in length | `string` | `""` | no |
