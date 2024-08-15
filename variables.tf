@@ -144,8 +144,8 @@ variable "domain_name" {
   default     = ""
 }
 
-variable "domain_name_zone_name" {
-  description = "The Hosted Zone name the domain should be created in. If not passed this falls back to `domain_name`"
+variable "apex_domain_name" {
+  description = "Optional domain name of the Hosted Zone where the domain should be created"
   type        = string
   default     = null
 }

@@ -134,7 +134,7 @@ locals {
 data "aws_route53_zone" "this" {
   count = local.create_domain_name && var.create_domain_records ? 1 : 0
 
-  name = var.domain_name_zone_name != null ? var.domain_name_zone_name : local.stripped_domain_name
+  name = coalesce(var.apex_domain_name, local.stripped_domain_name)
 }
 
 resource "aws_route53_record" "this" {
