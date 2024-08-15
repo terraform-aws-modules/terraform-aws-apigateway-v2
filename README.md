@@ -122,15 +122,15 @@ This will create records that allow users to access the API Gateway using the fo
 
 ## Specific Hosted Zone
 
-If you want to create the domain name in a specific hosted zone, you can use the `domain_name_zone_name` input parameter:
+If you want to create the domain name in a specific hosted zone, you can use the `apex_domain_name` input parameter:
 
 ```hcl
 module "api_gateway" {
   source = "terraform-aws-modules/apigateway-v2/aws"
 
   ...
-  domain_name_zone_name = "api.mydomain.com"
-  domain_name           = "prod.api.mydomain.com"
+  apex_domain_name = "api.mydomain.com"
+  domain_name      = "prod.api.mydomain.com"
   ...
 }
 ```
