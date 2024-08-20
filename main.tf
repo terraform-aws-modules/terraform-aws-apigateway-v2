@@ -122,17 +122,20 @@ resource "aws_apigatewayv2_api_mapping" "this" {
 
 locals {
   # https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-custom-domains.html
-  stripped_domain_name = replace(var.domain_name, "*.", "")
+  domain_prefix        = split(".", var.domain_name)[0]
+  stripped_domain_name = trimprefix(var.domain_name, "${split(".", var.domain_name)[0]}.")
 
-  record_names = coalescelist(var.subdomains, [local.stripped_domain_name])
+  record_names = coalescelist(var.subdomains, [local.domain_prefix])
   record_set = { for prd in setproduct(local.record_names, var.subdomain_record_types) : "${prd[0]}-${prd[1]}" => {
     name = prd[0]
     type = prd[1]
   } }
+
+  zone_id = coalesce(try(data.aws_route53_zone.this[0].zone_id, null), var.domain_zone_id)
 }
 
 data "aws_route53_zone" "this" {
-  count = local.create_domain_name && var.create_domain_records ? 1 : 0
+  count = local.create_domain_name && var.create_domain_records && var.domain_zone_id == null ? 1 : 0
 
   name = local.stripped_domain_name
 }
@@ -140,7 +143,7 @@ data "aws_route53_zone" "this" {
 resource "aws_route53_record" "this" {
   for_each = { for k, v in local.record_set : k => v if local.create_domain_name && var.create_domain_records }
 
-  zone_id = data.aws_route53_zone.this[0].zone_id
+  zone_id = local.zone_id
   name    = each.value.name
   type    = each.value.type
 
@@ -167,8 +170,8 @@ module "acm" {
 
   create_certificate = local.create_domain_name && var.create_domain_records && local.create_certificate
 
-  domain_name               = local.stripped_domain_name
-  zone_id                   = try(data.aws_route53_zone.this[0].id, "")
+  domain_name               = var.domain_name
+  zone_id                   = local.zone_id
   subject_alternative_names = local.is_wildcard ? [var.domain_name] : [for sub in var.subdomains : "${sub}.${local.stripped_domain_name}"]
 
   validation_method = "DNS"

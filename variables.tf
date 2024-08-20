@@ -184,6 +184,12 @@ variable "subdomain_record_types" {
   default     = ["A", "AAAA"]
 }
 
+variable "domain_zone_id" {
+  description = "The Route53 zone ID to create records in. If not provided, the module will attempt to discover the zone ID based on the domain name"
+  type        = string
+  default     = null
+}
+
 ################################################################################
 # Domain - Certificate
 ################################################################################
