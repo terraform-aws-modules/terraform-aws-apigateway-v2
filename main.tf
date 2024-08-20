@@ -122,8 +122,8 @@ resource "aws_apigatewayv2_api_mapping" "this" {
 
 locals {
   # https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-custom-domains.html
-  domain_prefix        = split(".", var.domain_name)[0]
-  stripped_domain_name = trimprefix(var.domain_name, "${split(".", var.domain_name)[0]}.")
+  domain_prefix    = split(".", var.domain_name)[0]
+  base_domain_name = trimprefix(var.domain_name, "${split(".", var.domain_name)[0]}.")
 
   record_names = coalescelist(var.subdomains, [local.domain_prefix])
   record_set = { for prd in setproduct(local.record_names, var.subdomain_record_types) : "${prd[0]}-${prd[1]}" => {
@@ -137,14 +137,14 @@ locals {
 data "aws_route53_zone" "this" {
   count = local.create_domain_name && var.create_domain_records && var.domain_zone_id == null ? 1 : 0
 
-  name = local.stripped_domain_name
+  name = local.base_domain_name
 }
 
 resource "aws_route53_record" "this" {
   for_each = { for k, v in local.record_set : k => v if local.create_domain_name && var.create_domain_records }
 
   zone_id = local.zone_id
-  name    = each.value.name
+  name    = format("%s.%s", each.value.name, local.base_domain_name)
   type    = each.value.type
 
   alias {
@@ -172,7 +172,7 @@ module "acm" {
 
   domain_name               = var.domain_name
   zone_id                   = local.zone_id
-  subject_alternative_names = local.is_wildcard ? [var.domain_name] : [for sub in var.subdomains : "${sub}.${local.stripped_domain_name}"]
+  subject_alternative_names = local.is_wildcard ? [var.domain_name] : [for sub in var.subdomains : "${sub}.${local.base_domain_name}"]
 
   validation_method = "DNS"
 
