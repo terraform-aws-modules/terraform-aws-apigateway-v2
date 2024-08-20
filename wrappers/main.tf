@@ -3,7 +3,6 @@ module "wrapper" {
 
   for_each = var.items
 
-  apex_domain_name                                   = try(each.value.apex_domain_name, var.defaults.apex_domain_name, null)
   api_key_selection_expression                       = try(each.value.api_key_selection_expression, var.defaults.api_key_selection_expression, null)
   api_mapping_key                                    = try(each.value.api_mapping_key, var.defaults.api_mapping_key, null)
   api_version                                        = try(each.value.api_version, var.defaults.api_version, null)
@@ -24,6 +23,7 @@ module "wrapper" {
   domain_name_certificate_arn                        = try(each.value.domain_name_certificate_arn, var.defaults.domain_name_certificate_arn, null)
   domain_name_ownership_verification_certificate_arn = try(each.value.domain_name_ownership_verification_certificate_arn, var.defaults.domain_name_ownership_verification_certificate_arn, null)
   fail_on_warnings                                   = try(each.value.fail_on_warnings, var.defaults.fail_on_warnings, null)
+  hosted_zone_name                                   = try(each.value.hosted_zone_name, var.defaults.hosted_zone_name, null)
   mutual_tls_authentication                          = try(each.value.mutual_tls_authentication, var.defaults.mutual_tls_authentication, {})
   name                                               = try(each.value.name, var.defaults.name, "")
   protocol_type                                      = try(each.value.protocol_type, var.defaults.protocol_type, "HTTP")
