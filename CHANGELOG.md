@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.2.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.1.3...v5.2.0) (2024-08-26)
+
+
+### Features
+
+* Allow hosted zone name to be passed in separately ([#119](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/119)) ([bcd2fdb](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/bcd2fdbc9d01c8f61e23102367a8eab4f0ee152e))
+
 ## [5.1.3](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.1.2...v5.1.3) (2024-08-12)
 
 
