@@ -408,7 +408,7 @@ resource "aws_apigatewayv2_deployment" "this" {
 ################################################################################
 
 resource "aws_cloudwatch_log_group" "this" {
-  for_each = { for k, v in { "this" = var.stage_access_log_settings } : k => v if local.create_stage && try(v.create_log_group, true) }
+  for_each = { for k, v in { "this" = var.stage_access_log_settings } : k => v if local.create_stage && v != null && try(v.create_log_group, true) }
 
   name              = coalesce(each.value.log_group_name, "/aws/apigateway/${var.name}/${replace(var.stage_name, "$", "")}")
   retention_in_days = each.value.log_group_retention_in_days
