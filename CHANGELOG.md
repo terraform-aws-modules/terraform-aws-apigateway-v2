@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.2.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.2.0...v5.2.1) (2024-11-28)
+
+
+### Bug Fixes
+
+* Add a way to prevent cloudwatch log group from being created ([#122](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/122)) ([ca7a071](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/ca7a0711b25124ad37400801d6ced22610e73c4f))
+* Update CI workflow versions to latest ([#123](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/123)) ([9d906dd](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/9d906dd770d18e1b08a5d110d013c5d8d11a3658))
+
 ## [5.2.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.1.3...v5.2.0) (2024-08-26)
 
 
