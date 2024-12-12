@@ -3,6 +3,7 @@ locals {
   is_websocket = var.protocol_type == "WEBSOCKET"
 
   create_routes_and_integrations = var.create && var.create_routes_and_integrations
+  disable_execute_api_endpoint   = var.disable_execute_api_endpoint != null ? var.disable_execute_api_endpoint : local.is_http && local.create_domain_name
 }
 
 ################################################################################
@@ -31,7 +32,7 @@ resource "aws_apigatewayv2_api" "this" {
   credentials_arn = local.is_http ? var.credentials_arn : null
   description     = var.description
   # https://docs.aws.amazon.com/apigateway/latest/developerguide/rest-api-disable-default-endpoint.html
-  disable_execute_api_endpoint = local.is_http && local.create_domain_name ? true : var.disable_execute_api_endpoint
+  disable_execute_api_endpoint = local.disable_execute_api_endpoint
   fail_on_warnings             = local.is_http ? var.fail_on_warnings : null
   name                         = var.name
   protocol_type                = var.protocol_type
