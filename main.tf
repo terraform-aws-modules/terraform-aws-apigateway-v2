@@ -162,8 +162,7 @@ locals {
 }
 
 module "acm" {
-  source  = "terraform-aws-modules/acm/aws"
-  version = "5.0.1"
+  source  = "git::https://github.com/terraform-aws-modules/terraform-aws-acm/.git?ref=f421377c87fe5207898adc0def87540fa07c2af4" # commit hash of v5.0.1
 
   create_certificate = local.create_domain_name && var.create_domain_records && local.create_certificate
 
