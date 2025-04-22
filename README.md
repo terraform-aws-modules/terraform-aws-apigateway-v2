@@ -237,6 +237,7 @@ module "api_gateway" {
 | <a name="input_hosted_zone_name"></a> [hosted\_zone\_name](#input\_hosted\_zone\_name) | Optional domain name of the Hosted Zone where the domain should be created | `string` | `null` | no |
 | <a name="input_mutual_tls_authentication"></a> [mutual\_tls\_authentication](#input\_mutual\_tls\_authentication) | The mutual TLS authentication configuration for the domain name | `map(string)` | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the API. Must be less than or equal to 128 characters in length | `string` | `""` | no |
+| <a name="input_private_zone"></a> [private\_zone](#input\_private\_zone) | Indicates the hosted zone being looked up is private. | `bool` | `false` | no |
 | <a name="input_protocol_type"></a> [protocol\_type](#input\_protocol\_type) | The API protocol. Valid values: `HTTP`, `WEBSOCKET` | `string` | `"HTTP"` | no |
 | <a name="input_route_key"></a> [route\_key](#input\_route\_key) | Part of quick create. Specifies any route key. Applicable for HTTP APIs | `string` | `null` | no |
 | <a name="input_route_selection_expression"></a> [route\_selection\_expression](#input\_route\_selection\_expression) | The route selection expression for the API. Defaults to `$request.method $request.path` | `string` | `null` | no |
