@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.3.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.2.1...v5.3.0) (2025-05-01)
+
+
+### Features
+
+* Support `ip_address_type` ([#135](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/135)) ([413c962](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/413c9623f9cd908bd090aa6c87b2462f814acdae))
+
 ## [5.2.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.2.0...v5.2.1) (2024-11-28)
 
 
