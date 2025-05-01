@@ -33,6 +33,7 @@ resource "aws_apigatewayv2_api" "this" {
   # https://docs.aws.amazon.com/apigateway/latest/developerguide/rest-api-disable-default-endpoint.html
   disable_execute_api_endpoint = local.is_http && local.create_domain_name ? true : var.disable_execute_api_endpoint
   fail_on_warnings             = local.is_http ? var.fail_on_warnings : null
+  ip_address_type              = var.ip_address_type
   name                         = var.name
   protocol_type                = var.protocol_type
   route_key                    = local.is_http ? var.route_key : null
@@ -91,6 +92,7 @@ resource "aws_apigatewayv2_domain_name" "this" {
   domain_name_configuration {
     certificate_arn                        = local.create_certificate ? module.acm.acm_certificate_arn : var.domain_name_certificate_arn
     endpoint_type                          = "REGIONAL"
+    ip_address_type                        = var.ip_address_type
     security_policy                        = "TLS_1_2"
     ownership_verification_certificate_arn = var.domain_name_ownership_verification_certificate_arn
   }

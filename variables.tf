@@ -57,6 +57,12 @@ variable "fail_on_warnings" {
   default     = null
 }
 
+variable "ip_address_type" {
+  description = "The IP address types that can invoke the API. Valid values: ipv4, dualstack. Use ipv4 to allow only IPv4 addresses to invoke your API, or use dualstack to allow both IPv4 and IPv6 addresses to invoke your API. Defaults to ipv4."
+  type        = string
+  default     = null
+}
+
 variable "name" {
   description = "The name of the API. Must be less than or equal to 128 characters in length"
   type        = string
