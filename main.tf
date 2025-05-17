@@ -134,9 +134,9 @@ locals {
 }
 
 data "aws_route53_zone" "this" {
-  count = local.create_domain_name && var.create_domain_records ? 1 : 0
+  count        = local.create_domain_name && var.create_domain_records ? 1 : 0
   private_zone = var.private_zone
-  name = coalesce(var.hosted_zone_name, local.stripped_domain_name)
+  name         = coalesce(var.hosted_zone_name, local.stripped_domain_name)
 }
 
 resource "aws_route53_record" "this" {
