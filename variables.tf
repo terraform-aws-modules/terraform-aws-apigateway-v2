@@ -156,6 +156,12 @@ variable "hosted_zone_name" {
   default     = null
 }
 
+variable "private_zone" {
+  description = "Whether the hosted zone is private or not"
+  type        = bool
+  default     = false
+}
+
 variable "domain_name_certificate_arn" {
   description = "The ARN of an AWS-managed certificate that will be used by the endpoint for the domain name. AWS Certificate Manager is the only supported source"
   type        = string
