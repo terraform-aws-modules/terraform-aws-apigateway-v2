@@ -12,9 +12,9 @@ This wrapper does not implement any extra functionality.
 
 ```hcl
 terraform {
-  source = "tfr:///terraform-aws-modules/aws-apigatewayv2/aws//wrappers"
+  source = "tfr:///terraform-aws-modules/apigateway-v2/aws//wrappers"
   # Alternative source:
-  # source = "git::git@github.com:terraform-aws-modules/terraform-aws-aws-apigatewayv2.git//wrappers?ref=master"
+  # source = "git::git@github.com:terraform-aws-modules/terraform-aws-apigateway-v2.git//wrappers?ref=master"
 }
 
 inputs = {
@@ -42,7 +42,7 @@ inputs = {
 
 ```hcl
 module "wrapper" {
-  source = "terraform-aws-modules/aws-apigatewayv2/aws//wrappers"
+  source = "terraform-aws-modules/apigateway-v2/aws//wrappers"
 
   defaults = { # Default values
     create = true
