@@ -221,7 +221,7 @@ module "api_gateway" {
 | <a name="input_body"></a> [body](#input\_body) | An OpenAPI specification that defines the set of routes and integrations to create as part of the HTTP APIs. Supported only for HTTP APIs | `string` | `null` | no |
 | <a name="input_cors_configuration"></a> [cors\_configuration](#input\_cors\_configuration) | The cross-origin resource sharing (CORS) configuration. Applicable for HTTP APIs | <pre>object({<br/>    allow_credentials = optional(bool)<br/>    allow_headers     = optional(list(string))<br/>    allow_methods     = optional(list(string))<br/>    allow_origins     = optional(list(string))<br/>    expose_headers    = optional(list(string), [])<br/>    max_age           = optional(number)<br/>  })</pre> | `null` | no |
 | <a name="input_create"></a> [create](#input\_create) | Controls if resources should be created | `bool` | `true` | no |
-| <a name="input_create_certificate"></a> [create\_certificate](#input\_create\_certificate) | Whether to create a certificate for the domain | `bool` | `true` | no |
+| <a name="input_create_certificate"></a> [create\_certificate](#input\_create\_certificate) | Whether to create a certificate for the domain.  Since certificate validate only works on public domains, this will be ignore if `private_zone` is set to `true` | `bool` | `true` | no |
 | <a name="input_create_domain_name"></a> [create\_domain\_name](#input\_create\_domain\_name) | Whether to create API domain name resource | `bool` | `true` | no |
 | <a name="input_create_domain_records"></a> [create\_domain\_records](#input\_create\_domain\_records) | Whether to create Route53 records for the domain name | `bool` | `true` | no |
 | <a name="input_create_routes_and_integrations"></a> [create\_routes\_and\_integrations](#input\_create\_routes\_and\_integrations) | Whether to create routes and integrations resources | `bool` | `true` | no |
@@ -237,7 +237,7 @@ module "api_gateway" {
 | <a name="input_hosted_zone_name"></a> [hosted\_zone\_name](#input\_hosted\_zone\_name) | Optional domain name of the Hosted Zone where the domain should be created | `string` | `null` | no |
 | <a name="input_mutual_tls_authentication"></a> [mutual\_tls\_authentication](#input\_mutual\_tls\_authentication) | The mutual TLS authentication configuration for the domain name | `map(string)` | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the API. Must be less than or equal to 128 characters in length | `string` | `""` | no |
-| <a name="input_private_zone"></a> [private\_zone](#input\_private\_zone) | Indicates the hosted zone being looked up is private. | `bool` | `false` | no |
+| <a name="input_private_zone"></a> [private\_zone](#input\_private\_zone) | Indicates the hosted zone being looked up is private.  Certificate validation will fail if this is set to true. | `bool` | `false` | no |
 | <a name="input_protocol_type"></a> [protocol\_type](#input\_protocol\_type) | The API protocol. Valid values: `HTTP`, `WEBSOCKET` | `string` | `"HTTP"` | no |
 | <a name="input_route_key"></a> [route\_key](#input\_route\_key) | Part of quick create. Specifies any route key. Applicable for HTTP APIs | `string` | `null` | no |
 | <a name="input_route_selection_expression"></a> [route\_selection\_expression](#input\_route\_selection\_expression) | The route selection expression for the API. Defaults to `$request.method $request.path` | `string` | `null` | no |

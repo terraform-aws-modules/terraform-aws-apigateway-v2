@@ -151,7 +151,7 @@ variable "hosted_zone_name" {
 }
 
 variable "private_zone" {
-  description = "Indicates the hosted zone being looked up is private."
+  description = "Indicates the hosted zone being looked up is private.  Certificate validation will fail if this is set to true."
   type        = bool
   default     = false
 }
@@ -201,7 +201,7 @@ variable "subdomain_record_types" {
 ################################################################################
 
 variable "create_certificate" {
-  description = "Whether to create a certificate for the domain"
+  description = "Whether to create a certificate for the domain.  Since certificate validate only works on public domains, this will be ignore if `private_zone` is set to `true`"
   type        = bool
   default     = true
 }

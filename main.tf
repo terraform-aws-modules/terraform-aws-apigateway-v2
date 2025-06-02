@@ -157,7 +157,7 @@ resource "aws_route53_record" "this" {
 ################################################################################
 
 locals {
-  create_certificate = local.create_domain_name && var.create_certificate
+  create_certificate = local.create_domain_name && var.create_certificate && !var.private_zone
 
   is_wildcard = startswith(var.domain_name, "*.")
 }
