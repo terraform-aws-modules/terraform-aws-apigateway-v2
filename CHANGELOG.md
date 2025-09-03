@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.3.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.3.0...v5.3.1) (2025-09-03)
+
+
+### Bug Fixes
+
+* Update stage_access_logs_cloudwatch_log_group outputs ([#138](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/138)) ([3fe488d](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/3fe488ddea4512483841ac8d0807dc706bdc6812))
+
 ## [5.3.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.2.1...v5.3.0) (2025-05-01)
 
 
