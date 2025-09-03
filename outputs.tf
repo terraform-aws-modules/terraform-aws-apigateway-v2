@@ -127,12 +127,12 @@ output "stage_invoke_url" {
 
 output "stage_access_logs_cloudwatch_log_group_name" {
   description = "Name of cloudwatch log group created"
-  value       = try(aws_cloudwatch_log_group.this[0].name, null)
+  value       = try(aws_cloudwatch_log_group.this["this"].name, null)
 }
 
 output "stage_access_logs_cloudwatch_log_group_arn" {
   description = "Arn of cloudwatch log group created"
-  value       = try(aws_cloudwatch_log_group.this[0].arn, null)
+  value       = try(aws_cloudwatch_log_group.this["this"].arn, null)
 }
 
 ################################################################################
