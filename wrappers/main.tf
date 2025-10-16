@@ -28,6 +28,7 @@ module "wrapper" {
   mutual_tls_authentication                          = try(each.value.mutual_tls_authentication, var.defaults.mutual_tls_authentication, {})
   name                                               = try(each.value.name, var.defaults.name, "")
   protocol_type                                      = try(each.value.protocol_type, var.defaults.protocol_type, "HTTP")
+  region                                             = try(each.value.region, var.defaults.region, null)
   route_key                                          = try(each.value.route_key, var.defaults.route_key, null)
   route_selection_expression                         = try(each.value.route_selection_expression, var.defaults.route_selection_expression, null)
   routes                                             = try(each.value.routes, var.defaults.routes, {})

@@ -41,6 +41,8 @@ resource "aws_apigatewayv2_api" "this" {
   target                       = local.is_http ? var.target : null
   version                      = var.api_version
 
+  region = var.region
+
   tags = merge(
     { terraform-aws-modules = "apigateway-v2" },
     var.tags,
@@ -74,6 +76,8 @@ resource "aws_apigatewayv2_authorizer" "this" {
   }
 
   name = coalesce(each.value.name, each.key)
+
+  region = var.region
 }
 
 ################################################################################
@@ -106,6 +110,8 @@ resource "aws_apigatewayv2_domain_name" "this" {
     }
   }
 
+  region = var.region
+
   tags = var.tags
 }
 
@@ -116,6 +122,8 @@ resource "aws_apigatewayv2_api_mapping" "this" {
   api_mapping_key = var.api_mapping_key
   domain_name     = aws_apigatewayv2_domain_name.this[0].id
   stage           = aws_apigatewayv2_stage.this[0].id
+
+  region = var.region
 }
 
 ################################################################################
@@ -165,7 +173,7 @@ locals {
 
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"
-  version = "5.0.1"
+  version = "6.1.0"
 
   create_certificate = local.create_domain_name && var.create_domain_records && local.create_certificate
 
@@ -174,6 +182,8 @@ module "acm" {
   subject_alternative_names = local.is_wildcard ? [var.domain_name] : [for sub in var.subdomains : "${sub}.${local.stripped_domain_name}"]
 
   validation_method = "DNS"
+
+  region = var.region
 
   tags = var.tags
 }
@@ -207,6 +217,8 @@ resource "aws_apigatewayv2_route" "this" {
   route_key                           = each.key
   route_response_selection_expression = local.is_websocket ? each.value.route_response_selection_expression : null
   target                              = "integrations/${aws_apigatewayv2_integration.this[each.key].id}"
+
+  region = var.region
 }
 
 ################################################################################
@@ -221,6 +233,8 @@ resource "aws_apigatewayv2_route_response" "this" {
   response_models            = each.value.route_response.response_models
   route_id                   = aws_apigatewayv2_route.this[each.key].id
   route_response_key         = each.value.route_response.route_response_key
+
+  region = var.region
 }
 
 ################################################################################
@@ -269,6 +283,8 @@ resource "aws_apigatewayv2_integration" "this" {
   lifecycle {
     create_before_destroy = true
   }
+
+  region = var.region
 }
 
 ################################################################################
@@ -285,6 +301,8 @@ resource "aws_apigatewayv2_integration_response" "this" {
   integration_response_key      = each.value.response.integration_response_key
   response_templates            = each.value.response.response_templates
   template_selection_expression = each.value.response.template_selection_expression
+
+  region = var.region
 }
 
 ################################################################################
@@ -373,6 +391,8 @@ resource "aws_apigatewayv2_stage" "this" {
   depends_on = [
     aws_apigatewayv2_route.this
   ]
+
+  region = var.region
 }
 
 ################################################################################
@@ -403,6 +423,8 @@ resource "aws_apigatewayv2_deployment" "this" {
   lifecycle {
     create_before_destroy = true
   }
+
+  region = var.region
 }
 
 ################################################################################
@@ -419,6 +441,8 @@ resource "aws_cloudwatch_log_group" "this" {
   log_group_class   = each.value.log_group_class
 
   tags = merge(var.tags, each.value.log_group_tags)
+
+  region = var.region
 }
 
 ################################################################################
@@ -433,4 +457,6 @@ resource "aws_apigatewayv2_vpc_link" "this" {
   subnet_ids         = each.value.subnet_ids
 
   tags = merge(var.tags, var.vpc_link_tags, try(each.value.tags, {}))
+
+  region = var.region
 }
