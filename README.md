@@ -177,19 +177,19 @@ module "api_gateway" {
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.3 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.96 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.0.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.96 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.0.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_acm"></a> [acm](#module\_acm) | terraform-aws-modules/acm/aws | 5.0.1 |
+| <a name="module_acm"></a> [acm](#module\_acm) | terraform-aws-modules/acm/aws | 6.1.0 |
 
 ## Resources
 
@@ -239,6 +239,7 @@ module "api_gateway" {
 | <a name="input_mutual_tls_authentication"></a> [mutual\_tls\_authentication](#input\_mutual\_tls\_authentication) | The mutual TLS authentication configuration for the domain name | `map(string)` | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | The name of the API. Must be less than or equal to 128 characters in length | `string` | `""` | no |
 | <a name="input_protocol_type"></a> [protocol\_type](#input\_protocol\_type) | The API protocol. Valid values: `HTTP`, `WEBSOCKET` | `string` | `"HTTP"` | no |
+| <a name="input_region"></a> [region](#input\_region) | The AWS region to create resources in | `string` | `null` | no |
 | <a name="input_route_key"></a> [route\_key](#input\_route\_key) | Part of quick create. Specifies any route key. Applicable for HTTP APIs | `string` | `null` | no |
 | <a name="input_route_selection_expression"></a> [route\_selection\_expression](#input\_route\_selection\_expression) | The route selection expression for the API. Defaults to `$request.method $request.path` | `string` | `null` | no |
 | <a name="input_routes"></a> [routes](#input\_routes) | Map of API gateway routes with integrations | <pre>map(object({<br/>    # Route<br/>    authorizer_key             = optional(string)<br/>    api_key_required           = optional(bool)<br/>    authorization_scopes       = optional(list(string), [])<br/>    authorization_type         = optional(string)<br/>    authorizer_id              = optional(string)<br/>    model_selection_expression = optional(string)<br/>    operation_name             = optional(string)<br/>    request_models             = optional(map(string), {})<br/>    request_parameter = optional(object({<br/>      request_parameter_key = optional(string)<br/>      required              = optional(bool, false)<br/>    }), {})<br/>    route_response_selection_expression = optional(string)<br/><br/>    # Route settings<br/>    data_trace_enabled       = optional(bool)<br/>    detailed_metrics_enabled = optional(bool)<br/>    logging_level            = optional(string)<br/>    throttling_burst_limit   = optional(number)<br/>    throttling_rate_limit    = optional(number)<br/><br/>    # Stage - Route response<br/>    route_response = optional(object({<br/>      create                     = optional(bool, false)<br/>      model_selection_expression = optional(string)<br/>      response_models            = optional(map(string))<br/>      route_response_key         = optional(string, "$default")<br/>    }), {})<br/><br/>    # Integration<br/>    integration = object({<br/>      connection_id             = optional(string)<br/>      vpc_link_key              = optional(string)<br/>      connection_type           = optional(string)<br/>      content_handling_strategy = optional(string)<br/>      credentials_arn           = optional(string)<br/>      description               = optional(string)<br/>      method                    = optional(string)<br/>      subtype                   = optional(string)<br/>      type                      = optional(string, "AWS_PROXY")<br/>      uri                       = optional(string)<br/>      passthrough_behavior      = optional(string)<br/>      payload_format_version    = optional(string)<br/>      request_parameters        = optional(map(string), {})<br/>      request_templates         = optional(map(string), {})<br/>      response_parameters = optional(list(object({<br/>        mappings    = map(string)<br/>        status_code = string<br/>      })))<br/>      template_selection_expression = optional(string)<br/>      timeout_milliseconds          = optional(number)<br/>      tls_config = optional(object({<br/>        server_name_to_verify = optional(string)<br/>      }))<br/><br/>      # Integration Response<br/>      response = optional(object({<br/>        content_handling_strategy     = optional(string)<br/>        integration_response_key      = optional(string)<br/>        response_templates            = optional(map(string))<br/>        template_selection_expression = optional(string)<br/>      }), {})<br/>    })<br/>  }))</pre> | `{}` | no |
