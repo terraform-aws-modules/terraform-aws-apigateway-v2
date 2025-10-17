@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.4.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.3.1...v5.4.0) (2025-10-17)
+
+
+### Features
+
+* Trigger redeploy when Authorizers change ([#139](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/139)) ([fe6fc44](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/fe6fc44d42a162723647aaf1e2a8d733552e2af8))
+
 ## [5.3.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.3.0...v5.3.1) (2025-09-03)
 
 
