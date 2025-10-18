@@ -33,3 +33,4 @@ terraform.rc
 builds
 
 .DS_Store
+.idea
