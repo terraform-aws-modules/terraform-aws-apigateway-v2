@@ -198,8 +198,8 @@ module "api_gateway_disabled" {
 module "api_gateway_without_default_tags" {
   source = "../../"
 
-  name                 = "${local.name}-no-default-tags"
-  include_default_tags = false
+  name                = "${local.name}-no-default-tags"
+  include_default_tag = false
 
   tags = {
     CustomTag = "custom-value"
