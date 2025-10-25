@@ -42,7 +42,7 @@ resource "aws_apigatewayv2_api" "this" {
   version                      = var.api_version
 
   tags = merge(
-    { terraform-aws-modules = "apigateway-v2" },
+    var.include_default_tags ? { terraform-aws-modules = "apigateway-v2" } : {},
     var.tags,
   )
 }

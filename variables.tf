@@ -4,6 +4,12 @@ variable "create" {
   default     = true
 }
 
+variable "include_default_tags" {
+  description = "Set to false to not include the default tag in the tags map."
+  type        = bool
+  default     = true
+}
+
 variable "tags" {
   description = "A mapping of tags to assign to API gateway resources"
   type        = map(string)
