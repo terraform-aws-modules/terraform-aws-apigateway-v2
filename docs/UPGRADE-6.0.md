@@ -12,7 +12,7 @@ If you find a bug, please open an issue with supporting configuration to reprodu
 
 ### Added
 
--
+- Support for `region` parameter to specify the AWS region for the resources created if different from the provider region.
 
 ### Modified
 
