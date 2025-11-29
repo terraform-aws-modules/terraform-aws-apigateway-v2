@@ -27,6 +27,7 @@ module "wrapper" {
   ip_address_type                                    = try(each.value.ip_address_type, var.defaults.ip_address_type, null)
   mutual_tls_authentication                          = try(each.value.mutual_tls_authentication, var.defaults.mutual_tls_authentication, {})
   name                                               = try(each.value.name, var.defaults.name, "")
+  private_zone                                       = try(each.value.private_zone, var.defaults.private_zone, false)
   protocol_type                                      = try(each.value.protocol_type, var.defaults.protocol_type, "HTTP")
   route_key                                          = try(each.value.route_key, var.defaults.route_key, null)
   route_selection_expression                         = try(each.value.route_selection_expression, var.defaults.route_selection_expression, null)

@@ -136,7 +136,8 @@ locals {
 data "aws_route53_zone" "this" {
   count = local.create_domain_name && var.create_domain_records ? 1 : 0
 
-  name = coalesce(var.hosted_zone_name, local.stripped_domain_name)
+  name         = coalesce(var.hosted_zone_name, local.stripped_domain_name)
+  private_zone = var.private_zone
 }
 
 resource "aws_route53_record" "this" {
@@ -158,7 +159,7 @@ resource "aws_route53_record" "this" {
 ################################################################################
 
 locals {
-  create_certificate = local.create_domain_name && var.create_certificate
+  create_certificate = local.create_domain_name && var.create_certificate && !var.private_zone
 
   is_wildcard = startswith(var.domain_name, "*.")
 }
