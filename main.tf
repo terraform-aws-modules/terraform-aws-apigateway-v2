@@ -12,6 +12,8 @@ locals {
 resource "aws_apigatewayv2_api" "this" {
   count = var.create ? 1 : 0
 
+  region = var.region
+
   api_key_selection_expression = local.is_websocket ? var.api_key_selection_expression : null
   body                         = local.is_http ? var.body : null
 
@@ -54,6 +56,8 @@ resource "aws_apigatewayv2_api" "this" {
 resource "aws_apigatewayv2_authorizer" "this" {
   for_each = { for k, v in var.authorizers : k => v if var.create }
 
+  region = var.region
+
   api_id = aws_apigatewayv2_api.this[0].id
 
   authorizer_credentials_arn        = each.value.authorizer_credentials_arn
@@ -87,6 +91,8 @@ locals {
 resource "aws_apigatewayv2_domain_name" "this" {
   count = local.create_domain_name ? 1 : 0
 
+  region = var.region
+
   domain_name = var.domain_name
 
   domain_name_configuration {
@@ -111,6 +117,8 @@ resource "aws_apigatewayv2_domain_name" "this" {
 
 resource "aws_apigatewayv2_api_mapping" "this" {
   count = local.create_domain_name && local.create_stage ? 1 : 0
+
+  region = var.region
 
   api_id          = aws_apigatewayv2_api.this[0].id
   api_mapping_key = var.api_mapping_key
@@ -166,7 +174,9 @@ locals {
 
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"
-  version = "5.0.1"
+  version = "6.2.0"
+
+  region = var.region
 
   create_certificate = local.create_domain_name && var.create_domain_records && local.create_certificate
 
@@ -185,6 +195,8 @@ module "acm" {
 
 resource "aws_apigatewayv2_route" "this" {
   for_each = { for k, v in var.routes : k => v if local.create_routes_and_integrations }
+
+  region = var.region
 
   api_id = aws_apigatewayv2_api.this[0].id
 
@@ -217,6 +229,8 @@ resource "aws_apigatewayv2_route" "this" {
 resource "aws_apigatewayv2_route_response" "this" {
   for_each = { for k, v in var.routes : k => v if local.create_routes_and_integrations && coalesce(v.route_response.create, false) }
 
+  region = var.region
+
   api_id                     = aws_apigatewayv2_api.this[0].id
   model_selection_expression = each.value.route_response.model_selection_expression
   response_models            = each.value.route_response.response_models
@@ -231,8 +245,9 @@ resource "aws_apigatewayv2_route_response" "this" {
 resource "aws_apigatewayv2_integration" "this" {
   for_each = { for k, v in var.routes : k => v.integration if local.create_routes_and_integrations }
 
-  api_id = aws_apigatewayv2_api.this[0].id
+  region = var.region
 
+  api_id                    = aws_apigatewayv2_api.this[0].id
   connection_id             = try(aws_apigatewayv2_vpc_link.this[each.value.vpc_link_key].id, each.value.connection_id)
   connection_type           = each.value.connection_type
   content_handling_strategy = each.value.content_handling_strategy
@@ -279,6 +294,8 @@ resource "aws_apigatewayv2_integration" "this" {
 resource "aws_apigatewayv2_integration_response" "this" {
   for_each = { for k, v in var.routes : k => v.integration if local.create_routes_and_integrations && v.integration.response.integration_response_key != null }
 
+  region = var.region
+
   api_id         = aws_apigatewayv2_api.this[0].id
   integration_id = aws_apigatewayv2_integration.this[each.key].id
 
@@ -323,6 +340,8 @@ locals {
 
 resource "aws_apigatewayv2_stage" "this" {
   count = local.create_stage ? 1 : 0
+
+  region = var.region
 
   api_id = aws_apigatewayv2_api.this[0].id
 
@@ -383,6 +402,8 @@ resource "aws_apigatewayv2_stage" "this" {
 resource "aws_apigatewayv2_deployment" "this" {
   count = local.create_stage && var.deploy_stage && !local.is_http ? 1 : 0
 
+  region = var.region
+
   api_id      = aws_apigatewayv2_api.this[0].id
   description = var.description
 
@@ -414,6 +435,8 @@ resource "aws_apigatewayv2_deployment" "this" {
 resource "aws_cloudwatch_log_group" "this" {
   for_each = { for k, v in { "this" = var.stage_access_log_settings } : k => v if local.create_stage && v != null && try(v.create_log_group, true) }
 
+  region = var.region
+
   name              = coalesce(each.value.log_group_name, "/aws/apigateway/${var.name}/${replace(var.stage_name, "$", "")}")
   retention_in_days = each.value.log_group_retention_in_days
   kms_key_id        = each.value.log_group_kms_key_id
@@ -429,6 +452,8 @@ resource "aws_cloudwatch_log_group" "this" {
 
 resource "aws_apigatewayv2_vpc_link" "this" {
   for_each = { for k, v in var.vpc_links : k => v if var.create }
+
+  region = var.region
 
   name               = coalesce(each.value.name, each.key)
   security_group_ids = each.value.security_group_ids
