@@ -174,7 +174,7 @@ locals {
 
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"
-  version = "6.1.1" # TODO - https://github.com/terraform-aws-modules/terraform-aws-acm/pull/167
+  version = "6.2.0"
 
   region = var.region
 
