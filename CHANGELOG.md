@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.4.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.4.0...v5.4.1) (2025-10-21)
+
+### Bug Fixes
+
+* Update CI workflow versions to latest ([#141](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/141)) ([fee61a5](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/fee61a50dd67ba8dcc8b16c782d0ab6ae8f0af2d))
+
+## [5.4.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.3.1...v5.4.0) (2025-10-17)
+
+
+### Features
+
+* Trigger redeploy when Authorizers change ([#139](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/139)) ([fe6fc44](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/fe6fc44d42a162723647aaf1e2a8d733552e2af8))
+
+## [5.3.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.3.0...v5.3.1) (2025-09-03)
+
+
+### Bug Fixes
+
+* Update stage_access_logs_cloudwatch_log_group outputs ([#138](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/138)) ([3fe488d](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/3fe488ddea4512483841ac8d0807dc706bdc6812))
+
 ## [5.3.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.2.1...v5.3.0) (2025-05-01)
 
 

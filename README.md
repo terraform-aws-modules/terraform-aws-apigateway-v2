@@ -87,6 +87,14 @@ module "api_gateway" {
       }
     }
 
+    "GET /some-route-with-iam" = {
+      authorization_type = "AWS_IAM"
+
+      integration = {
+        uri = "arn:aws:lambda:eu-west-1:052235179155:function:my-function"
+      }
+    }
+
     "$default" = {
       integration = {
         uri = "arn:aws:lambda:eu-west-1:052235179155:function:my-default-function"

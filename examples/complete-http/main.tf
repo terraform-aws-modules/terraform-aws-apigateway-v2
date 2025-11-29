@@ -104,6 +104,14 @@ module "api_gateway" {
       }
     }
 
+    "GET /some-route-with-iam" = {
+      authorization_type = "AWS_IAM"
+
+      integration = {
+        uri = module.lambda_function.lambda_function_arn
+      }
+    }
+
     "POST /start-step-function" = {
       integration = {
         type            = "AWS_PROXY"
