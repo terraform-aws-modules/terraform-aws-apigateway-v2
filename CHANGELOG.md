@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [6.0.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.5.0...v6.0.0) (2025-11-29)
+
+### ⚠ BREAKING CHANGES
+
+* Upgrade AWS provider and min required Terraform version to `6.0` and `1.5.7` respectively (#147)
+
+### Features
+
+* Upgrade AWS provider and min required Terraform version to `6.0` and `1.5.7` respectively ([#147](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/147)) ([dc798ef](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/dc798ef9b729544375d4b532f2e1b2e8cd304978))
+
 ## [5.5.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.4.1...v5.5.0) (2025-11-29)
 
 ### Features
