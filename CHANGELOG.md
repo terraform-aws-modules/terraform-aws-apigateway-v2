@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [5.5.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.4.1...v5.5.0) (2025-11-29)
+
+### Features
+
+* Support option of private hosted zone for Route53 records ([#137](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/137)) ([52fa251](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/52fa251a4af8d29e63cce78f8d03b894885ce0de))
+
 ## [5.4.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.4.0...v5.4.1) (2025-10-21)
 
 ### Bug Fixes
