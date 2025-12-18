@@ -43,10 +43,7 @@ resource "aws_apigatewayv2_api" "this" {
   target                       = local.is_http ? var.target : null
   version                      = var.api_version
 
-  tags = merge(
-    { terraform-aws-modules = "apigateway-v2" },
-    var.tags,
-  )
+  tags = var.tags
 }
 
 ################################################################################

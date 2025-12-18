@@ -54,8 +54,7 @@ module "api_gateway" {
   create_certificate    = true
 
   mutual_tls_authentication = {
-    truststore_uri     = "s3://${module.s3_bucket.s3_bucket_id}/${aws_s3_object.this.id}"
-    truststore_version = aws_s3_object.this.version_id
+    truststore_uri = "s3://${module.s3_bucket.s3_bucket_id}/${aws_s3_object.this.id}"
   }
 
   # Routes & Integration(s)
@@ -227,7 +226,7 @@ resource "aws_cognito_user_pool" "this" {
 
 module "step_function" {
   source  = "terraform-aws-modules/step-functions/aws"
-  version = "~> 4.0"
+  version = "~> 5.0"
 
   name      = local.name
   role_name = "${local.name}-step-function"
@@ -281,7 +280,7 @@ resource "null_resource" "download_package" {
 
 module "lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 7.0"
+  version = "~> 8.0"
 
   function_name = local.name
   description   = "My awesome lambda function"
@@ -311,7 +310,7 @@ module "lambda_function" {
 
 module "s3_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "~> 3.0"
+  version = "~> 5.0"
 
   bucket_prefix = "${local.name}-"
 
