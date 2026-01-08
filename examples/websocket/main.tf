@@ -126,13 +126,13 @@ module "api_gateway" {
 
 module "connect_lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 4.0"
+  version = "~> 8.0"
 
   function_name = "${local.name}-onConnect"
   description   = "Websocket onConnect handler"
   source_path   = ["function/onConnect.js"]
   handler       = "onConnect.handler"
-  runtime       = "nodejs20.x"
+  runtime       = "nodejs24.x"
   architectures = ["arm64"]
   memory_size   = 256
   publish       = true
@@ -158,13 +158,13 @@ module "connect_lambda_function" {
 
 module "disconnect_lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 4.0"
+  version = "~> 8.0"
 
   function_name = "${local.name}-onDisconnect"
   description   = "Websocket onDisconnect handler"
   source_path   = ["function/onDisconnect.js"]
   handler       = "onDisconnect.handler"
-  runtime       = "nodejs20.x"
+  runtime       = "nodejs24.x"
   architectures = ["arm64"]
   memory_size   = 256
   publish       = true
@@ -190,13 +190,13 @@ module "disconnect_lambda_function" {
 
 module "send_message_lambda_function" {
   source  = "terraform-aws-modules/lambda/aws"
-  version = "~> 4.0"
+  version = "~> 8.0"
 
   function_name = "${local.name}-sendMessage"
   description   = "Websocket sendMessage handler"
   source_path   = ["function/sendMessage.js"]
   handler       = "sendMessage.handler"
-  runtime       = "nodejs20.x"
+  runtime       = "nodejs24.x"
   architectures = ["arm64"]
   memory_size   = 256
   publish       = true
@@ -227,7 +227,7 @@ module "send_message_lambda_function" {
 
 module "dynamodb_table" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "~> 3.0"
+  version = "~> 5.0"
 
   name     = local.dynamodb_table_name
   hash_key = "connectionId"
