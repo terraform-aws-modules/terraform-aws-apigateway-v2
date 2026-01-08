@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [6.1.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v6.0.0...v6.1.0) (2026-01-08)
+
+### Features
+
+* Add provider meta user-agent, replacing static tag ([#148](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/148)) ([b5c0ee1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/b5c0ee1e6a956c82d1d35245c88a6c9a57796f6f))
+
 ## [6.0.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v5.5.0...v6.0.0) (2025-11-29)
 
 ### ⚠ BREAKING CHANGES
