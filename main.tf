@@ -434,11 +434,12 @@ resource "aws_cloudwatch_log_group" "this" {
 
   region = var.region
 
-  name              = coalesce(each.value.log_group_name, "/aws/apigateway/${var.name}/${replace(var.stage_name, "$", "")}")
-  retention_in_days = each.value.log_group_retention_in_days
-  kms_key_id        = each.value.log_group_kms_key_id
-  skip_destroy      = each.value.log_group_skip_destroy
-  log_group_class   = each.value.log_group_class
+  name                        = coalesce(each.value.log_group_name, "/aws/apigateway/${var.name}/${replace(var.stage_name, "$", "")}")
+  retention_in_days           = each.value.log_group_retention_in_days
+  kms_key_id                  = each.value.log_group_kms_key_id
+  skip_destroy                = each.value.log_group_skip_destroy
+  log_group_class             = each.value.log_group_class
+  deletion_protection_enabled = each.value.log_group_deletion_protection_enabled
 
   tags = merge(var.tags, each.value.log_group_tags)
 }

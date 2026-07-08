@@ -312,15 +312,16 @@ variable "create_stage" {
 variable "stage_access_log_settings" {
   description = "Settings for logging access in this stage. Use the aws_api_gateway_account resource to configure [permissions for CloudWatch Logging](https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html#set-up-access-logging-permissions)"
   type = object({
-    create_log_group            = optional(bool, true)
-    destination_arn             = optional(string)
-    format                      = optional(string)
-    log_group_name              = optional(string)
-    log_group_retention_in_days = optional(number, 30)
-    log_group_kms_key_id        = optional(string)
-    log_group_skip_destroy      = optional(bool)
-    log_group_class             = optional(string)
-    log_group_tags              = optional(map(string), {})
+    create_log_group                      = optional(bool, true)
+    destination_arn                       = optional(string)
+    format                                = optional(string)
+    log_group_name                        = optional(string)
+    log_group_retention_in_days           = optional(number, 30)
+    log_group_kms_key_id                  = optional(string)
+    log_group_skip_destroy                = optional(bool)
+    log_group_class                       = optional(string)
+    log_group_deletion_protection_enabled = optional(bool)
+    log_group_tags                        = optional(map(string), {})
   })
   default = {}
 }

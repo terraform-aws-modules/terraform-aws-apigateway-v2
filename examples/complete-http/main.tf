@@ -159,8 +159,9 @@ module "api_gateway" {
 
   # Stage
   stage_access_log_settings = {
-    create_log_group            = true
-    log_group_retention_in_days = 7
+    create_log_group                      = true
+    log_group_retention_in_days           = 7
+    log_group_deletion_protection_enabled = false
     format = jsonencode({
       context = {
         domainName              = "$context.domainName"
