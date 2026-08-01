@@ -184,26 +184,26 @@ module "api_gateway" {
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.7 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.28 |
 
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.28 |
 
 ## Modules
 
 | Name | Source | Version |
-|------|--------|---------|
+| ---- | ------ | ------- |
 | <a name="module_acm"></a> [acm](#module\_acm) | terraform-aws-modules/acm/aws | 6.2.0 |
 
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [aws_apigatewayv2_api.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_api) | resource |
 | [aws_apigatewayv2_api_mapping.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_api_mapping) | resource |
 | [aws_apigatewayv2_authorizer.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/apigatewayv2_authorizer) | resource |
@@ -222,7 +222,7 @@ module "api_gateway" {
 ## Inputs
 
 | Name | Description | Type | Default | Required |
-|------|-------------|------|---------|:--------:|
+| ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_api_key_selection_expression"></a> [api\_key\_selection\_expression](#input\_api\_key\_selection\_expression) | An API key selection expression. Valid values: `$context.authorizer.usageIdentifierKey`, `$request.header.x-api-key`. Defaults to `$request.header.x-api-key`. Applicable for WebSocket APIs | `string` | `null` | no |
 | <a name="input_api_mapping_key"></a> [api\_mapping\_key](#input\_api\_mapping\_key) | The [API mapping key](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-websocket-api-mapping-template-reference.html) | `string` | `null` | no |
 | <a name="input_api_version"></a> [api\_version](#input\_api\_version) | A version identifier for the API. Must be between 1 and 64 characters in length | `string` | `null` | no |
@@ -270,7 +270,7 @@ module "api_gateway" {
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_acm_certificate_arn"></a> [acm\_certificate\_arn](#output\_acm\_certificate\_arn) | The ARN of the certificate |
 | <a name="output_api_arn"></a> [api\_arn](#output\_api\_arn) | The ARN of the API |
 | <a name="output_api_endpoint"></a> [api\_endpoint](#output\_api\_endpoint) | URI of the API, of the form `https://{api-id}.execute-api.{region}.amazonaws.com` for HTTP APIs and `wss://{api-id}.execute-api.{region}.amazonaws.com` for WebSocket APIs |

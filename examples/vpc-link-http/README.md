@@ -18,7 +18,7 @@ Note that this example may create resources which cost money. Run `terraform des
 ## Requirements
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.5.7 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 6.28 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >= 2.0 |
@@ -26,14 +26,14 @@ Note that this example may create resources which cost money. Run `terraform des
 ## Providers
 
 | Name | Version |
-|------|---------|
+| ---- | ------- |
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 6.28 |
 | <a name="provider_null"></a> [null](#provider\_null) | >= 2.0 |
 
 ## Modules
 
 | Name | Source | Version |
-|------|--------|---------|
+| ---- | ------ | ------- |
 | <a name="module_alb"></a> [alb](#module\_alb) | terraform-aws-modules/alb/aws | ~> 10.0 |
 | <a name="module_api_gateway"></a> [api\_gateway](#module\_api\_gateway) | ../../ | n/a |
 | <a name="module_api_gateway_security_group"></a> [api\_gateway\_security\_group](#module\_api\_gateway\_security\_group) | terraform-aws-modules/security-group/aws | ~> 5.0 |
@@ -44,7 +44,7 @@ Note that this example may create resources which cost money. Run `terraform des
 ## Resources
 
 | Name | Type |
-|------|------|
+| ---- | ---- |
 | [null_resource.download_package](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 
@@ -55,7 +55,7 @@ No inputs.
 ## Outputs
 
 | Name | Description |
-|------|-------------|
+| ---- | ----------- |
 | <a name="output_acm_certificate_arn"></a> [acm\_certificate\_arn](#output\_acm\_certificate\_arn) | The ARN of the certificate |
 | <a name="output_api_arn"></a> [api\_arn](#output\_api\_arn) | The ARN of the API |
 | <a name="output_api_endpoint"></a> [api\_endpoint](#output\_api\_endpoint) | URI of the API, of the form `https://{api-id}.execute-api.{region}.amazonaws.com` for HTTP APIs and `wss://{api-id}.execute-api.{region}.amazonaws.com` for WebSocket APIs |
