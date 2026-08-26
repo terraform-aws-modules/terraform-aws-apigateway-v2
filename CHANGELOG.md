@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [6.1.1](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v6.1.0...v6.1.1) (2026-08-26)
+
+### Bug Fixes
+
+* Update GitHub Actions and pre-commit hook versions ([#154](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/issues/154)) ([88432f2](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/commit/88432f26f172dedbf65aec9ce707d94c71b30fc8))
+
 ## [6.1.0](https://github.com/terraform-aws-modules/terraform-aws-apigateway-v2/compare/v6.0.0...v6.1.0) (2026-01-08)
 
 ### Features
